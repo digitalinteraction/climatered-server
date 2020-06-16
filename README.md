@@ -14,6 +14,8 @@ A prototype API for the ifrc's virtual conference, designed to:
   - [Regular use](#regular-use)
   - [Testing](#testing)
   - [Irregular use](#irregular-use)
+  - [Code formatting](#code-formatting)
+  - [Deployment](#deployment)
 
 <!-- toc-tail -->
 
