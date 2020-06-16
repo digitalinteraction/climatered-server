@@ -27,7 +27,7 @@
     "type": "session",
     "slot": "003",
     "content": "Maecenas faucibus mollis interdum. Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.",
-    "links": ["https://zoom.us/me/robjanderson", "https://drive.google.com"]
+    "links": ["https://zoom.us/my/robjanderson", "https://drive.google.com"]
   },
   {
     "id": "session-003-b",
@@ -35,7 +35,7 @@
     "type": "session",
     "slot": "003",
     "content": "Maecenas faucibus mollis interdum. Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.",
-    "links": ["https://zoom.us/me/robjanderson", "https://drive.google.com"]
+    "links": ["https://zoom.us/my/robjanderson", "https://drive.google.com"]
   },
   {
     "id": "session-003-c",
@@ -43,6 +43,6 @@
     "type": "session",
     "slot": "003",
     "content": "Maecenas faucibus mollis interdum. Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.",
-    "links": ["https://zoom.us/me/robjanderson", "https://drive.google.com"]
+    "links": ["https://zoom.us/my/robjanderson", "https://drive.google.com"]
   }
 ]
