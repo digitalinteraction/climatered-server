@@ -48,7 +48,12 @@ These are the commands you'll regularly run to develop the API, in no particular
 # -> Runs on port 3000
 # -> Exit with control+C
 # -> Exit and run again if code changes
-npm run dev serve
+npm run serve
+
+# Run the cli
+# -> npm run serve uses this under the hood
+# -> Can add more uses/entrypoints in the future
+npm run dev # ...
 ```
 
 To run through an auth flow:
@@ -85,6 +90,12 @@ These are commands you might need to run but probably won't, also in no particul
 ```bash
 # See what the CLI can dp
 npm run dev -- --help
+
+# Manually build JavaScript from TypeScript
+npm run build
+
+# Manually run lint source code
+npm run lint
 
 # Generate the table-of-contents in this readme
 npm run readme-toc
