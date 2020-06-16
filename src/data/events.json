@@ -1,0 +1,48 @@
+[
+  {
+    "id": "plenary-001",
+    "name": "Opening Plenary",
+    "type": "plenary",
+    "slot": "001",
+    "content": "Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Cras mattis consectetur purus sit amet fermentum. Etiam porta sem malesuada magna mollis euismod.",
+    "links": [
+      "https://youtu.be/U3LFI2mI8Y0",
+      "https://app.sli.do/event/z4amyxli"
+    ]
+  },
+  {
+    "id": "panel-002",
+    "name": "Stakeholder panel",
+    "type": "panel",
+    "slot": "002",
+    "content": "Maecenas faucibus mollis interdum. Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.",
+    "links": [
+      "https://www.youtube.com/watch?v=U3LFI2mI8Y0",
+      "https://drive.google.com"
+    ]
+  },
+  {
+    "id": "session-003-a",
+    "name": "Tristique Pellentesque Ipsum Ridiculus",
+    "type": "session",
+    "slot": "003",
+    "content": "Maecenas faucibus mollis interdum. Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.",
+    "links": ["https://zoom.us/me/robjanderson", "https://drive.google.com"]
+  },
+  {
+    "id": "session-003-b",
+    "name": "Euismod Tristique Egestas Vehicula Inceptos",
+    "type": "session",
+    "slot": "003",
+    "content": "Maecenas faucibus mollis interdum. Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.",
+    "links": ["https://zoom.us/me/robjanderson", "https://drive.google.com"]
+  },
+  {
+    "id": "session-003-c",
+    "name": "Curabitur blandit tempus porttitor",
+    "type": "session",
+    "slot": "003",
+    "content": "Maecenas faucibus mollis interdum. Nullam quis risus eget urna mollis ornare vel eu leo. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.",
+    "links": ["https://zoom.us/me/robjanderson", "https://drive.google.com"]
+  }
+]
