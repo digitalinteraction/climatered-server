@@ -46,6 +46,8 @@ These are the commands you'll regularly run to develop the API, in no particular
 ```bash
 # Run the dev server
 # -> Runs on port 3000
+# -> Exit with control+C
+# -> Exit and run again if code changes
 npm run dev serve
 ```
 
