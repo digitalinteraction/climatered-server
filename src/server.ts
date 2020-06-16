@@ -1,5 +1,6 @@
 import { Server } from 'http'
 import { validateEnv } from 'valid-env'
+import path = require('path')
 import express = require('express')
 import cors = require('cors')
 import morgan = require('morgan')
@@ -52,6 +53,10 @@ function shutdown(server: Server) {
   })
 }
 
+function appendUrl(url: URL, extraPath: string) {
+  return new URL(path.join(url.pathname, extraPath), url.origin)
+}
+
 export function runServer() {
   const pkg = require('../package.json')
   const app = express()
@@ -75,6 +80,8 @@ export function runServer() {
     SELF_URL,
     WEB_URL,
   } = process.env as Record<string, string>
+
+  const selfUrl = new URL(SELF_URL)
 
   sendgrid.setApiKey(SENDGRID_API_KEY)
 
@@ -160,7 +167,7 @@ export function runServer() {
     )
     if (!isRegistered) return res.status(400).send({ message: 'Bad email' })
 
-    const link = new URL('/login/email/callback', SELF_URL)
+    const link = appendUrl(selfUrl, '/login/email/callback')
     link.searchParams.set(
       'token',
       jwt.sign({ typ: 'login', sub: email }, JWT_SECRET, { expiresIn: '30m' })
