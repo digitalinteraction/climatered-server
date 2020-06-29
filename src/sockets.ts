@@ -26,7 +26,7 @@ async function getUser(socketId: string, redis: Redis) {
 }
 
 export function createSockets(io: SocketServer, redis: Redis, env: Env) {
-  io.origins(env.CORS_HOSTS)
+  // io.origins(env.CORS_HOSTS)
 
   //
   // Handle each new socket connection
