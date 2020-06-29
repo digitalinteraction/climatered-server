@@ -24,7 +24,7 @@ const trackingSettings = {
   ganalytics: { enable: false },
 }
 
-function appendUrl(url: URL, extraPath: string) {
+export function appendUrl(url: URL, extraPath: string) {
   return new URL(path.join(url.pathname, extraPath), url.origin)
 }
 
@@ -55,10 +55,8 @@ export function getJwt(authorization: string) {
   return jwt.decode(authorization) as AuthJwt
 }
 
-export function createRoutes(io: SocketServer, env: Env) {
+export function createRoutes(selfUrl: URL, io: SocketServer, env: Env) {
   const app = express.Router()
-
-  const selfUrl = new URL(env.SELF_URL)
 
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))

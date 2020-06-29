@@ -40,12 +40,16 @@ export async function runServer() {
   const env = createEnv()
   debug('environment ok')
 
+  const selfUrl = new URL(env.SELF_URL)
+
   //
   // Create express and socket io apps
   //
   const app = express()
   const server = http.createServer(app)
-  const io = socketIo(server)
+  const io = socketIo(server, {
+    path: selfUrl.pathname,
+  })
   io.adapter(socketIoRedis(env.REDIS_URL))
 
   //
@@ -62,7 +66,7 @@ export async function runServer() {
   //
   // Setup our routes
   //
-  app.use(createRoutes(io, env))
+  app.use(createRoutes(selfUrl, io, env))
 
   //
   // Setup our sockets
