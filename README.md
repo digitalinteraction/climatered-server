@@ -44,6 +44,12 @@ npm install
 These are the commands you'll regularly run to develop the API, in no particular order.
 
 ```bash
+# Start the docker dev stack
+# -> It runs a redis instance for socket.io to use and to store authentications
+# -> Remember "docker-compose" down afterwards to stop and remove containers
+# -> Runs in headless mode (-d)
+docker-compose up -d
+
 # Run the dev server
 # -> Runs on port 3000
 # -> Exit with control+C
