@@ -47,9 +47,7 @@ export async function runServer() {
   //
   const app = express()
   const server = http.createServer(app)
-  const io = socketIo(server, {
-    path: selfUrl.pathname,
-  })
+  const io = socketIo(server)
   io.adapter(socketIoRedis(env.REDIS_URL))
 
   //
