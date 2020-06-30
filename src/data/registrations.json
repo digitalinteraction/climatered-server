@@ -1,6 +1,8 @@
 [
   {
     "name": "Rob Anderson",
-    "email": "rob@andrsn.uk"
+    "email": "rob@andrsn.uk",
+    "language": "en",
+    "roles": ["attendee", "translator"]
   }
 ]

@@ -61,6 +61,11 @@ export function createRoutes(selfUrl: URL, io: SocketServer, env: Env) {
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
 
+  app.use((req, res, next) => {
+    debug(`${req.method}: ${req.path} query=%o`, req.query)
+    next()
+  })
+
   if (env.CORS_HOSTS.length > 0) {
     debug(`cors=${env.CORS_HOSTS}`)
     app.use(cors({ origin: env.CORS_HOSTS }))
@@ -150,12 +155,19 @@ export function createRoutes(selfUrl: URL, io: SocketServer, env: Env) {
     try {
       const raw = req.query.token
       if (typeof raw !== 'string') throw new Error('Bad token')
-      let token = jwt.verify(raw, env.JWT_SECRET) as any
+      let login = jwt.verify(raw, env.JWT_SECRET) as any
 
-      if (typeof token !== 'object') throw new Error('Bad token')
-      if (token.typ !== 'login') throw new Error('Bad token')
+      if (typeof login !== 'object') throw new Error('Bad token')
+      if (login.typ !== 'login') throw new Error('Bad token')
 
-      const auth = jwt.sign({ typ: 'auth', sub: token.sub }, env.JWT_SECRET)
+      const registration = registrations.find((r) => r.email === login.sub)
+      if (!registration) throw new Error('Bad token')
+      const { roles = [], language = 'en' } = registration
+
+      const auth = jwt.sign(
+        { typ: 'auth', sub: login.sub, user_roles: roles, user_lang: language },
+        env.JWT_SECRET
+      )
 
       const url = new URL('/_token', env.WEB_URL)
       url.searchParams.set('token', auth)
