@@ -180,7 +180,7 @@ export function createSockets(io: SocketServer, redis: Redis, env: Env) {
 
       // If there is already a translator for that room, remove them
       const existing = await redis.get(key)
-      if (existing) {
+      if (existing && existing !== socket.id) {
         await redis.del(`translator_${existing}`)
         io.in(existing).emit('stop-channel-data')
       }
@@ -204,6 +204,7 @@ export function createSockets(io: SocketServer, redis: Redis, env: Env) {
 
       const key = `channel-${eventId}-${channel}`
       debug('  sendTo=%s', key)
+
       io.in(key).emit('channel-data', blob)
     })
 
