@@ -15,7 +15,8 @@ A prototype API for the ifrc's virtual conference, designed to:
   - [Testing](#testing)
   - [Irregular use](#irregular-use)
   - [Code formatting](#code-formatting)
-  - [Deployment](#deployment)
+- [Deployment](#deployment)
+  - [env vars](#env-vars)
 
 <!-- toc-tail -->
 
@@ -121,11 +122,24 @@ You can manually run the formatter with `npm run prettier` if you want.
 Prettier is slightly configured in [package.json#prettier](/package.json) under `"prettier"`
 and can ignores files using [.prettierignore](/.prettierignore).
 
-### Deployment
+## Deployment
 
-> WIP
+To deploy a new version, use the [npm version](https://docs.npmjs.com/cli/version) command.
 
-**env vars**
+```bash
+npm version # minor | major | patch | --help
+git push --follow-tags
+```
+
+This command will bump the version in the package.json, commit that change
+and tag that commit with the new version.
+When that tag is pushed to git, a GitHub action will automatically
+build a docker image at that point in the git history.
+
+This means that we have semantic versions for every change
+and they can easily be deployed.
+
+### env vars
 
 - `SENDGRID_API_KEY`
 - `SENDGRID_FROM`
