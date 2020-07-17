@@ -7,20 +7,20 @@ export interface SockContext<E> extends BaseContext<E> {
   emitToRoom(room: string, message: string, ...args: []): void
 }
 
-interface ChowSocket {
+export interface ChowSocket {
   id: string
   join(room: string): void
   leave(room: string): void
   emit(message: string, ...args: any[]): void
 }
 
-interface SocketError {
+interface SocketSendError {
   (message: string): void
 }
 
 interface SockHandler<C> {
   (
-    ctx: C & { socket: ChowSocket; sendError: SocketError },
+    ctx: C & { socket: ChowSocket; sendError: SocketSendError },
     ...args: any[]
   ): void | Promise<void>
 }

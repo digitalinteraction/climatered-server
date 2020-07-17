@@ -1,5 +1,6 @@
 import { mockchow, MockChowish } from '@robb_j/mockchow'
 import express = require('express')
+import base64id = require('base64id')
 import { Env } from './env'
 import { Context, TypedChow } from './server'
 
@@ -8,7 +9,7 @@ import { JwtService, AuthJwt, createJwtService } from './services/jwt'
 import { ScheduleService, Slot, ScheduleEvent } from './services/schedule'
 import { UrlService, createUrlService } from './services/url'
 import { UsersService, Registration } from './services/users'
-import { SockChow, SockContext } from './sockchow'
+import { SockChow, SockContext, ChowSocket } from './sockchow'
 
 export { mocked } from 'ts-jest/utils'
 
@@ -21,6 +22,7 @@ interface TestExtras {
   url: UrlService
   users: UsersService
   app: express.Application
+  io(): MockSocket
 }
 
 export function createTestEnv(): Env {
@@ -37,12 +39,13 @@ export function createTestEnv(): Env {
 }
 
 function mockRedis(): RedisService {
+  const data = new Map<string, string>()
   return {
     ping: jest.fn(),
     quit: jest.fn(),
-    get: jest.fn(),
-    set: jest.fn(),
-    del: jest.fn(),
+    get: jest.fn(async (k) => data.get(k) ?? null),
+    set: jest.fn((k, v) => data.set(k, v)),
+    del: jest.fn(async (k) => (data.delete(k), 1)),
   }
 }
 
@@ -135,6 +138,53 @@ function mockUsers(): UsersService {
   }
 }
 
+/**
+ * A ChowSocket for testing
+ * - Allows you to await socket.emit
+ * - Adds sendError as a jest.fn for testing errors
+ */
+type MockSocket = {
+  emit(message: string, ...args: any[]): Promise<void>
+  sendError(message: string): void
+} & ChowSocket
+
+/**
+ * Creates a fake socket.io client to test sending sockets
+ * and their interactions
+ */
+function fakeIo<E, C extends SockContext<E>>(chow: SockChow<E, C>) {
+  return () => {
+    // Generate a unique id for this socket
+    // - the same method socket.io engine uses (I belive)
+    const id = base64id.generateId()
+
+    // Mock out generic socket functions so they can be tested
+    const join = jest.fn()
+    const leave = jest.fn()
+    const sendError = jest.fn()
+
+    // A custom emit method to directly call handlers
+    const emit = jest.fn(async (message, ...args) => {
+      const handler = chow.socketHandlers.get(message)
+
+      if (!handler) {
+        console.error(
+          `Unknown socket message '${message}' registered:`,
+          chow.socketHandlers.keys()
+        )
+        throw new Error(`Unknown socket message '${message}'`)
+      }
+
+      const ctx = await chow.makeContext()
+      await handler({ ...ctx, socket, sendError }, ...args)
+    })
+
+    // Create and return our socket
+    const socket: MockSocket = { id, join, leave, emit, sendError }
+    return socket
+  }
+}
+
 export function createServer(): TypedMockChow {
   const env = createTestEnv()
 
@@ -149,6 +199,16 @@ export function createServer(): TypedMockChow {
     env
   )
 
+  const io = fakeIo(chow)
+
+  const socket = jest.fn((message: string, handler) => {
+    chow.socket(message, handler)
+  })
+
+  const emitToRoom = jest.fn((room, message, ...args) => {
+    chow.emitToRoom(room, message, ...args)
+  })
+
   const extras: TestExtras = {
     redis,
     jwt,
@@ -156,7 +216,8 @@ export function createServer(): TypedMockChow {
     url,
     users,
     app: chow.app,
+    io,
   }
 
-  return mockchow(chow, extras) as TypedMockChow
+  return Object.assign(mockchow(chow, extras), { socket, emitToRoom })
 }
