@@ -30,13 +30,11 @@ test('Authentication flow', async () => {
   const loginLink = `${SELF_URL}/login/email/callback?token=`
   const authLink = `${WEB_URL}/_token?token=`
 
-  // mocked(chow.jwt.sign).mockReturnValueOnce('fake_auth_token')
-
   //
   // [1] Test requesting an email code
-  //   - It sends them an email
-  //   - It returns a http/200
-  //   - It has a valid login token
+  //  - It sends them an email
+  //  - It returns a http/200
+  //  - It has a valid login token
   //
   const emailRequest = await agent.get('/login/email').query({ email })
   const loginToken = getJwtFromEmail(

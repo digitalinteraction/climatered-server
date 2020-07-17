@@ -1,11 +1,10 @@
 import { mockchow, MockChowish } from '@robb_j/mockchow'
 import express = require('express')
-import jwt = require('jsonwebtoken')
 import { Env } from './env'
 import { Context, TypedChow } from './server'
 
 import { RedisService } from './services/redis'
-import { JwtService, AuthJwt } from './services/jwt'
+import { JwtService, AuthJwt, createJwtService } from './services/jwt'
 import { ScheduleService, Slot, ScheduleEvent } from './services/schedule'
 import { UrlService, createUrlService } from './services/url'
 import { UsersService, Registration } from './services/users'
@@ -48,20 +47,11 @@ function mockRedis(): RedisService {
 }
 
 function mockJwt(secretKey: string): JwtService {
-  const authJwt: AuthJwt = {
-    typ: 'auth',
-    sub: 'user@example.com',
-    user_roles: ['attendee'],
-    user_lang: 'en',
-  }
+  const jwt = createJwtService(secretKey)
   return {
-    sign: jest.fn((payload, opts) => jwt.sign(payload, secretKey, opts)),
-    verify: jest.fn((token) => jwt.verify(token, secretKey)),
-    authFromRequest: jest.fn((request) =>
-      request.headers.authorization === 'Bearer valid_auth_token'
-        ? authJwt
-        : null
-    ),
+    sign: jest.fn((payload, opts) => jwt.sign(payload, opts)),
+    verify: jest.fn((token) => jwt.verify(token)),
+    authFromRequest: jest.fn((request) => jwt.authFromRequest(request)),
   }
 }
 

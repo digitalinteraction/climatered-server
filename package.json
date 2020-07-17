@@ -7,8 +7,8 @@
   "author": "",
   "license": "MIT",
   "scripts": {
-    "test": "jest",
-    "coverage": "jest --coverage",
+    "test": "jest --runInBand",
+    "coverage": "jest --runInBand --coverage",
     "build": "tsc",
     "lint": "tsc --noEmit",
     "prettier": "prettier --write '**/*.{js,json,css,md,ts,tsx}'",

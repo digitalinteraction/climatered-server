@@ -44,7 +44,7 @@ function authFromRequest(request: ChowRequest, secretKey: string) {
 
 export function createJwtService(secretKey: string): JwtService {
   return {
-    sign: (payload) => jwt.sign(payload, secretKey),
+    sign: (payload, options) => jwt.sign(payload, secretKey, options),
     verify: (token) => jwt.verify(token, secretKey),
     authFromRequest: (request) => authFromRequest(request, secretKey),
   }

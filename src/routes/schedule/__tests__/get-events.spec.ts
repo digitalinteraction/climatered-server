@@ -5,6 +5,7 @@ import {
   mocked,
 } from '../../../test-utils'
 import getEventsRoute from '../get-events'
+import jwt = require('jsonwebtoken')
 
 let chow: TypedMockChow
 
@@ -31,8 +32,18 @@ describe('GET /schedule/events', () => {
   })
 
   it('should add links when authenticated', async () => {
+    let authToken = jwt.sign(
+      {
+        typ: 'auth',
+        sub: 'user@example.com',
+        user_roles: ['attendee'],
+        user_lang: 'en',
+      },
+      chow.env.JWT_SECRET
+    )
+
     const headers = {
-      authorization: 'Bearer valid_auth_token',
+      authorization: `Bearer ${authToken}`,
     }
 
     const res = await chow.http('get', '/schedule/events', { headers })
