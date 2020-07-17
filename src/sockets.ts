@@ -2,13 +2,18 @@ import { Redis } from 'ioredis'
 import { Server as SocketServer, Socket } from 'socket.io'
 import createDebug = require('debug')
 import { Env } from './env'
-import { checkAuthorization, getJwt } from './routes'
+import jwt = require('jsonwebtoken')
 
 import slots = require('./data/slots.json')
 import events = require('./data/events.json')
 import registrations = require('./data/registrations.json')
+import { AuthJwt } from './services/jwt'
 
 const debug = createDebug('api:sockets')
+
+function getJwt(authorization: string) {
+  return jwt.decode(authorization) as AuthJwt
+}
 
 // Send an error back to the socket client
 function sendError(socket: Socket, from: string, message: string) {
