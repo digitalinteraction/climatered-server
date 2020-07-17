@@ -10,7 +10,7 @@ beforeEach(() => {
   authSocket(chow)
 })
 
-describe('@auth', () => {
+describe('@auth(token)', () => {
   it('should store the auth in redis', async () => {
     const socket = chow.io()
 
