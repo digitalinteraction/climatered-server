@@ -1,4 +1,6 @@
 import { mockchow, MockChowish } from '@robb_j/mockchow'
+import express = require('express')
+import jwt = require('jsonwebtoken')
 import { Env } from './env'
 import { Context, TypedChow } from './server'
 
@@ -11,14 +13,15 @@ import { SockChow, SockContext } from './sockchow'
 
 export { mocked } from 'ts-jest/utils'
 
-export type TypedMockChow = MockChowish & TypedChow & Services
+export type TypedMockChow = MockChowish & TypedChow & TestExtras
 
-interface Services {
+interface TestExtras {
   redis: RedisService
   jwt: JwtService
   schedule: ScheduleService
   url: UrlService
   users: UsersService
+  app: express.Application
 }
 
 export function createTestEnv(): Env {
@@ -44,7 +47,7 @@ function mockRedis(): RedisService {
   }
 }
 
-function mockJwt(): JwtService {
+function mockJwt(secretKey: string): JwtService {
   const authJwt: AuthJwt = {
     typ: 'auth',
     sub: 'user@example.com',
@@ -52,8 +55,8 @@ function mockJwt(): JwtService {
     user_lang: 'en',
   }
   return {
-    sign: jest.fn(),
-    verify: jest.fn(),
+    sign: jest.fn((payload, opts) => jwt.sign(payload, secretKey, opts)),
+    verify: jest.fn((token) => jwt.verify(token, secretKey)),
     authFromRequest: jest.fn((request) =>
       request.headers.authorization === 'Bearer valid_auth_token'
         ? authJwt
@@ -146,23 +149,24 @@ export function createServer(): TypedMockChow {
   const env = createTestEnv()
 
   const redis = mockRedis()
-  const jwt = mockJwt()
+  const jwt = mockJwt(env.JWT_SECRET)
   const schedule = mockSchedule()
   const url = mockUrl(env.SELF_URL, env.WEB_URL)
   const users = mockUsers()
 
-  const services = {
+  const chow = new SockChow<Env, Context>(
+    (base) => ({ ...base, ...extras }),
+    env
+  )
+
+  const extras: TestExtras = {
     redis,
     jwt,
     schedule,
     url,
     users,
+    app: chow.app,
   }
 
-  const chow: TypedChow = new SockChow<Env, Context>(
-    (base) => ({ ...base, ...services }),
-    env
-  )
-
-  return mockchow(chow, services) as TypedMockChow
+  return mockchow(chow, extras) as TypedMockChow
 }

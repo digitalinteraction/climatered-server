@@ -79,15 +79,21 @@ http :3000/login/email/callback token==$TOKEN
 
 ### Testing
 
-This is a very rough prototype, there aren't any unit tests.
-If there were, you would run them like this:
+There are unit tests alongside code in `__tests__` directories
+and integration tests in the `tests/` top-level directory.
+Tests are using [Jest](https://jestjs.io/)
+
+> Roughly, unit tests use jest's `it` and integration tests use `test`
 
 ```bash
 # Run the tests
-npm test -s
+npm run test
 
 # Generate code coverage
-npm run coverage -s
+npm run coverage
+
+# View the coverage report
+open coverage/lcov-report/index.html
 ```
 
 ### Irregular use

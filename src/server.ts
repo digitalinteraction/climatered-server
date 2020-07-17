@@ -37,15 +37,11 @@ export interface Context extends SockContext<Env> {
 
 export type TypedChow = SockChowish<Env, Context> & Chowish<Env, Context>
 
-export function setupServer(chow: TypedChow) {
-  //
-  // Register events
-  //
+export function setupEvents(chow: TypedChow) {
   chow.apply(emailEvent)
+}
 
-  //
-  // Register routes
-  //
+export function setupRoutes(chow: TypedChow) {
   chow.apply(
     homeRoute,
     emailRequestRoute,
@@ -53,21 +49,10 @@ export function setupServer(chow: TypedChow) {
     getSlotsRoute,
     getEventsRoute
   )
-
-  //
-  // Register sockets
-  //
-  chow.apply(authSocket)
 }
 
-export function setupSockets(
-  io: socketIo.Server,
-  redis: RedisService,
-  env: Env
-) {
-  //
-  // todo
-  //
+export function setupSockets(chow: TypedChow) {
+  chow.apply(authSocket)
 }
 
 export async function runServer() {
@@ -102,14 +87,9 @@ export async function runServer() {
     users,
   })
   const chow = new SockChow(ctxFactory, env)
-  setupServer(chow)
-
-  //
-  // Setup socket.io server
-  //
-  const io = socketIo(chow.server)
-  io.adapter(socketIoRedis(env.REDIS_URL))
-  setupSockets(io, redis, env)
+  setupEvents(chow)
+  setupRoutes(chow)
+  setupSockets(chow)
 
   //
   // Start our server
