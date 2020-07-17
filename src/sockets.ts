@@ -37,18 +37,18 @@ export function createSockets(io: SocketServer, redis: Redis, env: Env) {
     //
     // A socket endpoint to authenticate itself by passing up a jwt
     //
-    socket.on('auth', async ({ token = '' }) => {
-      const hasAuth = checkAuthorization(env.JWT_SECRET, {
-        authorization: `Bearer ${token}`,
-      })
-      debug(`auth id=${socket.id} token=${token} hasAuth=${hasAuth}`)
+    // socket.on('auth', async ({ token = '' }) => {
+    //   const hasAuth = checkAuthorization(env.JWT_SECRET, {
+    //     authorization: `Bearer ${token}`,
+    //   })
+    //   debug(`auth id=${socket.id} token=${token} hasAuth=${hasAuth}`)
 
-      if (hasAuth) {
-        await redis.set('auth_' + socket.id, token)
-      } else {
-        sendError(socket, 'auth', 'Not authorized')
-      }
-    })
+    //   if (hasAuth) {
+    //     await redis.set('auth_' + socket.id, token)
+    //   } else {
+    //     sendError(socket, 'auth', 'Not authorized')
+    //   }
+    // })
 
     //
     // A socket endpoint to join an event
@@ -120,20 +120,20 @@ export function createSockets(io: SocketServer, redis: Redis, env: Env) {
     //
     // Listen to a channel on an event
     //
-    socket.on('join-channel', async ({ eventId = '', channel = '' }) => {
-      debug(`join-channel event=${eventId} channel=${channel}`)
+    // socket.on('join-channel', async ({ eventId = '', channel = '' }) => {
+    //   debug(`join-channel event=${eventId} channel=${channel}`)
 
-      const user = await getUser(socket.id, redis)
-      if (!user) return sendError(socket, 'join-channel', 'bad_auth')
+    //   const user = await getUser(socket.id, redis)
+    //   if (!user) return sendError(socket, 'join-channel', 'bad_auth')
 
-      const event = events.find((e) => e.id === eventId)
-      if (!event) return sendError(socket, 'join-channel', `event.not_found`)
+    //   const event = events.find((e) => e.id === eventId)
+    //   if (!event) return sendError(socket, 'join-channel', `event.not_found`)
 
-      const found = event.channels?.includes(channel)
-      if (!found) return sendError(socket, 'join-channel', `channel.not_found`)
+    //   const found = event.channels?.includes(channel)
+    //   if (!found) return sendError(socket, 'join-channel', `channel.not_found`)
 
-      socket.join(`channel-${event.id}-${channel}`)
-    })
+    //   socket.join(`channel-${event.id}-${channel}`)
+    // })
 
     //
     // Stop listening to a channel

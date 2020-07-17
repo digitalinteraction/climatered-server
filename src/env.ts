@@ -2,7 +2,7 @@ import { validateEnv } from 'valid-env'
 
 export type Env = ReturnType<typeof createEnv>
 
-export function createEnv() {
+export function createEnv(processEnv: Record<string, string | undefined>) {
   validateEnv([
     'SENDGRID_API_KEY',
     'SENDGRID_FROM',
@@ -20,9 +20,9 @@ export function createEnv() {
     SELF_URL,
     WEB_URL,
     REDIS_URL,
-  } = process.env as Record<string, string>
+  } = processEnv as Record<string, string>
 
-  const CORS_HOSTS = process.env.CORS_HOSTS?.split(',') ?? []
+  const CORS_HOSTS = processEnv.CORS_HOSTS?.split(',') ?? []
 
   return {
     NODE_ENV,
