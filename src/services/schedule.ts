@@ -41,6 +41,7 @@ export interface ScheduleEvent {
 export interface ScheduleService {
   getSlots(): Promise<Slot[]>
   getEvents(): Promise<ScheduleEvent[]>
+  findEvent(id: string): Promise<ScheduleEvent | null>
 }
 
 export function createScheduleService(): ScheduleService {
@@ -53,5 +54,6 @@ export function createScheduleService(): ScheduleService {
   return {
     getSlots: async () => parsedSlots,
     getEvents: async () => events as any,
+    findEvent: async (id) => (events as any[]).find((e) => e.id === id) ?? null,
   }
 }

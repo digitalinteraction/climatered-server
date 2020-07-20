@@ -143,75 +143,75 @@ export function createSockets(io: SocketServer, redis: Redis, env: Env) {
     //
     // Stop listening to a channel
     //
-    socket.on('leave-channel', async ({ eventId = '', channel = '' }) => {
-      debug(`leave-channel event=${eventId} channel=${channel}`)
+    // socket.on('leave-channel', async ({ eventId = '', channel = '' }) => {
+    //   debug(`leave-channel event=${eventId} channel=${channel}`)
 
-      const user = await getUser(socket.id, redis)
-      if (!user) return sendError(socket, 'leave-channel', 'bad_auth')
+    //   const user = await getUser(socket.id, redis)
+    //   if (!user) return sendError(socket, 'leave-channel', 'bad_auth')
 
-      const event = events.find((e) => e.id === eventId)
-      if (!event) return sendError(socket, 'leave-channel', `event.not_found`)
+    //   const event = events.find((e) => e.id === eventId)
+    //   if (!event) return sendError(socket, 'leave-channel', `event.not_found`)
 
-      const found = event.channels?.includes(channel)
-      if (!found) return sendError(socket, 'leave-channel', `channel.not_found`)
+    //   const found = event.channels?.includes(channel)
+    //   if (!found) return sendError(socket, 'leave-channel', `channel.not_found`)
 
-      socket.leave(`channel-${event.id}-${channel}`)
-    })
+    //   socket.leave(`channel-${event.id}-${channel}`)
+    // })
 
     //
     // Start translating for a channel
     //
-    socket.on('start-channel', async ({ eventId = '', channel = '' }) => {
-      debug(`start-channel event=${eventId} channel=${channel}`)
+    // socket.on('start-channel', async ({ eventId = '', channel = '' }) => {
+    //   debug(`start-channel event=${eventId} channel=${channel}`)
 
-      // Make sure the user exists and they are a translator
-      const user = await getUser(socket.id, redis)
-      if (!user || !user.roles.includes('translator')) {
-        return sendError(socket, 'start-channel', 'bad_auth')
-      }
+    //   // Make sure the user exists and they are a translator
+    //   const user = await getUser(socket.id, redis)
+    //   if (!user || !user.roles.includes('translator')) {
+    //     return sendError(socket, 'start-channel', 'bad_auth')
+    //   }
 
-      // Ensure the event exists
-      const event = events.find((e) => e.id === eventId)
-      if (!event) return sendError(socket, 'start-channel', `event.not_found`)
+    //   // Ensure the event exists
+    //   const event = events.find((e) => e.id === eventId)
+    //   if (!event) return sendError(socket, 'start-channel', `event.not_found`)
 
-      // Ensure the channel exists
-      const found = event.channels?.includes(channel)
-      if (!found) return sendError(socket, 'start-channel', `channel.not_found`)
+    //   // Ensure the channel exists
+    //   const found = event.channels?.includes(channel)
+    //   if (!found) return sendError(socket, 'start-channel', `channel.not_found`)
 
-      // Generate the lock key
-      // This value points to the current translator for this channel
-      // (assuming 2 people broadcasting would be an issue)?
-      const key = `translator_${eventId}_${channel}`
+    //   // Generate the lock key
+    //   // This value points to the current translator for this channel
+    //   // (assuming 2 people broadcasting would be an issue)?
+    //   const key = `translator_${eventId}_${channel}`
 
-      // If there is already a translator for that room, remove them
-      const existing = await redis.get(key)
-      if (existing && existing !== socket.id) {
-        await redis.del(`translator_${existing}`)
-        io.in(existing).emit('stop-channel-data')
-      }
+    //   // If there is already a translator for that room, remove them
+    //   const existing = await redis.get(key)
+    //   if (existing && existing !== socket.id) {
+    //     await redis.del(`translator_${existing}`)
+    //     io.in(existing).emit('stop-channel-data')
+    //   }
 
-      // Make this new use the translator
-      // And store the socket-packet so they can send data
-      await redis.set(key, socket.id)
-      await redis.set(`translator_${socket.id}`, [eventId, channel].join(';'))
-    })
+    //   // Make this new use the translator
+    //   // And store the socket-packet so they can send data
+    //   await redis.set(key, socket.id)
+    //   await redis.set(`translator_${socket.id}`, [eventId, channel].join(';'))
+    // })
 
     //
     // Listen for translator packets and broadcast them
     //
-    socket.on('channel-data', async (blob) => {
-      debug(`channel-data id=${socket.id}`)
+    // socket.on('channel-data', async (blob) => {
+    //   debug(`channel-data id=${socket.id}`)
 
-      const packet = await redis.get(`translator_${socket.id}`)
-      if (!packet) return sendError(socket, 'channel-data', 'bad_auth')
+    //   const packet = await redis.get(`translator_${socket.id}`)
+    //   if (!packet) return sendError(socket, 'channel-data', 'bad_auth')
 
-      const [eventId, channel] = packet.split(';')
+    //   const [eventId, channel] = packet.split(';')
 
-      const key = `channel-${eventId}-${channel}`
-      debug('  sendTo=%s', key)
+    //   const key = `channel-${eventId}-${channel}`
+    //   debug('  sendTo=%s', key)
 
-      io.in(key).emit('channel-data', blob)
-    })
+    //   io.in(key).emit('channel-data', blob)
+    // })
 
     //
     // Listen for disconnects too

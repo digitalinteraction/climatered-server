@@ -9,7 +9,7 @@ import { JwtService, AuthJwt, createJwtService } from './services/jwt'
 import { ScheduleService, Slot, ScheduleEvent } from './services/schedule'
 import { UrlService, createUrlService } from './services/url'
 import { UsersService, Registration } from './services/users'
-import { SockChow, SockContext, ChowSocket } from './sockchow'
+import { SockChow, SockContext, ChowSocket, EmitToRoomFn } from './sockchow'
 
 export { mocked } from 'ts-jest/utils'
 
@@ -44,7 +44,7 @@ function mockRedis(): RedisService {
     ping: jest.fn(),
     quit: jest.fn(),
     get: jest.fn(async (k) => data.get(k) ?? null),
-    set: jest.fn((k, v) => data.set(k, v)),
+    set: jest.fn(async (k, v) => data.set(k, v) as any),
     del: jest.fn(async (k) => (data.delete(k), 1)),
   }
 }
@@ -69,7 +69,7 @@ export const createEvent = (
   type: string,
   slot: string,
   translated: boolean
-) => ({
+): ScheduleEvent => ({
   id,
   name: `Event ${type} ${id}`,
   type: type as any,
@@ -93,6 +93,13 @@ export const createEvent = (
   enableTranslation: translated,
 })
 
+export const createRegistration = (roles: string[]): Registration => ({
+  name: 'Geoff Testington',
+  email: 'user@example.com',
+  language: 'en',
+  roles,
+})
+
 function mockSchedule(): ScheduleService {
   const slots: Slot[] = [
     createSlot('001', 12),
@@ -111,6 +118,7 @@ function mockSchedule(): ScheduleService {
   return {
     getSlots: jest.fn(async () => slots),
     getEvents: jest.fn(async () => events),
+    findEvent: jest.fn(async (id) => events.find((e) => e.id === id) ?? null),
   }
 }
 
@@ -152,7 +160,10 @@ type MockSocket = {
  * Creates a fake socket.io client to test sending sockets
  * and their interactions
  */
-function fakeIo<E, C extends SockContext<E>>(chow: SockChow<E, C>) {
+function fakeIo<E, C extends SockContext<E>>(
+  chow: SockChow<E, C>,
+  emitToRoom: EmitToRoomFn
+) {
   return () => {
     // Generate a unique id for this socket
     // - the same method socket.io engine uses (I belive)
@@ -176,7 +187,7 @@ function fakeIo<E, C extends SockContext<E>>(chow: SockChow<E, C>) {
       }
 
       const ctx = await chow.makeContext()
-      await handler({ ...ctx, socket, sendError }, ...args)
+      await handler({ ...ctx, socket, sendError, emitToRoom }, ...args)
     })
 
     // Create and return our socket
@@ -199,8 +210,6 @@ export function createServer(): TypedMockChow {
     env
   )
 
-  const io = fakeIo(chow)
-
   const socket = jest.fn((message: string, handler) => {
     chow.socket(message, handler)
   })
@@ -208,6 +217,8 @@ export function createServer(): TypedMockChow {
   const emitToRoom = jest.fn((room, message, ...args) => {
     chow.emitToRoom(room, message, ...args)
   })
+
+  const io = fakeIo(chow, emitToRoom)
 
   const extras: TestExtras = {
     redis,

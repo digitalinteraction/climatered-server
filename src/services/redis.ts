@@ -4,7 +4,7 @@ export interface RedisService {
   ping(): Promise<string>
   quit(): Promise<'OK'>
   get(key: string): Promise<string | null>
-  set(key: string, value: string): void
+  set(key: string, value: string): Promise<void>
   del(key: string): Promise<number>
 }
 
@@ -15,7 +15,7 @@ export function createRedisService(redisUrl: string): RedisService {
     ping: () => redis.ping(),
     quit: () => redis.quit(),
     get: (k) => redis.get(k),
-    set: (k, v) => redis.set(k, v),
+    set: (k, v) => redis.set(k, v) as any,
     del: (k) => redis.del(k),
   }
 }

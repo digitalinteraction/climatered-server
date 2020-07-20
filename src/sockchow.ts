@@ -3,8 +3,12 @@ import { Chow, BaseContext, Chowish } from '@robb_j/chowchow'
 import socketIo = require('socket.io')
 import socketIoRedis = require('socket.io-redis')
 
+export interface EmitToRoomFn {
+  (room: string, message: string, ...args: []): void
+}
+
 export interface SockContext<E> extends BaseContext<E> {
-  emitToRoom(room: string, message: string, ...args: []): void
+  emitToRoom: EmitToRoomFn
 }
 
 export interface ChowSocket {
