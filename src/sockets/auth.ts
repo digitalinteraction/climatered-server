@@ -1,5 +1,8 @@
 import { TypedChow } from '../server'
 import { AuthJwt } from '../services/jwt'
+import createDebug = require('debug')
+
+const debug = createDebug('api:socket:join-channel')
 
 export default function auth(chow: TypedChow) {
   //
@@ -8,12 +11,17 @@ export default function auth(chow: TypedChow) {
   chow.socket('auth', async (ctx, token = '') => {
     const { socket, jwt, redis, sendError } = ctx
 
+    debug(`socket="${socket.id}" token="${token}"`)
+
     try {
       const auth = jwt.verify(token) as AuthJwt
 
       if (typeof auth !== 'object' || auth.typ !== 'auth') {
+        debug('invalid auth')
         throw new Error('Bad auth')
       }
+
+      debug('valid auth')
 
       //
       // THOUGHT – store the jwt here, or just JSON encode it?

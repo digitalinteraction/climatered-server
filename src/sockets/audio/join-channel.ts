@@ -1,4 +1,7 @@
 import { TypedChow } from '../../server'
+import createDebug = require('debug')
+
+const debug = createDebug('api:socket:join-channel')
 
 export function validChannel(channel: string) {
   return ['en', 'fr', 'es', 'ar'].includes(channel)
@@ -10,6 +13,8 @@ export default function joinChannel(chow: TypedChow) {
   //
   chow.socket('join-channel', async (ctx, eventId, channel) => {
     const { socket, redis, users, schedule, sendError } = ctx
+
+    debug(`socket="${socket.id}" eventId="${eventId}" channel="${channel}"`)
 
     //
     // Ensure the correct arguments were passed up

@@ -1,5 +1,8 @@
 import { TypedChow } from '../../server'
 import { validChannel } from './join-channel'
+import createDebug = require('debug')
+
+const debug = createDebug('api:socket:leave-channel')
 
 export default function leaveChannel(chow: TypedChow) {
   //
@@ -7,6 +10,8 @@ export default function leaveChannel(chow: TypedChow) {
   //
   chow.socket('leave-channel', async (ctx, eventId, channel) => {
     const { socket, redis, users, schedule, sendError } = ctx
+
+    debug(`socket="${socket.id}" eventId="${eventId}" channel="${channel}"`)
 
     //
     // Ensure the correct arguments were passed up

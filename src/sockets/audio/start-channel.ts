@@ -1,5 +1,8 @@
 import { TypedChow } from '../../server'
 import { validChannel } from './join-channel'
+import createDebug = require('debug')
+
+const debug = createDebug('api:socket:start-channel')
 
 export default function startChannel(chow: TypedChow) {
   //
@@ -7,6 +10,7 @@ export default function startChannel(chow: TypedChow) {
   //
   chow.socket('start-channel', async (ctx, eventId, channel) => {
     const { socket, sendError, users, redis, schedule, emitToRoom } = ctx
+    debug(`socket="${socket.id}" eventId="${eventId}" channel="${channel}"`)
 
     //
     // Ensure the correct arguments were passed
@@ -39,6 +43,7 @@ export default function startChannel(chow: TypedChow) {
     //
     const existingTranslator = await redis.get(channelKey)
     if (existingTranslator && existingTranslator !== socket.id) {
+      debug(`kick translator "${existingTranslator}"`)
       await redis.del(translatorKey)
       emitToRoom(existingTranslator, 'channel-takenover')
     }

@@ -1,7 +1,6 @@
 import createDebug = require('debug')
 import dotenv = require('dotenv')
-import socketIo = require('socket.io')
-import socketIoRedis = require('socket.io-redis')
+import morgan = require('morgan')
 
 import { createTerminus } from '@godaddy/terminus'
 import { Chowish } from '@robb_j/chowchow'
@@ -42,11 +41,32 @@ export interface Context extends SockContext<Env> {
 
 export type TypedChow = SockChowish<Env, Context> & Chowish<Env, Context>
 
+export function setupMiddleware(chow: TypedChow) {
+  chow.middleware((app) => {
+    //
+    // Log requests for debugging
+    //
+    app.use((req, res, next) => {
+      debug(`${req.method}: ${req.path}`)
+      next()
+    })
+
+    //
+    // Optionally enable access logs
+    //
+    if (chow.env.ENABLE_ACCESS_LOGS) {
+      app.use(morgan('tiny'))
+    }
+  })
+}
+
 export function setupEvents(chow: TypedChow) {
+  debug('#setupEvents')
   chow.apply(emailEvent)
 }
 
 export function setupRoutes(chow: TypedChow) {
+  debug('#setupRoutes')
   chow.apply(
     homeRoute,
     emailRequestRoute,
@@ -57,6 +77,7 @@ export function setupRoutes(chow: TypedChow) {
 }
 
 export function setupSockets(chow: TypedChow) {
+  debug('#setupSockets')
   chow.apply(
     authSocket,
     joinChannelSocket,
@@ -68,6 +89,7 @@ export function setupSockets(chow: TypedChow) {
 }
 
 export async function runServer() {
+  debug('#runServer')
   //
   // Load variables from environment variables
   //
@@ -76,11 +98,13 @@ export async function runServer() {
   //
   // Create our custom environment
   //
+  debug('#runServer creating env')
   const env = createEnv(process.env)
 
   //
   // Setup services
   //
+  debug('#runServer setting up services')
   const redis = createRedisService(env.REDIS_URL)
   const schedule = createScheduleService()
   const jwt = createJwtService(env.JWT_SECRET)
@@ -90,6 +114,7 @@ export async function runServer() {
   //
   // Create our chow instance
   //
+  debug('#runServer creating server')
   const ctxFactory: (ctx: SockContext<Env>) => Context = (base) => ({
     ...base,
     redis,
@@ -106,6 +131,7 @@ export async function runServer() {
   //
   // Start our server
   //
+  debug('#runServer starting')
   await chow.start({
     port: 3000,
     trustProxy: true,

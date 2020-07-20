@@ -41,6 +41,7 @@ export function createTestEnv(): Env {
     SELF_URL: 'http://api.localhost',
     WEB_URL: 'http://web.localhost',
     REDIS_URL: 'redis://localhost',
+    ENABLE_ACCESS_LOGS: false,
   }
 }
 

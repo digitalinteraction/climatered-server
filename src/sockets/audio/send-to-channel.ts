@@ -1,4 +1,7 @@
 import { TypedChow } from '../../server'
+import createDebug = require('debug')
+
+const debug = createDebug('api:socket:send-to-channel')
 
 export default function sendToChannel(chow: TypedChow) {
   //
@@ -6,6 +9,8 @@ export default function sendToChannel(chow: TypedChow) {
   //
   chow.socket('send-to-channel', async (ctx, rawData) => {
     const { sendError, emitToRoom, socket, redis } = ctx
+
+    debug(`socket="${socket.id}"`)
 
     //
     // Get their translator packet to check they are allowed to broadcast
@@ -19,6 +24,7 @@ export default function sendToChannel(chow: TypedChow) {
     //
     const [eventId, channel] = packet.split(';')
     const key = `channel-${eventId}-${channel}`
+    debug(`room="${key}"`)
 
     //
     // Emit the raw data to the room
