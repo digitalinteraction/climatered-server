@@ -124,6 +124,12 @@ export async function runServer() {
     users,
   })
   const chow = new SockChow(ctxFactory, env)
+  chow.addHelpers({
+    trustProxy: true,
+    jsonBody: true,
+    urlEncodedBody: true,
+    corsHosts: env.CORS_HOSTS,
+  })
   setupEvents(chow)
   setupRoutes(chow)
   setupSockets(chow)
@@ -134,10 +140,6 @@ export async function runServer() {
   debug('#runServer starting')
   await chow.start({
     port: 3000,
-    trustProxy: true,
-    jsonBody: true,
-    urlEncodedBody: true,
-    corsHosts: env.CORS_HOSTS,
     handle404s: true,
     outputUrl: true,
   })

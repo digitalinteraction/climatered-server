@@ -51,6 +51,6 @@ describe('@start-channel(eventId, channel)', () => {
     await socket.emit('start-channel', '001', 'fr')
 
     expect(chow.redis.del).toBeCalledWith(`translator_${socket.id}`)
-    expect(chow.emitToRoom).toBeCalledWith(oldTranslator, 'channel-takenover')
+    expect(chow.emitToRoom).toBeCalledWith(oldTranslator, 'channel-takeover')
   })
 })

@@ -72,13 +72,16 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
     for (const [message, handler] of this.socketHandlers) {
       socket.on(message, async (...args) => {
         try {
-          const ctx = await this.makeContext()
-
-          await handler({
-            ...ctx,
-            socket: createSocket(socket),
-            sendError: (error) => this.catchSocketError(socket, message, error),
-          })
+          await handler(
+            {
+              ...(await this.makeContext()),
+              socket: createSocket(socket),
+              sendError: (error) => {
+                return this.catchSocketError(socket, message, error)
+              },
+            },
+            ...args
+          )
         } catch (error) {
           this.catchSocketError(socket, message, error)
         }

@@ -45,7 +45,7 @@ export default function startChannel(chow: TypedChow) {
     if (existingTranslator && existingTranslator !== socket.id) {
       debug(`kick translator "${existingTranslator}"`)
       await redis.del(translatorKey)
-      emitToRoom(existingTranslator, 'channel-takenover')
+      emitToRoom(existingTranslator, 'channel-takeover')
     }
 
     //
