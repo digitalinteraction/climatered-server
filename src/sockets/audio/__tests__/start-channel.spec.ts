@@ -1,11 +1,11 @@
+import startChannel from '../start-channel'
 import {
   TypedMockChow,
   createServer,
-  createRegistration,
   mocked,
-} from '../../test-utils'
-import startChannel from '../start-channel'
-import { Registration } from '../../services/users'
+  createRegistration,
+  Registration,
+} from '../../../test-utils'
 
 let chow: TypedMockChow
 let translator: Registration

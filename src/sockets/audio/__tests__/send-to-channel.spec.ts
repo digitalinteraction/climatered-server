@@ -1,11 +1,11 @@
+import sendToChannelSocket from '../send-to-channel'
 import {
   TypedMockChow,
   createServer,
   mocked,
   createRegistration,
-} from '../../test-utils'
-import sendToChannelSocket from '../send-to-channel'
-import { Registration } from '../../services/users'
+  Registration,
+} from '../../../test-utils'
 
 let chow: TypedMockChow
 let translator: Registration

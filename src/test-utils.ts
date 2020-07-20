@@ -6,12 +6,18 @@ import { Context, TypedChow } from './server'
 
 import { RedisService } from './services/redis'
 import { JwtService, AuthJwt, createJwtService } from './services/jwt'
-import { ScheduleService, Slot, ScheduleEvent } from './services/schedule'
+import {
+  ScheduleService,
+  ScheduleSlot,
+  ScheduleEvent,
+} from './services/schedule'
 import { UrlService, createUrlService } from './services/url'
 import { UsersService, Registration } from './services/users'
 import { SockChow, SockContext, ChowSocket, EmitToRoomFn } from './sockchow'
 
 export { mocked } from 'ts-jest/utils'
+export { Registration } from './services/users'
+export { ScheduleEvent, ScheduleSlot } from './services/schedule'
 
 export type TypedMockChow = MockChowish & TypedChow & TestExtras
 
@@ -101,7 +107,7 @@ export const createRegistration = (roles: string[]): Registration => ({
 })
 
 function mockSchedule(): ScheduleService {
-  const slots: Slot[] = [
+  const slots: ScheduleSlot[] = [
     createSlot('001', 12),
     createSlot('002', 13),
     createSlot('003', 14),

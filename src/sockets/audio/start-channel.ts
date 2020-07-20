@@ -1,4 +1,4 @@
-import { TypedChow } from '../server'
+import { TypedChow } from '../../server'
 import { validChannel } from './join-channel'
 
 export default function startChannel(chow: TypedChow) {

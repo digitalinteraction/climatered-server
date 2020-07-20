@@ -1,14 +1,11 @@
-import { TypedChow } from '../server'
+import { TypedChow } from '../../server'
+import { validChannel } from './join-channel'
 
-export function validChannel(channel: string) {
-  return ['en', 'fr', 'es', 'ar'].includes(channel)
-}
-
-export default function joinChannel(chow: TypedChow) {
+export default function leaveChannel(chow: TypedChow) {
   //
-  // join-channel(eventId, channel)
+  // @leave-channel(eventId, channel)
   //
-  chow.socket('join-channel', async (ctx, eventId, channel) => {
+  chow.socket('leave-channel', async (ctx, eventId, channel) => {
     const { socket, redis, users, schedule, sendError } = ctx
 
     //
@@ -25,7 +22,7 @@ export default function joinChannel(chow: TypedChow) {
     if (!registration) return sendError('Bad auth')
 
     //
-    // Find the event they want to subscribe to
+    // Find the event to unsubscribe from
     //
     const allEvents = await schedule.getEvents()
     const event = allEvents.find((e) => e.id === eventId)
@@ -34,8 +31,8 @@ export default function joinChannel(chow: TypedChow) {
     }
 
     //
-    // If they passed all checks, subscribe them for audio
+    // If all assetions passed so far, remove them from the channel
     //
-    socket.join(`channel-${event.id}-${channel}`)
+    socket.leave(`channel-${event.id}-${channel}`)
   })
 }

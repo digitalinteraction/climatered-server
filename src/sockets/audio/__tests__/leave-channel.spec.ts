@@ -1,11 +1,11 @@
+import leaveChannelSocket from '../leave-channel'
 import {
   TypedMockChow,
   createServer,
   mocked,
   createRegistration,
-} from '../../test-utils'
-import leaveChannelSocket from '../leave-channel'
-import { Registration } from '../../services/users'
+  Registration,
+} from '../../../test-utils'
 
 let chow: TypedMockChow
 let attendee: Registration

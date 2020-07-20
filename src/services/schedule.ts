@@ -4,7 +4,7 @@ import events = require('../data/events.json')
 
 type t = typeof events
 
-export interface Slot {
+export interface ScheduleSlot {
   id: string
   start: Date
   end: Date
@@ -39,7 +39,7 @@ export interface ScheduleEvent {
 }
 
 export interface ScheduleService {
-  getSlots(): Promise<Slot[]>
+  getSlots(): Promise<ScheduleSlot[]>
   getEvents(): Promise<ScheduleEvent[]>
   findEvent(id: string): Promise<ScheduleEvent | null>
 }

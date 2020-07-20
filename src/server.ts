@@ -4,7 +4,7 @@ import socketIo = require('socket.io')
 import socketIoRedis = require('socket.io-redis')
 
 import { createTerminus } from '@godaddy/terminus'
-import { Chow, BaseContext, Chowish } from '@robb_j/chowchow'
+import { Chowish } from '@robb_j/chowchow'
 
 import { createEnv, Env } from './env'
 
@@ -21,6 +21,11 @@ import getSlotsRoute from './routes/schedule/get-slots'
 import getEventsRoute from './routes/schedule/get-events'
 
 import authSocket from './sockets/auth'
+import joinChannelSocket from './sockets/audio/join-channel'
+import leaveChannelSocket from './sockets/audio/leave-channel'
+import sendToChannelSocket from './sockets/audio/send-to-channel'
+import startChannelSocket from './sockets/audio/start-channel'
+import stopChannelSocket from './sockets/audio/stop-channel'
 
 import emailEvent from './events/email'
 import { SockChowish, SockChow, SockContext } from './sockchow'
@@ -52,7 +57,14 @@ export function setupRoutes(chow: TypedChow) {
 }
 
 export function setupSockets(chow: TypedChow) {
-  chow.apply(authSocket)
+  chow.apply(
+    authSocket,
+    joinChannelSocket,
+    leaveChannelSocket,
+    sendToChannelSocket,
+    startChannelSocket,
+    stopChannelSocket
+  )
 }
 
 export async function runServer() {

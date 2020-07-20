@@ -1,4 +1,4 @@
-import { TypedChow } from '../server'
+import { TypedChow } from '../../server'
 
 export default function sendToChannel(chow: TypedChow) {
   //
@@ -7,13 +7,22 @@ export default function sendToChannel(chow: TypedChow) {
   chow.socket('send-to-channel', async (ctx, rawData) => {
     const { sendError, emitToRoom, socket, redis } = ctx
 
+    //
+    // Get their translator packet to check they are allowed to broadcast
+    // and to tell them who to broadcast to
+    //
     const packet = await redis.get(`translator_${socket.id}`)
-
     if (!packet) return sendError('Bad auth')
 
+    //
+    // Reconstruct the key to emit to based on the packet
+    //
     const [eventId, channel] = packet.split(';')
     const key = `channel-${eventId}-${channel}`
 
+    //
+    // Emit the raw data to the room
+    //
     emitToRoom(key, rawData)
   })
 }

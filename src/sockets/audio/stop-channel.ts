@@ -1,7 +1,6 @@
-import { TypedChow } from '../server'
-import { send } from '@sendgrid/mail'
+import { TypedChow } from '../../server'
 
-export default function stopChannelSocket(chow: TypedChow) {
+export default function stopChannel(chow: TypedChow) {
   //
   // @stop-channel()
   //

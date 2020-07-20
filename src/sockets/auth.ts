@@ -3,9 +3,11 @@ import { AuthJwt } from '../services/jwt'
 
 export default function auth(chow: TypedChow) {
   //
-  // auth(token)
+  // @auth(token)
   //
-  chow.socket('auth', async ({ socket, jwt, redis, sendError }, token = '') => {
+  chow.socket('auth', async (ctx, token = '') => {
+    const { socket, jwt, redis, sendError } = ctx
+
     try {
       const auth = jwt.verify(token) as AuthJwt
 
@@ -15,6 +17,7 @@ export default function auth(chow: TypedChow) {
 
       //
       // THOUGHT – store the jwt here, or just JSON encode it?
+      // - is it easier to jwt.decode or JSON.parse the info on the other side
       //
       redis.set('auth_' + socket.id, JSON.stringify(auth))
     } catch (error) {
