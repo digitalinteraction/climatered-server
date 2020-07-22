@@ -32,8 +32,7 @@ export default function joinChannel(chow: TypedChow) {
     //
     // Find the event they want to subscribe to
     //
-    const allEvents = await schedule.getEvents()
-    const event = allEvents.find((e) => e.id === eventId)
+    const event = await schedule.findEvent(eventId)
     if (!event || !event.enableTranslation || !validChannel(channel)) {
       return sendError('Event not found')
     }

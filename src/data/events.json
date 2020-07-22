@@ -43,7 +43,8 @@
         "language": "es"
       }
     ],
-    "channels": ["fr", "ar", "es"]
+    "hostLanguage": "en",
+    "enableTranslation": true
   },
   {
     "id": "panel-002",
@@ -89,7 +90,8 @@
         "language": "es"
       }
     ],
-    "channels": ["en", "ar", "es"]
+    "hostLanguage": "fr",
+    "enableTranslation": true
   },
   {
     "id": "session-003-a",
@@ -120,7 +122,8 @@
         "language": "*"
       }
     ],
-    "channels": null
+    "hostLanguage": "en",
+    "enableTranslation": false
   },
   {
     "id": "session-003-b",
@@ -151,7 +154,8 @@
         "language": "*"
       }
     ],
-    "channels": null
+    "hostLanguage": "en",
+    "enableTranslation": false
   },
   {
     "id": "session-003-c",
@@ -182,6 +186,7 @@
         "language": "*"
       }
     ],
-    "channels": null
+    "hostLanguage": "en",
+    "enableTranslation": false
   }
 ]

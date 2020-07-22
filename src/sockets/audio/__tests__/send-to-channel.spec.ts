@@ -26,6 +26,10 @@ describe('@send-to-channel(rawData)', () => {
 
     await socket.emit('send-to-channel', rawData)
 
-    expect(chow.emitToRoom).toBeCalledWith('channel-001-fr', rawData)
+    expect(chow.emitToRoom).toBeCalledWith(
+      'channel-001-fr',
+      'channel-data',
+      rawData
+    )
   })
 })

@@ -10,8 +10,6 @@ export default function sendToChannel(chow: TypedChow) {
   chow.socket('send-to-channel', async (ctx, rawData) => {
     const { sendError, emitToRoom, socket, redis } = ctx
 
-    debug(`socket="${socket.id}"`)
-
     //
     // Get their translator packet to check they are allowed to broadcast
     // and to tell them who to broadcast to
@@ -24,11 +22,11 @@ export default function sendToChannel(chow: TypedChow) {
     //
     const [eventId, channel] = packet.split(';')
     const key = `channel-${eventId}-${channel}`
-    debug(`room="${key}"`)
+    debug(`socket="${socket.id}" room="${key}"`)
 
     //
     // Emit the raw data to the room
     //
-    emitToRoom(key, rawData)
+    emitToRoom(key, 'channel-data', rawData)
   })
 }

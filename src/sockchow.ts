@@ -4,7 +4,7 @@ import socketIo = require('socket.io')
 import socketIoRedis = require('socket.io-redis')
 
 export interface EmitToRoomFn {
-  (room: string, message: string, ...args: []): void
+  (room: string, message: string, ...args: any[]): void
 }
 
 export interface SockContext<E> extends BaseContext<E> {
@@ -31,7 +31,7 @@ interface SockHandler<C> {
 
 export interface SockChowish<E, C extends SockContext<E>> {
   socket(message: string, handler: SockHandler<C>): void
-  emitToRoom(room: string, message: string, ...args: []): void
+  emitToRoom: EmitToRoomFn
 }
 
 function createSocket(socket: socketIo.Socket): ChowSocket {
@@ -93,7 +93,7 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
     return {
       ...super.baseContext(),
       emitToRoom: (room, message, ...args) =>
-        this.emitToRoom(room, message, args),
+        this.emitToRoom(room, message, ...args),
     }
   }
 
