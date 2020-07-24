@@ -47,9 +47,15 @@ These are the commands you'll regularly run to develop the API, in no particular
 ```bash
 # Start the docker dev stack
 # -> It runs a redis instance for socket.io to use and to store authentications
-# -> Remember "docker-compose" down afterwards to stop and remove containers
+# -> Remember "docker-compose down" afterwards to stop and remove containers
 # -> Runs in headless mode (-d)
 docker-compose up -d
+
+# Run the content scraper
+# -> Clones the schedule locally
+# -> Reads in content and validates it
+# -> Puts it into redis for the api
+npm run dev scrape-content
 
 # Run the dev server
 # -> Runs on port 3000
