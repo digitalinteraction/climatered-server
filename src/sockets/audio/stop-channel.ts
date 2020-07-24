@@ -22,8 +22,8 @@ export default function stopChannel(chow: TypedChow) {
     const packet = await redis.get(translatorKey)
     if (!packet) return sendError('Not broadcasting')
 
-    const [eventId, channel] = packet.split(';')
-    const channelKey = `translator_${eventId}_${channel}`
+    const [sessionId, channel] = packet.split(';')
+    const channelKey = `translator_${sessionId}_${channel}`
 
     debug(`channelKey="${channelKey}"`)
     await redis.del(channelKey)

@@ -117,7 +117,11 @@ export async function runScraper() {
     // Generate an array of iterators that read in content and yield errors
     // then can be told to write to redis after
     const iterators = contentToParse.map(async function* ({ key, struct }) {
-      const [errors, records] = await readAndParse(tmpdir, key + '*.md', struct)
+      const [errors, records] = await readAndParse(
+        tmpdir,
+        `${key}/*.md`,
+        struct
+      )
 
       yield errors
 

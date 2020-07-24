@@ -6,18 +6,14 @@ import { Context, TypedChow } from './server'
 
 import { RedisService } from './services/redis'
 import { JwtService, AuthJwt, createJwtService } from './services/jwt'
-import {
-  ScheduleService,
-  ScheduleSlot,
-  ScheduleEvent,
-} from './services/schedule'
+import { ScheduleService } from './services/schedule'
 import { UrlService, createUrlService } from './services/url'
 import { UsersService, Registration } from './services/users'
 import { SockChow, SockContext, ChowSocket, EmitToRoomFn } from './sockchow'
+import { Session, Slot } from './structs'
 
 export { mocked } from 'ts-jest/utils'
 export { Registration } from './services/users'
-export { ScheduleEvent, ScheduleSlot } from './services/schedule'
 
 export type TypedMockChow = MockChowish & TypedChow & TestExtras
 
@@ -65,22 +61,23 @@ function mockJwt(secretKey: string): JwtService {
   }
 }
 
-export const createSlot = (id: string, start: number) => ({
+export const createSlot = (id: string, start: number): Slot => ({
   id: id,
   start: new Date(`2020-06-15T${start}:00:00.000Z`),
   end: new Date(`2020-06-15T${start + 1}:00:00.000Z`),
 })
 
-export const createEvent = (
+export const createSession = (
   id: string,
   type: string,
-  slot: string,
+  slot: string | undefined,
   translated: boolean
-): ScheduleEvent => ({
+): Session => ({
   id,
-  name: `Event ${type} ${id}`,
-  type: type as any,
+  type: type,
   slot,
+  track: 'act',
+  themes: [],
   title: {
     en: 'Title - en',
     fr: 'Title - fr',
@@ -98,6 +95,11 @@ export const createEvent = (
   ],
   hostLanguage: 'en',
   enableTranslation: translated,
+  speakers: [],
+  hostOrganisation: undefined,
+  isRecorded: false,
+  attendeeInteraction: 'view',
+  attendeeDevices: 'all',
 })
 
 export const createRegistration = (roles: string[]): Registration => ({
@@ -108,24 +110,26 @@ export const createRegistration = (roles: string[]): Registration => ({
 })
 
 function mockSchedule(): ScheduleService {
-  const slots: ScheduleSlot[] = [
+  const slots = [
     createSlot('001', 12),
     createSlot('002', 13),
     createSlot('003', 14),
   ]
 
-  const events: ScheduleEvent[] = [
-    createEvent('001', 'plenary', '001', true),
-    createEvent('002', 'panel', '002', true),
-    createEvent('003-a', 'session', '003', false),
-    createEvent('003-b', 'session', '003', false),
-    createEvent('003-c', 'session', '003', false),
+  const sessions = [
+    createSession('001', 'plenary', '001', true),
+    createSession('002', 'panel', '002', true),
+    createSession('003-a', 'session', '003', false),
+    createSession('003-b', 'session', '003', false),
+    createSession('003-c', 'session', '003', false),
   ]
 
   return {
     getSlots: jest.fn(async () => slots),
-    getEvents: jest.fn(async () => events),
-    findEvent: jest.fn(async (id) => events.find((e) => e.id === id) ?? null),
+    getSessions: jest.fn(async () => sessions),
+    findSession: jest.fn(
+      async (id) => sessions.find((e) => e.id === id) ?? null
+    ),
   }
 }
 

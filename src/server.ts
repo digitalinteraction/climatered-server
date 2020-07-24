@@ -17,7 +17,7 @@ import homeRoute from './routes/home'
 import emailRequestRoute from './routes/auth/email-request'
 import emailCallbackRoute from './routes/auth/email-callback'
 import getSlotsRoute from './routes/schedule/get-slots'
-import getEventsRoute from './routes/schedule/get-events'
+import getSessionsRoute from './routes/schedule/get-sessions'
 
 import authSocket from './sockets/auth'
 import joinChannelSocket from './sockets/audio/join-channel'
@@ -72,7 +72,7 @@ export function setupRoutes(chow: TypedChow) {
     emailRequestRoute,
     emailCallbackRoute,
     getSlotsRoute,
-    getEventsRoute
+    getSessionsRoute
   )
 }
 
@@ -106,7 +106,7 @@ export async function runServer() {
   //
   debug('#runServer setting up services')
   const redis = createRedisService(env.REDIS_URL)
-  const schedule = createScheduleService()
+  const schedule = createScheduleService(redis)
   const jwt = createJwtService(env.JWT_SECRET)
   const url = createUrlService(env.SELF_URL, env.WEB_URL)
   const users = createUsersService()

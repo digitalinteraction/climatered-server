@@ -20,8 +20,8 @@ export default function sendToChannel(chow: TypedChow) {
     //
     // Reconstruct the key to emit to based on the packet
     //
-    const [eventId, channel] = packet.split(';')
-    const key = `channel-${eventId}-${channel}`
+    const [sessionId, channel] = packet.split(';')
+    const key = `channel-${sessionId}-${channel}`
     debug(`socket="${socket.id}" room="${key}"`)
 
     //

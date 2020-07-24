@@ -16,7 +16,7 @@ beforeEach(() => {
   leaveChannelSocket(chow)
 })
 
-describe('@leave-channel(eventId', () => {
+describe('@leave-channel(sessionId', () => {
   it('should remove that user from the channel', async () => {
     const socket = chow.io()
 

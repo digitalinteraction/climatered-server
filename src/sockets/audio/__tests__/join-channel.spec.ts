@@ -16,7 +16,7 @@ beforeEach(() => {
   joinChannelSocket(chow)
 })
 
-describe('@join-channel(eventId, channel)', () => {
+describe('@join-channel(sessionId, channel)', () => {
   it('should join the socket to the room', async () => {
     const socket = chow.io()
 

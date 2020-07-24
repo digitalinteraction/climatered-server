@@ -32,15 +32,14 @@ test('Schedule flow', async () => {
   })
 
   //
-  // [2] Test getting events without authentication
+  // [2] Test getting sessions without authentication
   //
-  const unauthedEvents = await agent.get('/schedule/events')
+  const unauthedSessions = await agent.get('/schedule/sessions')
 
-  expect(unauthedEvents.status).toEqual(200)
-  expect(unauthedEvents.body.events).toHaveLength(5)
-  expect(unauthedEvents.body.events[0]).toEqual({
+  expect(unauthedSessions.status).toEqual(200)
+  expect(unauthedSessions.body.sessions).toHaveLength(5)
+  expect(unauthedSessions.body.sessions[0]).toEqual({
     id: expect.any(String),
-    name: expect.any(String),
     type: expect.any(String),
     slot: expect.any(String),
     title: {
@@ -58,18 +57,24 @@ test('Schedule flow', async () => {
     links: [],
     hostLanguage: expect.any(String),
     enableTranslation: expect.any(Boolean),
+    isRecorded: expect.any(Boolean),
+    track: expect.any(String),
+    themes: expect.any(Array),
+    speakers: expect.any(Array),
+    attendeeInteraction: expect.any(String),
+    attendeeDevices: expect.any(String),
   })
 
   //
-  // [3] Test getting events with authentication
+  // [3] Test getting sessions with authentication
   //
-  const authedEvents = await agent
-    .get('/schedule/events')
+  const authedSessions = await agent
+    .get('/schedule/sessions')
     .set({ authorization })
 
-  expect(authedEvents.status).toEqual(200)
-  expect(authedEvents.body.events).toHaveLength(5)
-  expect(authedEvents.body.events[0].links).toContainEqual({
+  expect(authedSessions.status).toEqual(200)
+  expect(authedSessions.body.sessions).toHaveLength(5)
+  expect(authedSessions.body.sessions[0].links).toContainEqual({
     type: expect.any(String),
     url: expect.any(String),
     language: expect.any(String),

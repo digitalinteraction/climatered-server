@@ -6,6 +6,7 @@ import {
   date,
   optional,
   enums,
+  StructType,
 } from 'superstruct'
 
 export {
@@ -18,7 +19,13 @@ export {
 //
 // Slot
 //
-export type Slot = typeof SlotStruct.schema
+export type Slot = StructType<typeof SlotStruct>
+export interface SlotJson {
+  id: string
+  start: string
+  end: string
+}
+
 export const SlotStruct = object({
   id: string(),
   start: date(),
@@ -28,7 +35,7 @@ export const SlotStruct = object({
 //
 // Localised
 //
-export type Localised = typeof LocalisedStruct.schema
+export type Localised = StructType<typeof LocalisedStruct>
 export const LocalisedStruct = object({
   en: string(),
   fr: string(),
@@ -39,7 +46,7 @@ export const LocalisedStruct = object({
 //
 // Link
 //
-export type Link = typeof LinkStruct.schema
+export type Link = StructType<typeof LinkStruct>
 export const LinkStruct = object({
   type: enums(['video', 'poll', 'tool']),
   url: string(),
@@ -49,7 +56,7 @@ export const LinkStruct = object({
 //
 // Session
 //
-export type Session = typeof SessionStruct.schema
+export type Session = StructType<typeof SessionStruct>
 export const SessionStruct = object({
   id: string(),
   type: enums([
@@ -80,7 +87,7 @@ export const SessionStruct = object({
 //
 // Speaker
 //
-export type Speaker = typeof SpeakerStruct.schema
+export type Speaker = StructType<typeof SpeakerStruct>
 export const SpeakerStruct = object({
   name: string(),
   role: string(),
@@ -90,7 +97,7 @@ export const SpeakerStruct = object({
 //
 // Track
 //
-export type Track = typeof TrackStruct.schema
+export type Track = StructType<typeof TrackStruct>
 export const TrackStruct = object({
   id: string(),
   title: LocalisedStruct,
@@ -99,7 +106,7 @@ export const TrackStruct = object({
 //
 // Theme
 //
-export type Theme = typeof ThemeStruct.schema
+export type Theme = StructType<typeof ThemeStruct>
 export const ThemeStruct = object({
   id: string(),
   title: LocalisedStruct,
@@ -108,7 +115,7 @@ export const ThemeStruct = object({
 //
 // Translator
 //
-export type Translator = typeof TranslatorStruct.schema
+export type Translator = StructType<typeof TranslatorStruct>
 export const TranslatorStruct = object({
   name: string(),
   email: string(),

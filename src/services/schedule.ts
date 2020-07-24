@@ -1,59 +1,44 @@
-import slots = require('../data/slots.json')
-import events = require('../data/events.json')
+// import slots = require('../data/slots.json')
+// import events = require('../data/events.json')
 // import registrations = require('../data/registrations.json')
 
-type t = typeof events
-
-export interface ScheduleSlot {
-  id: string
-  start: Date
-  end: Date
-}
-
-export interface Link {
-  type: string
-  url: string
-  language: string
-}
-
-export interface ScheduleEvent {
-  id: string
-  name: string
-  type: 'plenary' | 'panel' | 'session'
-  slot: string
-  title: {
-    en: string
-    fr: string
-    es: string
-    ar: string
-  }
-  content: {
-    en: string
-    fr: string
-    es: string
-    ar: string
-  }
-  links: Link[]
-  hostLanguage: string
-  enableTranslation: boolean
-}
+import { Session, Slot, SlotStruct, SlotJson } from '../structs'
+import { RedisService } from './redis'
 
 export interface ScheduleService {
-  getSlots(): Promise<ScheduleSlot[]>
-  getEvents(): Promise<ScheduleEvent[]>
-  findEvent(id: string): Promise<ScheduleEvent | null>
+  getSlots(): Promise<Slot[]>
+  getSessions(): Promise<Session[]>
+  findSession(id: string): Promise<Session | null>
 }
 
-export function createScheduleService(): ScheduleService {
-  const parsedSlots = slots.map((s) => ({
-    id: s.id,
-    start: new Date(s.start),
-    end: new Date(s.end),
-  }))
+export function createScheduleService(redis: RedisService): ScheduleService {
+  async function getSlots(): Promise<Slot[]> {
+    const raw = await redis.get('schedule.slots')
+    if (!raw) return []
+
+    const jsonSlots: SlotJson[] = JSON.parse(raw)
+
+    return jsonSlots.map((s) => ({
+      id: s.id,
+      start: new Date(s.start),
+      end: new Date(s.end),
+    }))
+  }
+
+  async function getSessions(): Promise<Session[]> {
+    const raw = await redis.get('schedule.sessions')
+    if (!raw) return []
+    return JSON.parse(raw)
+  }
+
+  async function findSession(id: string) {
+    const sessions = await getSessions()
+    return sessions.find((s) => s.id === id) ?? null
+  }
 
   return {
-    getSlots: async () => parsedSlots,
-    getEvents: async () => events as any,
-    findEvent: async (id) => (events as any[]).find((e) => e.id === id) ?? null,
+    getSlots,
+    getSessions,
+    findSession,
   }
 }

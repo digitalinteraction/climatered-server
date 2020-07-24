@@ -9,17 +9,17 @@ export function validChannel(channel: string) {
 
 export default function joinChannel(chow: TypedChow) {
   //
-  // @join-channel(eventId, channel)
+  // @join-channel(sessionId, channel)
   //
-  chow.socket('join-channel', async (ctx, eventId, channel) => {
+  chow.socket('join-channel', async (ctx, sessionId, channel) => {
     const { socket, redis, users, schedule, sendError } = ctx
 
-    debug(`socket="${socket.id}" eventId="${eventId}" channel="${channel}"`)
+    debug(`socket="${socket.id}" sessionId="${sessionId}" channel="${channel}"`)
 
     //
     // Ensure the correct arguments were passed up
     //
-    if (typeof eventId !== 'string' || typeof channel !== 'string') {
+    if (typeof sessionId !== 'string' || typeof channel !== 'string') {
       return sendError('Invalid socket arguments')
     }
 
@@ -30,16 +30,16 @@ export default function joinChannel(chow: TypedChow) {
     if (!registration) return sendError('Bad auth')
 
     //
-    // Find the event they want to subscribe to
+    // Find the session they want to subscribe to
     //
-    const event = await schedule.findEvent(eventId)
-    if (!event || !event.enableTranslation || !validChannel(channel)) {
-      return sendError('Event not found')
+    const session = await schedule.findSession(sessionId)
+    if (!session || !session.enableTranslation || !validChannel(channel)) {
+      return sendError('Session not found')
     }
 
     //
     // If they passed all checks, subscribe them for audio
     //
-    socket.join(`channel-${event.id}-${channel}`)
+    socket.join(`channel-${session.id}-${channel}`)
   })
 }

@@ -6,17 +6,17 @@ const debug = createDebug('api:socket:leave-channel')
 
 export default function leaveChannel(chow: TypedChow) {
   //
-  // @leave-channel(eventId, channel)
+  // @leave-channel(sessionId, channel)
   //
-  chow.socket('leave-channel', async (ctx, eventId, channel) => {
+  chow.socket('leave-channel', async (ctx, sessionId, channel) => {
     const { socket, redis, users, schedule, sendError } = ctx
 
-    debug(`socket="${socket.id}" eventId="${eventId}" channel="${channel}"`)
+    debug(`socket="${socket.id}" sessionId="${sessionId}" channel="${channel}"`)
 
     //
     // Ensure the correct arguments were passed up
     //
-    if (typeof eventId !== 'string' || typeof channel !== 'string') {
+    if (typeof sessionId !== 'string' || typeof channel !== 'string') {
       return sendError('Invalid socket arguments')
     }
 
@@ -27,17 +27,16 @@ export default function leaveChannel(chow: TypedChow) {
     if (!registration) return sendError('Bad auth')
 
     //
-    // Find the event to unsubscribe from
+    // Find the session to unsubscribe from
     //
-    const allEvents = await schedule.getEvents()
-    const event = allEvents.find((e) => e.id === eventId)
-    if (!event || !event.enableTranslation || !validChannel(channel)) {
-      return sendError('Event not found')
+    const session = await schedule.findSession(sessionId)
+    if (!session || !session.enableTranslation || !validChannel(channel)) {
+      return sendError('Session not found')
     }
 
     //
     // If all assetions passed so far, remove them from the channel
     //
-    socket.leave(`channel-${event.id}-${channel}`)
+    socket.leave(`channel-${session.id}-${channel}`)
   })
 }

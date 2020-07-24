@@ -118,6 +118,9 @@ npm run lint
 
 # Generate the table-of-contents in this readme
 npm run readme-toc
+
+# Reset the jest cache
+npx jest --clearCache
 ```
 
 ### Code formatting

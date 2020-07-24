@@ -16,7 +16,7 @@ beforeEach(() => {
   startChannel(chow)
 })
 
-describe('@start-channel(eventId, channel)', () => {
+describe('@start-channel(sessionId, channel)', () => {
   it('should mark the translator as current', async () => {
     const socket = chow.io()
 

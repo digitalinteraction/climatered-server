@@ -6,16 +6,16 @@ const debug = createDebug('api:socket:start-channel')
 
 export default function startChannel(chow: TypedChow) {
   //
-  // @start-channel(eventId, channel)
+  // @start-channel(sessionId, channel)
   //
-  chow.socket('start-channel', async (ctx, eventId, channel) => {
+  chow.socket('start-channel', async (ctx, sessionId, channel) => {
     const { socket, sendError, users, redis, schedule, emitToRoom } = ctx
-    debug(`socket="${socket.id}" eventId="${eventId}" channel="${channel}"`)
+    debug(`socket="${socket.id}" sessionId="${sessionId}" channel="${channel}"`)
 
     //
     // Ensure the correct arguments were passed
     //
-    if (typeof eventId !== 'string' || typeof channel !== 'string') {
+    if (typeof sessionId !== 'string' || typeof channel !== 'string') {
       return sendError('Bad arguments')
     }
 
@@ -28,14 +28,14 @@ export default function startChannel(chow: TypedChow) {
     }
 
     //
-    // Get the event they're broadcasting to
+    // Get the session they're broadcasting to
     //
-    const event = await schedule.findEvent(eventId)
-    if (!event || !event.enableTranslation || !validChannel(channel)) {
-      return sendError('Event not found')
+    const session = await schedule.findSession(sessionId)
+    if (!session || !session.enableTranslation || !validChannel(channel)) {
+      return sendError('Session not found')
     }
 
-    const channelKey = `translator_${event.id}_${channel}`
+    const channelKey = `translator_${session.id}_${channel}`
     const translatorKey = `translator_${socket.id}`
 
     //
@@ -49,13 +49,13 @@ export default function startChannel(chow: TypedChow) {
     }
 
     //
-    // Store the socket id of the translator for this event-channel
+    // Store the socket id of the translator for this session-channel
     //
     await redis.set(channelKey, socket.id)
 
     //
-    // Store a packet to quickly know which event to broadcast to
+    // Store a packet to quickly know which session to broadcast to
     //
-    await redis.set(translatorKey, [event.id, channel].join(';'))
+    await redis.set(translatorKey, [session.id, channel].join(';'))
   })
 }
