@@ -1,19 +1,21 @@
 import { mockchow, MockChowish } from '@robb_j/mockchow'
 import express = require('express')
 import base64id = require('base64id')
-import { Env } from './env'
-import { Context, TypedChow } from './server'
+import { Env } from '../env'
+import { Context, TypedChow } from '../server'
 
-import { RedisService } from './services/redis'
-import { JwtService, AuthJwt, createJwtService } from './services/jwt'
-import { ScheduleService } from './services/schedule'
-import { UrlService, createUrlService } from './services/url'
-import { UsersService, Registration } from './services/users'
-import { SockChow, SockContext, ChowSocket, EmitToRoomFn } from './sockchow'
-import { Session, Slot } from './structs'
+import { RedisService } from '../services/redis'
+import { JwtService, AuthJwt, createJwtService } from '../services/jwt'
+import { ScheduleService } from '../services/schedule'
+import { UrlService, createUrlService } from '../services/url'
+import { UsersService, Registration } from '../services/users'
+import { SockChow, SockContext, ChowSocket, EmitToRoomFn } from '../sockchow'
+import { createSlot, createSession } from './fixtures'
 
 export { mocked } from 'ts-jest/utils'
-export { Registration } from './services/users'
+export { Registration } from '../services/users'
+
+export * from './fixtures'
 
 export type TypedMockChow = MockChowish & TypedChow & TestExtras
 
@@ -61,54 +63,6 @@ function mockJwt(secretKey: string): JwtService {
   }
 }
 
-export const createSlot = (id: string, start: number): Slot => ({
-  id: id,
-  start: new Date(`2020-06-15T${start}:00:00.000Z`),
-  end: new Date(`2020-06-15T${start + 1}:00:00.000Z`),
-})
-
-export const createSession = (
-  id: string,
-  type: string,
-  slot: string | undefined,
-  translated: boolean
-): Session => ({
-  id,
-  type: type,
-  slot,
-  track: 'act',
-  themes: [],
-  title: {
-    en: 'Title - en',
-    fr: 'Title - fr',
-    es: 'Title - es',
-    ar: 'Title - ar',
-  },
-  content: {
-    en: 'Content - en',
-    fr: 'Content - fr',
-    es: 'Content - es',
-    ar: 'Content - ar',
-  },
-  links: [
-    { type: 'video', url: 'https://youtu.be/dQw4w9WgXcQ', language: 'en' },
-  ],
-  hostLanguage: 'en',
-  enableTranslation: translated,
-  speakers: [],
-  hostOrganisation: undefined,
-  isRecorded: false,
-  attendeeInteraction: 'view',
-  attendeeDevices: 'all',
-})
-
-export const createRegistration = (roles: string[]): Registration => ({
-  name: 'Geoff Testington',
-  email: 'user@example.com',
-  language: 'en',
-  roles,
-})
-
 function mockSchedule(): ScheduleService {
   const slots = [
     createSlot('001', 12),
@@ -130,6 +84,9 @@ function mockSchedule(): ScheduleService {
     findSession: jest.fn(
       async (id) => sessions.find((e) => e.id === id) ?? null
     ),
+    getTracks: jest.fn(),
+    getThemes: jest.fn(),
+    getSpeakers: jest.fn(),
   }
 }
 

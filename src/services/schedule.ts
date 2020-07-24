@@ -1,17 +1,31 @@
-// import slots = require('../data/slots.json')
-// import events = require('../data/events.json')
-// import registrations = require('../data/registrations.json')
-
-import { Session, Slot, SlotStruct, SlotJson } from '../structs'
+import {
+  Session,
+  Slot,
+  SlotStruct,
+  SlotJson,
+  Speaker,
+  Track,
+  Theme,
+} from '../structs'
 import { RedisService } from './redis'
 
 export interface ScheduleService {
   getSlots(): Promise<Slot[]>
   getSessions(): Promise<Session[]>
   findSession(id: string): Promise<Session | null>
+  getTracks(): Promise<Track[]>
+  getThemes(): Promise<Theme[]>
+  getSpeakers(): Promise<Speaker[]>
 }
 
 export function createScheduleService(redis: RedisService): ScheduleService {
+  async function getJson(key: string) {
+    const raw = await redis.get('schedule.slots')
+    if (!raw) return []
+
+    return JSON.parse(raw)
+  }
+
   async function getSlots(): Promise<Slot[]> {
     const raw = await redis.get('schedule.slots')
     if (!raw) return []
@@ -25,14 +39,13 @@ export function createScheduleService(redis: RedisService): ScheduleService {
     }))
   }
 
-  async function getSessions(): Promise<Session[]> {
-    const raw = await redis.get('schedule.sessions')
-    if (!raw) return []
-    return JSON.parse(raw)
-  }
+  const getSessions = () => getJson('schedule.sessions')
+  const getTracks = () => getJson('schedule.tracks')
+  const getThemes = () => getJson('schedule.themes')
+  const getSpeakers = () => getJson('schedule.speakers')
 
   async function findSession(id: string) {
-    const sessions = await getSessions()
+    const sessions: Session[] = await getSessions()
     return sessions.find((s) => s.id === id) ?? null
   }
 
@@ -40,5 +53,8 @@ export function createScheduleService(redis: RedisService): ScheduleService {
     getSlots,
     getSessions,
     findSession,
+    getTracks,
+    getThemes,
+    getSpeakers,
   }
 }
