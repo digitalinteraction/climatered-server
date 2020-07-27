@@ -50,6 +50,7 @@ function mockRedis(): RedisService {
     quit: jest.fn(),
     get: jest.fn(async (k) => data.get(k) ?? null),
     set: jest.fn(async (k, v) => data.set(k, v) as any),
+    setAndExpire: jest.fn(async (k, v) => data.set(k, v) as any),
     del: jest.fn(async (k) => (data.delete(k), 1)),
   }
 }

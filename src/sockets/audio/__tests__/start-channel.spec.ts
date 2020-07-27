@@ -10,6 +10,8 @@ import {
 let chow: TypedMockChow
 let translator: Registration
 
+const sixHours = 6 * 60 * 60
+
 beforeEach(() => {
   chow = createServer()
   translator = createRegistration(['translator'])
@@ -24,7 +26,11 @@ describe('@start-channel(sessionId, channel)', () => {
 
     await socket.emit('start-channel', '001', 'fr')
 
-    expect(chow.redis.set).toBeCalledWith('translator_001_fr', socket.id)
+    expect(chow.redis.setAndExpire).toBeCalledWith(
+      'translator_001_fr',
+      socket.id,
+      sixHours
+    )
   })
 
   it('should store the translator packet', async () => {
@@ -35,9 +41,10 @@ describe('@start-channel(sessionId, channel)', () => {
     await socket.emit('start-channel', '001', 'fr')
 
     const translatorPacket = '001;fr'
-    expect(chow.redis.set).toBeCalledWith(
+    expect(chow.redis.setAndExpire).toBeCalledWith(
       'translator_' + socket.id,
-      translatorPacket
+      translatorPacket,
+      sixHours
     )
   })
 

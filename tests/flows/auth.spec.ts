@@ -51,8 +51,12 @@ test('Authentication flow', async () => {
     iat: expect.any(Number),
     typ: 'login',
     sub: 'user@example.com',
-    exp: Math.floor(Date.now() / 1000) + 30 * 60,
+    exp: expect.any(Number),
   })
+  const { exp } = jwt.verify(loginToken, JWT_SECRET) as any
+  const expectedExp = Math.floor(Date.now() / 1000) + 30 * 60
+  expect(exp).toBeGreaterThanOrEqual(expectedExp - 1)
+  expect(exp).toBeLessThanOrEqual(expectedExp + 1)
 
   //
   // [2] Test validating a jwt to get an auth token
