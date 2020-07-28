@@ -1,4 +1,5 @@
 import path = require('path')
+import os = require('os')
 import fse = require('fs-extra')
 import cp = require('child_process')
 import glob = require('globby')
@@ -82,7 +83,7 @@ function debugExec(cmd: string) {
 }
 
 export async function runScraper() {
-  const tmpdir = await fse.mkdtemp('schedule-clone-')
+  const tmpdir = await fse.mkdtemp(path.join(os.tmpdir(), 'schedule-clone-'))
 
   debug(`runScraper tmpdir="${tmpdir}"`)
 
@@ -97,6 +98,12 @@ export async function runScraper() {
   const redis = new IORedis(REDIS_URL)
 
   try {
+    // Check the redis connection
+    await new Promise((resolve, reject) => {
+      redis.once('connect', () => resolve())
+      redis.once('error', (e) => reject(e))
+    })
+
     // Ensure we were passed a valid url
     const { stderr } = await debugExec(`git ls-remote ${SCHEDULE_GIT_URL}`)
     if (stderr) throw new Error(stderr)
