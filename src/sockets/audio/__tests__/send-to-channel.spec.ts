@@ -1,18 +1,10 @@
 import sendToChannelSocket from '../send-to-channel'
-import {
-  TypedMockChow,
-  createServer,
-  mocked,
-  createRegistration,
-  Registration,
-} from '../../../test-utils'
+import { TypedMockChow, createServer } from '../../../test-utils'
 
 let chow: TypedMockChow
-let translator: Registration
 
 beforeEach(() => {
   chow = createServer()
-  translator = createRegistration(['translator'])
   sendToChannelSocket(chow)
 })
 

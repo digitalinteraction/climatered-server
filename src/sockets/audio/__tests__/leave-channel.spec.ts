@@ -3,16 +3,16 @@ import {
   TypedMockChow,
   createServer,
   mocked,
-  createRegistration,
-  Registration,
+  createAuthToken,
+  AuthJwt,
 } from '../../../test-utils'
 
 let chow: TypedMockChow
-let attendee: Registration
+let attendee: AuthJwt
 
 beforeEach(() => {
   chow = createServer()
-  attendee = createRegistration(['attendee'])
+  attendee = createAuthToken(['attendee'])
   leaveChannelSocket(chow)
 })
 
@@ -20,7 +20,7 @@ describe('@leave-channel(sessionId', () => {
   it('should remove that user from the channel', async () => {
     const socket = chow.io()
 
-    mocked(chow.users.registrationForSocket).mockResolvedValue(attendee)
+    mocked(chow.auth.fromSocket).mockResolvedValue(attendee)
 
     await socket.emit('leave-channel', '001', 'fr')
 

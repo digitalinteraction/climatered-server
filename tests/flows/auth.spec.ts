@@ -52,6 +52,7 @@ test('Authentication flow', async () => {
     typ: 'login',
     sub: 'user@example.com',
     exp: expect.any(Number),
+    user_roles: ['attendee'],
   })
   const { exp } = jwt.verify(loginToken, JWT_SECRET) as any
   const expectedExp = Math.floor(Date.now() / 1000) + 30 * 60

@@ -1,4 +1,4 @@
-import { createServer, mocked } from '../../src/test-utils'
+import { createServer } from '../../src/test-utils'
 import { setupRoutes } from '../../src/server'
 import supertest = require('supertest')
 import jwt = require('jsonwebtoken')

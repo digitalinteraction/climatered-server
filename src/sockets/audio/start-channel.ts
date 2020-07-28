@@ -1,6 +1,7 @@
 import { TypedChow } from '../../server'
 import { validChannel } from './join-channel'
 import createDebug = require('debug')
+import { AuthJwt } from '../../services/jwt'
 
 const debug = createDebug('api:socket:start-channel')
 
@@ -11,7 +12,7 @@ export default function startChannel(chow: TypedChow) {
   // @start-channel(sessionId, channel)
   //
   chow.socket('start-channel', async (ctx, sessionId, channel) => {
-    const { socket, sendError, users, redis, schedule, emitToRoom } = ctx
+    const { socket, sendError, redis, schedule, emitToRoom, auth } = ctx
     debug(`socket="${socket.id}" sessionId="${sessionId}" channel="${channel}"`)
 
     //
@@ -24,8 +25,8 @@ export default function startChannel(chow: TypedChow) {
     //
     // Check the bradcaster is a translator
     //
-    const user = await users.registrationForSocket(socket.id, redis)
-    if (!user || !user.roles.includes('translator')) {
+    const authToken = await auth.fromSocket(socket.id)
+    if (!authToken || !authToken.user_roles.includes('translator')) {
       return sendError('Bad auth')
     }
 

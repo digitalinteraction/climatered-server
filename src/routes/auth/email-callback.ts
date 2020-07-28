@@ -24,9 +24,10 @@ export default function emailCallback(chow: TypedChow) {
 
         //
         // Try to associate the token with a registration
+        // -> Translators may not be registered though
+        // -> We trust that the jwt was signed by the email-request endpoint
         //
         const registration = await users.getRegistration(login.sub)
-        if (!registration) throw genericFail()
 
         //
         // Create an authentication token
@@ -35,8 +36,8 @@ export default function emailCallback(chow: TypedChow) {
         const auth: AuthJwt = {
           typ: 'auth',
           sub: login.sub,
-          user_roles: registration.roles,
-          user_lang: registration.language,
+          user_roles: login.user_roles,
+          user_lang: registration?.language ?? 'en',
         }
         const link = url.forWeb('/_token')
         link.searchParams.set('token', jwt.sign(auth))

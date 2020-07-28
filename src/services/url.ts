@@ -4,6 +4,9 @@ export function appendUrl(url: URL, extraPath: string) {
   return new URL(path.join(url.pathname, extraPath), url.origin)
 }
 
+/**
+ * A service for formatting urls to the api itself or the associated web app
+ */
 export interface UrlService {
   forSelf(path: string): URL
   forWeb(path: string): URL

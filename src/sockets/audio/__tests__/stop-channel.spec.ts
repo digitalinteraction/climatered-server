@@ -3,16 +3,16 @@ import {
   TypedMockChow,
   createServer,
   mocked,
-  createRegistration,
-  Registration,
+  AuthJwt,
+  createAuthToken,
 } from '../../../test-utils'
 
 let chow: TypedMockChow
-let translator: Registration
+let translator: AuthJwt
 
 beforeEach(() => {
   chow = createServer()
-  translator = createRegistration(['translator'])
+  translator = createAuthToken(['translator'])
   stopChannelSocket(chow)
 })
 
@@ -22,7 +22,7 @@ describe('@stop-channel()', () => {
 
     const translatorKey = `translator_${socket.id}`
 
-    mocked(chow.users.registrationForSocket).mockResolvedValue(translator)
+    mocked(chow.auth.fromSocket).mockResolvedValue(translator)
     await chow.redis.set('translator_001_fr', socket.id)
     await chow.redis.set(translatorKey, '001;fr')
 

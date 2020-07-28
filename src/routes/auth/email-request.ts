@@ -2,6 +2,7 @@ import { TypedChow } from '../../server'
 import emailRegex = require('email-regex')
 import { HttpMessage } from '@robb_j/chowchow/dist'
 
+import { Translator } from '../../structs'
 import { EmailEvent } from '../../events/email'
 import { LoginJwt } from '../../services/jwt'
 
@@ -9,7 +10,7 @@ export default function emailRequest(chow: TypedChow) {
   chow.route(
     'get',
     '/login/email',
-    async ({ request, jwt, url, emit, users }) => {
+    async ({ request, jwt, url, emit, users, redis }) => {
       //
       // Get and validate their email
       //
@@ -19,16 +20,38 @@ export default function emailRequest(chow: TypedChow) {
       }
 
       //
+      // Check if they are a translator
+      //
+      const allTranslators = await redis.getJson<Translator[]>(
+        'schedule.translators',
+        []
+      )
+      const translator = allTranslators.find((t) =>
+        users.compareEmails(t.email, email)
+      )
+
+      //
       // Find a matching registration
       //
       const registration = await users.getRegistration(email)
-      if (!registration) return new HttpMessage(400, 'Bad email')
+      if (!translator && !registration) return new HttpMessage(400, 'Bad email')
+
+      //
+      // Decide roles
+      //
+      const roles = []
+      if (registration) roles.push('attendee')
+      if (translator) roles.push('translator')
 
       //
       // Generate a link to send them back to
       // with the jwt as a query parameter
       //
-      const token: LoginJwt = { typ: 'login', sub: email.toLowerCase() }
+      const token: LoginJwt = {
+        typ: 'login',
+        sub: email.toLowerCase(),
+        user_roles: roles,
+      }
       const link = url.forSelf('/login/email/callback')
       link.searchParams.set('token', jwt.sign(token, { expiresIn: '30m' }))
 

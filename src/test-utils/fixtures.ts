@@ -1,5 +1,6 @@
 import { Session, Slot } from '../structs'
 import { Registration } from '../services/users'
+import { AuthJwt } from '../services/jwt'
 
 //
 // Functions to generate data for testing
@@ -50,5 +51,11 @@ export const createRegistration = (roles: string[]): Registration => ({
   name: 'Geoff Testington',
   email: 'user@example.com',
   language: 'en',
-  roles,
+})
+
+export const createAuthToken = (roles: string[]): AuthJwt => ({
+  typ: 'auth',
+  sub: 'user@example.com',
+  user_roles: roles,
+  user_lang: 'en',
 })

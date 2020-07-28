@@ -11,6 +11,7 @@ beforeEach(() => {
   mocked(chow.jwt.verify).mockReturnValue({
     typ: 'login',
     sub: 'user@example.com',
+    user_roles: ['attendee', 'translator'],
   })
 
   mocked(chow.jwt.sign).mockReturnValue('fake_auth_token')
@@ -19,7 +20,6 @@ beforeEach(() => {
     name: 'Geoff Testington',
     email: 'user@example.com',
     language: 'en',
-    roles: ['attendee'],
   })
 })
 
@@ -44,7 +44,7 @@ describe('GET /login/email/callback', () => {
     expect(chow.jwt.sign).toBeCalledWith({
       typ: 'auth',
       sub: 'user@example.com',
-      user_roles: ['attendee'],
+      user_roles: ['attendee', 'translator'],
       user_lang: 'en',
     })
   })

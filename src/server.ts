@@ -12,6 +12,7 @@ import { ScheduleService, createScheduleService } from './services/schedule'
 import { JwtService, createJwtService } from './services/jwt'
 import { UrlService, createUrlService } from './services/url'
 import { UsersService, createUsersService } from './services/users'
+import { AuthService, createAuthService } from './services/auth'
 
 import homeRoute from './routes/home'
 import emailRequestRoute from './routes/auth/email-request'
@@ -37,6 +38,7 @@ export interface Context extends SockContext<Env> {
   jwt: JwtService
   url: UrlService
   users: UsersService
+  auth: AuthService
 }
 
 export type TypedChow = SockChowish<Env, Context> & Chowish<Env, Context>
@@ -110,6 +112,7 @@ export async function runServer() {
   const jwt = createJwtService(env.JWT_SECRET)
   const url = createUrlService(env.SELF_URL, env.WEB_URL)
   const users = createUsersService()
+  const auth = createAuthService(redis, jwt)
 
   //
   // Create our chow instance
@@ -122,6 +125,7 @@ export async function runServer() {
     jwt,
     url,
     users,
+    auth,
   })
   const chow = new SockChow(ctxFactory, env)
   chow.addHelpers({

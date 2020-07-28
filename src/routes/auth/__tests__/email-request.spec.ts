@@ -28,7 +28,7 @@ describe('GET /login/email', () => {
     expect(res.body).toEqual({ message: 'Bad email' })
   })
 
-  it('should sign an login token for valid email addresses', async () => {
+  it('should sign an login token for an attendee', async () => {
     const query = {
       email: 'user@example.com',
     }
@@ -36,7 +36,29 @@ describe('GET /login/email', () => {
     await chow.http('get', '/login/email', { query })
 
     expect(chow.jwt.sign).toBeCalledWith(
-      { typ: 'login', sub: 'user@example.com' },
+      { typ: 'login', sub: 'user@example.com', user_roles: ['attendee'] },
+      { expiresIn: '30m' }
+    )
+  })
+
+  it('should sign an login token for a', async () => {
+    await chow.redis.set(
+      'schedule.translators',
+      JSON.stringify([{ name: 'Geoff', email: 'translator@example.com' }])
+    )
+
+    const query = {
+      email: 'translator@example.com',
+    }
+
+    await chow.http('get', '/login/email', { query })
+
+    expect(chow.jwt.sign).toBeCalledWith(
+      {
+        typ: 'login',
+        sub: 'translator@example.com',
+        user_roles: ['translator'],
+      },
       { expiresIn: '30m' }
     )
   })

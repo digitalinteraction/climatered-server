@@ -5,15 +5,18 @@ import { Env } from '../env'
 import { Context, TypedChow } from '../server'
 
 import { RedisService } from '../services/redis'
-import { JwtService, AuthJwt, createJwtService } from '../services/jwt'
+import { JwtService, createJwtService } from '../services/jwt'
 import { ScheduleService } from '../services/schedule'
 import { UrlService, createUrlService } from '../services/url'
-import { UsersService, Registration } from '../services/users'
+import { UsersService, Registration, compareEmails } from '../services/users'
+import { AuthService, createAuthService } from '../services/auth'
+
 import { SockChow, SockContext, ChowSocket, EmitToRoomFn } from '../sockchow'
 import { createSlot, createSession } from './fixtures'
 
 export { mocked } from 'ts-jest/utils'
 export { Registration } from '../services/users'
+export { AuthJwt, LoginJwt } from '../services/jwt'
 
 export * from './fixtures'
 
@@ -25,6 +28,7 @@ interface TestExtras {
   schedule: ScheduleService
   url: UrlService
   users: UsersService
+  auth: AuthService
   app: express.Application
   io(): MockSocket
 }
@@ -45,10 +49,14 @@ export function createTestEnv(): Env {
 
 function mockRedis(): RedisService {
   const data = new Map<string, string>()
+
   return {
     ping: jest.fn(),
     quit: jest.fn(),
     get: jest.fn(async (k) => data.get(k) ?? null),
+    getJson: jest.fn(async (k, f) =>
+      data.has(k) ? JSON.parse(data.get(k)!) : f
+    ),
     set: jest.fn(async (k, v) => data.set(k, v) as any),
     setAndExpire: jest.fn(async (k, v) => data.set(k, v) as any),
     del: jest.fn(async (k) => (data.delete(k), 1)),
@@ -60,7 +68,6 @@ function mockJwt(secretKey: string): JwtService {
   return {
     sign: jest.fn((payload, opts) => jwt.sign(payload, opts)),
     verify: jest.fn((token) => jwt.verify(token)),
-    authFromRequest: jest.fn((request) => jwt.authFromRequest(request)),
   }
 }
 
@@ -106,12 +113,20 @@ function mockUsers(): UsersService {
       name: 'Geoff Testington',
       email: 'user@example.com',
       language: 'en',
-      roles: ['attendee'],
     },
   }
   return {
     getRegistration: jest.fn(async (email) => registrations[email]),
-    registrationForSocket: jest.fn(async () => null),
+    compareEmails,
+  }
+}
+
+function mockAuth(redis: RedisService, jwt: JwtService): AuthService {
+  const auth = createAuthService(redis, jwt)
+
+  return {
+    fromRequest: jest.fn((request) => auth.fromRequest(request)),
+    fromSocket: jest.fn((id) => auth.fromSocket(id)),
   }
 }
 
@@ -141,7 +156,9 @@ function fakeIo<E, C extends SockContext<E>>(
     // Mock out generic socket functions so they can be tested
     const join = jest.fn()
     const leave = jest.fn()
-    const sendError = jest.fn()
+    const sendError = jest.fn((message) => {
+      throw new Error(`#sendError called with: ` + message)
+    })
 
     // A custom emit method to directly call handlers
     const emit = jest.fn(async (message, ...args) => {
@@ -173,6 +190,7 @@ export function createServer(): TypedMockChow {
   const schedule = mockSchedule()
   const url = mockUrl(env.SELF_URL, env.WEB_URL)
   const users = mockUsers()
+  const auth = mockAuth(redis, jwt)
 
   const chow = new SockChow<Env, Context>(
     (base) => ({ ...base, ...extras }),
@@ -197,6 +215,7 @@ export function createServer(): TypedMockChow {
     users,
     app: chow.app,
     io,
+    auth,
   }
 
   return Object.assign(mockchow(chow, extras), { socket, emitToRoom })

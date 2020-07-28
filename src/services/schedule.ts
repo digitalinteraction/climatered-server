@@ -9,6 +9,9 @@ import {
 } from '../structs'
 import { RedisService } from './redis'
 
+/**
+ * A service for fetching schedule information for the conference
+ */
 export interface ScheduleService {
   getSlots(): Promise<Slot[]>
   getSessions(): Promise<Session[]>

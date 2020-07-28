@@ -3,18 +3,18 @@ import {
   TypedMockChow,
   createServer,
   mocked,
-  createRegistration,
-  Registration,
+  AuthJwt,
+  createAuthToken,
 } from '../../../test-utils'
 
 let chow: TypedMockChow
-let translator: Registration
+let translator: AuthJwt
 
 const sixHours = 6 * 60 * 60
 
 beforeEach(() => {
   chow = createServer()
-  translator = createRegistration(['translator'])
+  translator = createAuthToken(['translator'])
   startChannel(chow)
 })
 
@@ -22,7 +22,7 @@ describe('@start-channel(sessionId, channel)', () => {
   it('should mark the translator as current', async () => {
     const socket = chow.io()
 
-    mocked(chow.users.registrationForSocket).mockResolvedValue(translator)
+    mocked(chow.auth.fromSocket).mockResolvedValue(translator)
 
     await socket.emit('start-channel', '001', 'fr')
 
@@ -36,7 +36,7 @@ describe('@start-channel(sessionId, channel)', () => {
   it('should store the translator packet', async () => {
     const socket = chow.io()
 
-    mocked(chow.users.registrationForSocket).mockResolvedValue(translator)
+    mocked(chow.auth.fromSocket).mockResolvedValue(translator)
 
     await socket.emit('start-channel', '001', 'fr')
 
@@ -52,7 +52,7 @@ describe('@start-channel(sessionId, channel)', () => {
     const socket = chow.io()
 
     const oldTranslator = `translator_not_${socket.id}`
-    mocked(chow.users.registrationForSocket).mockResolvedValue(translator)
+    mocked(chow.auth.fromSocket).mockResolvedValue(translator)
     await chow.redis.set('translator_001_fr', oldTranslator)
 
     await socket.emit('start-channel', '001', 'fr')

@@ -1,4 +1,4 @@
-import { TypedMockChow, createServer } from '../../test-utils'
+import { TypedMockChow, createServer, mocked } from '../../test-utils'
 import authSocket from '../auth'
 import { AuthJwt } from '../../services/jwt'
 import jwt = require('jsonwebtoken')
@@ -32,6 +32,7 @@ describe('@auth(token)', () => {
 
   it('should send an error for invalid jwt', async () => {
     const socket = chow.io()
+    mocked(socket.sendError).mockImplementation(() => {})
 
     const token = 'no_a_jwt'
 

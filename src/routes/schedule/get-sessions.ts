@@ -7,11 +7,11 @@ export default function getSessions(chow: TypedChow) {
   chow.route(
     'get',
     '/schedule/sessions',
-    async ({ request, schedule, jwt }) => {
+    async ({ request, schedule, auth }) => {
       //
       // Get the user's auth from the request
       //
-      const auth = jwt.authFromRequest(request)
+      const authToken = await auth.fromRequest(request)
 
       //
       // Load sessions from the schedule
@@ -21,7 +21,7 @@ export default function getSessions(chow: TypedChow) {
       //
       // Remove links from the sessions if they aren't logged in
       //
-      if (!auth) {
+      if (!authToken) {
         sessions = sessions.map((e) => ({ ...e, links: [] }))
       }
 
