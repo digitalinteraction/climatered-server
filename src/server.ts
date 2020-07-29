@@ -13,10 +13,13 @@ import { JwtService, createJwtService } from './services/jwt'
 import { UrlService, createUrlService } from './services/url'
 import { UsersService, createUsersService } from './services/users'
 import { AuthService, createAuthService } from './services/auth'
+import { PostgresService, createPostgresService } from './services/postgres'
 
 import homeRoute from './routes/home'
 import emailRequestRoute from './routes/auth/email-request'
 import emailCallbackRoute from './routes/auth/email-callback'
+import registerRoute from './routes/auth/register'
+import verifyRoute from './routes/auth/verify'
 import getSlotsRoute from './routes/schedule/get-slots'
 import getSessionsRoute from './routes/schedule/get-sessions'
 
@@ -41,6 +44,7 @@ export interface Context extends SockContext<Env> {
   url: UrlService
   users: UsersService
   auth: AuthService
+  pg: PostgresService
 }
 
 export type TypedChow = SockChowish<Env, Context> & Chowish<Env, Context>
@@ -75,6 +79,8 @@ export function setupRoutes(chow: TypedChow) {
     homeRoute,
     emailRequestRoute,
     emailCallbackRoute,
+    registerRoute,
+    verifyRoute,
     getSlotsRoute,
     getSessionsRoute
   )
@@ -115,8 +121,9 @@ export async function runServer() {
   const schedule = createScheduleService(redis)
   const jwt = createJwtService(env.JWT_SECRET)
   const url = createUrlService(env.SELF_URL, env.WEB_URL)
-  const users = createUsersService()
   const auth = createAuthService(redis, jwt)
+  const pg = createPostgresService(env.SQL_URL)
+  const users = createUsersService(pg)
 
   //
   // Create our chow instance
@@ -130,6 +137,7 @@ export async function runServer() {
     url,
     users,
     auth,
+    pg,
   })
   const chow = new SockChow(ctxFactory, env)
   chow.addHelpers({

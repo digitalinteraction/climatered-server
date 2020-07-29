@@ -10,6 +10,7 @@ export function createEnv(processEnv: Record<string, string | undefined>) {
     'SELF_URL',
     'WEB_URL',
     'REDIS_URL',
+    'SQL_URL',
   ])
 
   const {
@@ -20,6 +21,7 @@ export function createEnv(processEnv: Record<string, string | undefined>) {
     SELF_URL,
     WEB_URL,
     REDIS_URL,
+    SQL_URL,
   } = processEnv as Record<string, string>
 
   const ENABLE_ACCESS_LOGS = Boolean(process.env.ENABLE_ACCESS_LOGS)
@@ -35,5 +37,6 @@ export function createEnv(processEnv: Record<string, string | undefined>) {
     WEB_URL,
     REDIS_URL,
     ENABLE_ACCESS_LOGS,
+    SQL_URL,
   }
 }

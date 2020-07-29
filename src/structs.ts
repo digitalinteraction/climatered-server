@@ -1,4 +1,5 @@
 import {
+  number,
   string,
   object,
   array,
@@ -8,6 +9,8 @@ import {
   enums,
   StructType,
 } from 'superstruct'
+
+import countries = require('i18n-iso-countries')
 
 export {
   is as isStruct,
@@ -119,4 +122,34 @@ export type Translator = StructType<typeof TranslatorStruct>
 export const TranslatorStruct = object({
   name: string(),
   email: string(),
+})
+
+//
+// Registration
+//
+const countryCodes = Object.keys(countries.getNames('en'))
+
+export type Registration = StructType<typeof RegistrationStruct>
+export const RegistrationStruct = object({
+  id: number(),
+  created: date(),
+  name: string(),
+  email: string(),
+  language: enums(['en', 'fr', 'es', 'ar']),
+  country: enums(countryCodes),
+  affiliation: string(),
+  verified: boolean(),
+  consented: date(),
+})
+
+//
+// RegisterBody - the fields needed to register
+//
+export type RegisterBody = StructType<typeof RegisterBodyStruct>
+export const RegisterBodyStruct = object({
+  name: string(),
+  email: string(),
+  language: string(),
+  country: enums(countryCodes),
+  affiliation: string(),
 })

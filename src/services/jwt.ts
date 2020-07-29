@@ -18,6 +18,11 @@ export interface AuthJwt {
   user_lang: string
 }
 
+export interface VerifyJwt {
+  typ: 'verify'
+  sub: string
+}
+
 /**
  * A service for signing and verifying json web tokens
  */

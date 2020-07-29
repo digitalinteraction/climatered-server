@@ -1,4 +1,9 @@
-import { TypedMockChow, createServer, mocked } from '../../../test-utils'
+import {
+  TypedMockChow,
+  createServer,
+  mocked,
+  createRegistration,
+} from '../../../test-utils'
 import emailCallbackRoute from '../email-callback'
 import { HttpRedirect } from '@robb_j/chowchow'
 
@@ -16,11 +21,8 @@ beforeEach(() => {
 
   mocked(chow.jwt.sign).mockReturnValue('fake_auth_token')
 
-  mocked(chow.users.getRegistration).mockResolvedValue({
-    name: 'Geoff Testington',
-    email: 'user@example.com',
-    language: 'en',
-  })
+  const registration = createRegistration()
+  mocked(chow.users.getRegistration).mockResolvedValue(registration)
 })
 
 describe('GET /login/email/callback', () => {

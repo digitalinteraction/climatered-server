@@ -18,7 +18,7 @@ import {
   ThemeStruct,
   TranslatorStruct,
   SpeakerStruct,
-} from './structs'
+} from '../structs'
 import IORedis = require('ioredis')
 
 const exec = promisify(cp.exec)

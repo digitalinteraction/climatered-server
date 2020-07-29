@@ -8,14 +8,15 @@ import { RedisService } from '../services/redis'
 import { JwtService, createJwtService } from '../services/jwt'
 import { ScheduleService } from '../services/schedule'
 import { UrlService, createUrlService } from '../services/url'
-import { UsersService, Registration, compareEmails } from '../services/users'
+import { UsersService, compareEmails } from '../services/users'
 import { AuthService, createAuthService } from '../services/auth'
+import { PostgresService } from '../services/postgres'
 
 import { SockChow, SockContext, ChowSocket, EmitToRoomFn } from '../sockchow'
 import { createSlot, createSession } from './fixtures'
+import { Registration } from '../structs'
 
 export { mocked } from 'ts-jest/utils'
-export { Registration } from '../services/users'
 export { AuthJwt, LoginJwt } from '../services/jwt'
 
 export * from './fixtures'
@@ -30,6 +31,8 @@ interface TestExtras {
   users: UsersService
   auth: AuthService
   app: express.Application
+  pg: PostgresService
+  sql: jest.Mock
   io(): MockSocket
 }
 
@@ -44,6 +47,7 @@ export function createTestEnv(): Env {
     WEB_URL: 'http://web.localhost',
     REDIS_URL: 'redis://localhost',
     ENABLE_ACCESS_LOGS: false,
+    SQL_URL: 'postgresql://user:secret@localhost:5432/test',
   }
 }
 
@@ -110,13 +114,21 @@ function mockUrl(self: string, web: string): UrlService {
 function mockUsers(): UsersService {
   const registrations: Record<string, Registration> = {
     'user@example.com': {
+      id: 1,
+      created: new Date(),
       name: 'Geoff Testington',
       email: 'user@example.com',
       language: 'en',
+      country: 'GB',
+      verified: true,
+      affiliation: 'Open Lab',
+      consented: new Date(),
     },
   }
   return {
     getRegistration: jest.fn(async (email) => registrations[email]),
+    register: jest.fn(),
+    verify: jest.fn(),
     compareEmails,
   }
 }
@@ -128,6 +140,23 @@ function mockAuth(redis: RedisService, jwt: JwtService): AuthService {
     fromRequest: jest.fn((request) => auth.fromRequest(request)),
     fromSocket: jest.fn((id) => auth.fromSocket(id)),
   }
+}
+
+function mockPostgres(): [jest.Mock, PostgresService] {
+  const sql = jest.fn()
+
+  const fakeClient = () => ({
+    release: jest.fn(),
+    sql,
+  })
+
+  const svc = {
+    run: jest.fn((block) => block(fakeClient())),
+    client: jest.fn(),
+    close: jest.fn(),
+  }
+
+  return [sql, svc]
 }
 
 /**
@@ -191,6 +220,7 @@ export function createServer(): TypedMockChow {
   const url = mockUrl(env.SELF_URL, env.WEB_URL)
   const users = mockUsers()
   const auth = mockAuth(redis, jwt)
+  const [sql, pg] = mockPostgres()
 
   const chow = new SockChow<Env, Context>(
     (base) => ({ ...base, ...extras }),
@@ -216,6 +246,8 @@ export function createServer(): TypedMockChow {
     app: chow.app,
     io,
     auth,
+    pg,
+    sql,
   }
 
   return Object.assign(mockchow(chow, extras), { socket, emitToRoom })

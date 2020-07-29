@@ -1,5 +1,4 @@
-import { Session, Slot } from '../structs'
-import { Registration } from '../services/users'
+import { Session, Slot, Registration } from '../structs'
 import { AuthJwt } from '../services/jwt'
 
 //
@@ -47,10 +46,16 @@ export const createSession = (
   attendeeDevices: 'all',
 })
 
-export const createRegistration = (roles: string[]): Registration => ({
+export const createRegistration = (): Registration => ({
+  id: 1,
+  created: new Date(),
   name: 'Geoff Testington',
   email: 'user@example.com',
   language: 'en',
+  country: 'GB',
+  affiliation: 'Open Lab',
+  verified: true,
+  consented: new Date(),
 })
 
 export const createAuthToken = (roles: string[]): AuthJwt => ({

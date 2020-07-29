@@ -2,7 +2,8 @@ import yargs = require('yargs')
 import jwt = require('jsonwebtoken')
 import { validateEnv } from 'valid-env'
 import { runServer } from './server'
-import { runScraper } from './content-scraper'
+import { runScraper } from './cmd/scrape-content'
+import { runMigrator } from './cmd/migrate'
 
 yargs.help().alias('h', 'help').demandCommand().recommendCommands()
 
@@ -27,6 +28,20 @@ yargs.command(
   async (args) => {
     try {
       await runScraper()
+    } catch (error) {
+      console.error(error)
+      process.exit(1)
+    }
+  }
+)
+
+yargs.command(
+  'migrate',
+  'Run the database migrator',
+  (yargs) => yargs,
+  async (args) => {
+    try {
+      await runMigrator()
     } catch (error) {
       console.error(error)
       process.exit(1)
