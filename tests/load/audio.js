@@ -81,8 +81,8 @@ function pause(ms) {
     const numPackets = 10
 
     const small = await loadTest(10, packetSize, numPackets)
-    const medium = await loadTest(100, 16 * 1024, 5)
-    const large = await loadTest(1000, 16 * 1024, 5)
+    const medium = await loadTest(100, packetSize, numPackets)
+    const large = await loadTest(1000, packetSize, numPackets)
 
     const all = { small, medium, large }
 
