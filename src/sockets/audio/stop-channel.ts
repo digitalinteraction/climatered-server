@@ -1,7 +1,7 @@
 import { TypedChow } from '../../server'
 import createDebug = require('debug')
 
-const debug = createDebug('api:socket:start-channel')
+const debug = createDebug('api:socket:stop-channel')
 
 export default function stopChannel(chow: TypedChow) {
   //

@@ -2,7 +2,11 @@
   {
     "name": "Rob Anderson",
     "email": "robanderson@hey.com",
-    "language": "en",
-    "roles": ["attendee", "translator"]
+    "language": "en"
+  },
+  {
+    "name": "Rob Anderson",
+    "email": "attendee@example.com",
+    "language": "en"
   }
 ]

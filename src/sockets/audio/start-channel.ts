@@ -1,7 +1,6 @@
 import { TypedChow } from '../../server'
 import { validChannel } from './join-channel'
 import createDebug = require('debug')
-import { AuthJwt } from '../../services/jwt'
 
 const debug = createDebug('api:socket:start-channel')
 

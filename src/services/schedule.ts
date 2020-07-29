@@ -22,30 +22,21 @@ export interface ScheduleService {
 }
 
 export function createScheduleService(redis: RedisService): ScheduleService {
-  async function getJson(key: string) {
-    const raw = await redis.get('schedule.slots')
-    if (!raw) return []
-
-    return JSON.parse(raw)
-  }
-
   async function getSlots(): Promise<Slot[]> {
-    const raw = await redis.get('schedule.slots')
-    if (!raw) return []
+    const slots = await redis.getJson<SlotJson[]>('schedule.slots', [])
+    if (!slots) return []
 
-    const jsonSlots: SlotJson[] = JSON.parse(raw)
-
-    return jsonSlots.map((s) => ({
+    return slots.map((s) => ({
       id: s.id,
       start: new Date(s.start),
       end: new Date(s.end),
     }))
   }
 
-  const getSessions = () => getJson('schedule.sessions')
-  const getTracks = () => getJson('schedule.tracks')
-  const getThemes = () => getJson('schedule.themes')
-  const getSpeakers = () => getJson('schedule.speakers')
+  const getSessions = () => redis.getJson('schedule.sessions', [])
+  const getTracks = () => redis.getJson('schedule.tracks', [])
+  const getThemes = () => redis.getJson('schedule.themes', [])
+  const getSpeakers = () => redis.getJson('schedule.speakers', [])
 
   async function findSession(id: string) {
     const sessions: Session[] = await getSessions()

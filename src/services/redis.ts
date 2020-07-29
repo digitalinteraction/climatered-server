@@ -17,7 +17,10 @@ export function createRedisService(redisUrl: string): RedisService {
   const redis = new Redis(redisUrl)
 
   return {
-    ping: () => redis.ping(),
+    ping: () => {
+      if (redis.status !== 'ready') throw new Error('Not connected')
+      return redis.ping()
+    },
     quit: () => redis.quit(),
     get: (k) => redis.get(k),
     getJson: async (key, fallback) => {

@@ -20,7 +20,9 @@ import emailCallbackRoute from './routes/auth/email-callback'
 import getSlotsRoute from './routes/schedule/get-slots'
 import getSessionsRoute from './routes/schedule/get-sessions'
 
+import hiSocket from './sockets/hi'
 import authSocket from './sockets/auth'
+import deauthSocket from './sockets/deauth'
 import joinChannelSocket from './sockets/audio/join-channel'
 import leaveChannelSocket from './sockets/audio/leave-channel'
 import sendToChannelSocket from './sockets/audio/send-to-channel'
@@ -81,7 +83,9 @@ export function setupRoutes(chow: TypedChow) {
 export function setupSockets(chow: TypedChow) {
   debug('#setupSockets')
   chow.apply(
+    hiSocket,
     authSocket,
+    deauthSocket,
     joinChannelSocket,
     leaveChannelSocket,
     sendToChannelSocket,

@@ -2,7 +2,7 @@ import { TypedChow } from '../server'
 import { AuthJwt } from '../services/jwt'
 import createDebug = require('debug')
 
-const debug = createDebug('api:socket:join-channel')
+const debug = createDebug('api:socket:auth')
 
 export default function auth(chow: TypedChow) {
   //
@@ -21,15 +21,17 @@ export default function auth(chow: TypedChow) {
         throw new Error('Bad auth')
       }
 
-      debug('valid auth')
-
       //
       // THOUGHT – store the jwt here, or just JSON encode it?
       // - is it easier to jwt.decode or JSON.parse the info on the other side
       //
       redis.set('auth_' + socket.id, JSON.stringify(auth))
+
+      debug('valid auth')
+      return true
     } catch (error) {
       sendError('Bad auth')
+      return false
     }
   })
 }

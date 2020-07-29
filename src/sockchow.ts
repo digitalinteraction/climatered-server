@@ -26,7 +26,7 @@ interface SockHandler<C> {
   (
     ctx: C & { socket: ChowSocket; sendError: SocketSendError },
     ...args: any[]
-  ): void | Promise<void>
+  ): any | Promise<any>
 }
 
 export interface SockChowish<E, C extends SockContext<E>> {
@@ -72,7 +72,9 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
     for (const [message, handler] of this.socketHandlers) {
       socket.on(message, async (...args) => {
         try {
-          await handler(
+          const ack = args.slice(-1)[0]
+
+          const result = await handler(
             {
               ...(await this.makeContext()),
               socket: createSocket(socket),
@@ -82,6 +84,11 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
             },
             ...args
           )
+
+          // If they requested an acknowledgement, send back the result of the handler
+          if (typeof ack === 'function') {
+            ack(result)
+          }
         } catch (error) {
           this.catchSocketError(socket, message, error)
         }
