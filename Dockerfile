@@ -1,6 +1,7 @@
 # [0] A common base for both stages
 FROM node:12-alpine as base
 WORKDIR /app
+RUN apk add --no-cache git
 COPY ["package*.json", "tsconfig.json", "/app/"]
 
 # [1] A builder to install modules and run a build
