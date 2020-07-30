@@ -1,0 +1,53 @@
+small
+auth translator - 43ms
+add attendees(10) - 72ms
+send data 1 - 16ms
+send data 2 - 10ms
+send data 3 - 18ms
+send data 4 - 18ms
+send data 5 - 11ms
+deauth attendees - 23ms
+deauth translator - 2ms
+
+medium
+auth translator - 20ms
+add attendees(100) - 615ms
+send data 1 - 33ms
+send data 2 - 43ms
+send data 3 - 56ms
+send data 4 - 54ms
+send data 5 - 38ms
+deauth attendees - 118ms
+deauth translator - 1ms
+
+large
+auth translator - 23ms
+add attendees(1000) - 5s
+send data 1 - 364ms
+send data 2 - 317ms
+send data 3 - 327ms
+send data 4 - 338ms
+send data 5 - 321ms
+deauth attendees - 1s
+deauth translator - 1ms
+
+small
+  attendees: 10
+  packetSize: 16384
+  startup: 115ms
+  sending: 1.52ms
+  shutdown: 25ms
+
+medium
+  attendees: 100
+  packetSize: 16384
+  startup: 635ms
+  sending: 4.5ms
+  shutdown: 119ms
+
+large
+  attendees: 1000
+  packetSize: 16384
+  startup: 5s
+  sending: 33.44ms
+  shutdown: 1s
