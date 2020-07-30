@@ -28,6 +28,15 @@ export default function register(chow: TypedChow) {
       }
 
       // TODO: Check for an existing registration ...
+      const registration = await users.getRegistration(body.email)
+      if (registration) {
+        emit<EmailEvent>('email', {
+          to: registration.email,
+          subject: 'Climate:Red registration',
+          text: `Someone tried to register with your email address, but you have already registered`,
+        })
+        return new HttpMessage(200, 'email sent')
+      }
 
       //
       // Make the registration
