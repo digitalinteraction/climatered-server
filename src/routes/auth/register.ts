@@ -27,6 +27,8 @@ export default function register(chow: TypedChow) {
         throw err!
       }
 
+      // TODO: Check for an existing registration ...
+
       //
       // Make the registration
       //
