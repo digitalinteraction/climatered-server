@@ -29,7 +29,7 @@ export default function verify(chow: TypedChow) {
         //
         // Make sure there is an active registration token for that verif token
         //
-        const registration = await users.getRegistration(verify.sub)
+        const registration = await users.getRegistration(verify.sub, false)
         debug(`registration.id=${registration?.id}`)
 
         if (!registration) throw new BadToken()

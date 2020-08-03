@@ -27,8 +27,10 @@ export default function register(chow: TypedChow) {
         throw err!
       }
 
-      // TODO: Check for an existing registration ...
-      const registration = await users.getRegistration(body.email)
+      //
+      // Check for an existing verified registrations
+      //
+      const registration = await users.getRegistration(body.email, true)
       if (registration) {
         emit<EmailEvent>('email', {
           to: registration.email,
@@ -42,7 +44,6 @@ export default function register(chow: TypedChow) {
       // Make the registration
       //
       await users.register(body)
-
       const { email } = body
 
       const verify: VerifyJwt = {

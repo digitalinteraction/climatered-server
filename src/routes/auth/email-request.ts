@@ -33,7 +33,7 @@ export default function emailRequest(chow: TypedChow) {
       //
       // Find a matching registration
       //
-      const registration = await users.getRegistration(email)
+      const registration = await users.getRegistration(email, true)
       if (!translator && !registration) return new HttpMessage(400, 'Bad email')
 
       //

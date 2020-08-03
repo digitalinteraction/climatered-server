@@ -27,7 +27,7 @@ export default function emailCallback(chow: TypedChow) {
         // -> Translators may not be registered though
         // -> We trust that the jwt was signed by the email-request endpoint
         //
-        const registration = await users.getRegistration(login.sub)
+        const registration = await users.getRegistration(login.sub, true)
 
         //
         // Create an authentication token
