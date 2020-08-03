@@ -10,9 +10,23 @@ yargs.help().alias('h', 'help').demandCommand().recommendCommands()
 yargs.command(
   'serve',
   'Run the api server',
-  (yargs) => yargs,
+  (yargs) =>
+    yargs
+      .option('migrate', {
+        type: 'boolean',
+        describe: 'Run database migrations',
+        default: false,
+      })
+      .option('scrape', {
+        type: 'boolean',
+        describe: 'Scrape content from the repo',
+        default: false,
+      }),
   async (args) => {
     try {
+      if (args.migrate) await runMigrator()
+      if (args.scrape) await runScraper()
+
       await runServer()
     } catch (error) {
       console.error(error)
