@@ -1,5 +1,8 @@
 import pg = require('pg')
 import fs = require('fs')
+import createDebug = require('debug')
+
+const debug = createDebug('api:service:pg')
 
 export interface PoolClient {
   release(): void
@@ -43,11 +46,14 @@ export function createPostgresService(
   sqlUrl: string,
   caPath?: string
 ): PostgresService {
+  debug(`#create sqlUrl="${sqlUrl}"`)
+
   const opts: pg.PoolConfig = {
     connectionString: sqlUrl,
   }
 
   if (caPath) {
+    debug(`using caPath="${caPath}"`)
     opts.ssl = { ca: fs.readFileSync(caPath, 'utf8') }
   }
 
