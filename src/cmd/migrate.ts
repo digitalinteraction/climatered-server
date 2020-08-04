@@ -23,7 +23,10 @@ export async function runMigrator() {
   validateEnv(['SQL_URL'])
 
   debug(`sqlUrl=${process.env.SQL_URL}`)
-  const pg = createPostgresService(process.env.SQL_URL!)
+  const pg = createPostgresService(
+    process.env.SQL_URL!,
+    process.env.SQL_CA_PATH
+  )
 
   await pg.run(async (client) => {
     debug('connected')
