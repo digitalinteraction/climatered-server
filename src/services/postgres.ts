@@ -1,4 +1,5 @@
 import pg = require('pg')
+import fs = require('fs')
 
 export interface PoolClient {
   release(): void
@@ -38,8 +39,19 @@ async function makeClient(pool: pg.Pool): Promise<PoolClient> {
   }
 }
 
-export function createPostgresService(sqlUrl: string): PostgresService {
-  const pool = new pg.Pool({ connectionString: sqlUrl })
+export function createPostgresService(
+  sqlUrl: string,
+  caPath?: string
+): PostgresService {
+  const opts: pg.PoolConfig = {
+    connectionString: sqlUrl,
+  }
+
+  if (caPath) {
+    opts.ssl = { ca: fs.readFileSync(caPath, 'utf8') }
+  }
+
+  const pool = new pg.Pool(opts)
 
   return {
     client: () => makeClient(pool),

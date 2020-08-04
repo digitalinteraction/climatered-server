@@ -48,6 +48,7 @@ export function createTestEnv(): Env {
     REDIS_URL: 'redis://localhost',
     ENABLE_ACCESS_LOGS: false,
     SQL_URL: 'postgresql://user:secret@localhost:5432/test',
+    SQL_CA_PATH: undefined,
   }
 }
 

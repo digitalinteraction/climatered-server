@@ -122,7 +122,7 @@ export async function runServer() {
   const jwt = createJwtService(env.JWT_SECRET)
   const url = createUrlService(env.SELF_URL, env.WEB_URL)
   const auth = createAuthService(redis, jwt)
-  const pg = createPostgresService(env.SQL_URL)
+  const pg = createPostgresService(env.SQL_URL, env.SQL_CA_PATH)
   const users = createUsersService(pg)
 
   //
