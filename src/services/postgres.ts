@@ -42,22 +42,10 @@ async function makeClient(pool: pg.Pool): Promise<PoolClient> {
   }
 }
 
-export function createPostgresService(
-  sqlUrl: string,
-  caPath?: string
-): PostgresService {
+export function createPostgresService(sqlUrl: string): PostgresService {
   debug(`#create sqlUrl="${sqlUrl}"`)
 
-  const opts: pg.PoolConfig = {
-    connectionString: sqlUrl,
-  }
-
-  if (caPath) {
-    debug(`using caPath="${caPath}"`)
-    opts.ssl = { ca: fs.readFileSync(caPath, 'utf8') }
-  }
-
-  const pool = new pg.Pool(opts)
+  const pool = new pg.Pool({ connectionString: sqlUrl })
 
   return {
     client: () => makeClient(pool),

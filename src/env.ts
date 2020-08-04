@@ -25,7 +25,6 @@ export function createEnv(processEnv: Record<string, string | undefined>) {
   } = processEnv as Record<string, string>
 
   const ENABLE_ACCESS_LOGS = Boolean(process.env.ENABLE_ACCESS_LOGS)
-  const { SQL_CA_PATH } = process.env
   const CORS_HOSTS = processEnv.CORS_HOSTS?.split(',') ?? []
 
   return {
@@ -39,6 +38,5 @@ export function createEnv(processEnv: Record<string, string | undefined>) {
     REDIS_URL,
     ENABLE_ACCESS_LOGS,
     SQL_URL,
-    SQL_CA_PATH,
   }
 }
