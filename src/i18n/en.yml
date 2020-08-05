@@ -1,0 +1,20 @@
+email:
+  general:
+    greeting: Hi,
+    signature: |
+      Thanks, the Climate:Red team
+
+  userExists:
+    subject: Your Climate:Red registration
+    body: |
+      Someone tried to register with your email address. If this was you, you can login at the link below.
+
+  pleaseVerify:
+    subject: Complete your Climate:Red registration
+    body: |
+      Thanks for signing up for Climate:Red! You're almost there, we just need to verify your email address. To do this please click the link below.
+
+  login:
+    subject: Climate:Red login
+    body: |
+      Here is your Climate:Red login code, to log in click the link below or open it in your browser.
