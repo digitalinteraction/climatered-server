@@ -9,6 +9,7 @@ FROM base as builder
 ENV NODE_ENV development
 RUN npm ci &> /dev/null
 COPY src /app/src
+COPY i18n /app/i18n
 RUN npm run build -s &> /dev/null
 
 # [2] From the base again, install production deps and copy compilled code
@@ -16,6 +17,7 @@ FROM base as dist
 EXPOSE 3000
 ENV NODE_ENV production
 RUN npm ci &> /dev/null
+COPY i18n /app/i18n
 COPY --from=builder /app/dist /app/dist
 ENTRYPOINT [ "node", "dist/cli.js" ]
 CMD ["serve"]

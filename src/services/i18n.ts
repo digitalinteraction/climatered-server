@@ -12,7 +12,7 @@ export interface I18nService {
 
 async function readYaml(country: string) {
   const data = await fse.readFile(
-    path.join(__dirname, `../i18n/${country}.yml`),
+    path.join(__dirname, `../../i18n/${country}.yml`),
     'utf8'
   )
 
