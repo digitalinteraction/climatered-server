@@ -14,6 +14,7 @@ import { UrlService, createUrlService } from './services/url'
 import { UsersService, createUsersService } from './services/users'
 import { AuthService, createAuthService } from './services/auth'
 import { PostgresService, createPostgresService } from './services/postgres'
+import { I18nService, createI18nService } from './services/i18n'
 
 import homeRoute from './routes/home'
 import emailRequestRoute from './routes/auth/email-request'
@@ -45,6 +46,7 @@ export interface Context extends SockContext<Env> {
   users: UsersService
   auth: AuthService
   pg: PostgresService
+  i18n: I18nService
 }
 
 export type TypedChow = SockChowish<Env, Context> & Chowish<Env, Context>
@@ -124,6 +126,7 @@ export async function runServer() {
   const auth = createAuthService(redis, jwt)
   const pg = createPostgresService(env.SQL_URL)
   const users = createUsersService(pg)
+  const i18n = await createI18nService()
 
   //
   // Create our chow instance
@@ -138,6 +141,7 @@ export async function runServer() {
     users,
     auth,
     pg,
+    i18n,
   })
   const chow = new SockChow(ctxFactory, env)
   chow.addHelpers({

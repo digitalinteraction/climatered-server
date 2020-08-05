@@ -43,7 +43,7 @@ export default function verify(chow: TypedChow) {
           return new HttpRedirect(link.toString())
         }
 
-        await users.verify(registration.email)
+        await users.verify(registration.id)
 
         // Check if they're also a translator
         const allTranslators = await redis.getJson<Translator[]>(

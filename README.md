@@ -144,6 +144,10 @@ You can manually run the formatter with `npm run prettier` if you want.
 Prettier is slightly configured in [package.json#prettier](/package.json) under `"prettier"`
 and can ignores files using [.prettierignore](/.prettierignore).
 
+### Useful links
+
+- https://sendgrid.com/docs/for-developers/sending-email/using-handlebars/
+
 ## Deployment
 
 To deploy a new version, use the [npm version](https://docs.npmjs.com/cli/version) command.
@@ -163,11 +167,19 @@ and they can easily be deployed.
 
 ### env vars
 
+**required**
+
 - `SENDGRID_API_KEY`
 - `SENDGRID_FROM`
+- `SENDGRID_TRANSACTIONAL_TEMPLATE_ID`
 - `JWT_SECRET`
 - `SELF_URL`
 - `WEB_URL`
+- `REDIS_URL`
+- `SQL_URL`
+
+**optional**
+
 - `CORS_HOSTS`
 - `ENABLE_ACCESS_LOGS`
 - `DEBUG=api*`

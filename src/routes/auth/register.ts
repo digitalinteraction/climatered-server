@@ -16,7 +16,7 @@ export default function register(chow: TypedChow) {
   chow.route(
     'post',
     '/register',
-    async ({ request, users, emit, jwt, url }) => {
+    async ({ request, users, emit, jwt, url, i18n }) => {
       //
       // Make sure they passed up the right thing
       //
@@ -27,6 +27,9 @@ export default function register(chow: TypedChow) {
         throw err!
       }
 
+      // re-type the language so it matches i18n's locale
+      const locale = body.language as any
+
       //
       // Check for an existing verified registrations
       //
@@ -34,8 +37,14 @@ export default function register(chow: TypedChow) {
       if (registration) {
         emit<EmailEvent>('email', {
           to: registration.email,
-          subject: 'Climate:Red registration',
-          text: `Someone tried to register with your email address, but you have already registered`,
+          subject: i18n.translate(locale, 'email.userExists.subject'),
+          data: {
+            greeting: i18n.translate(locale, 'email.general.greeting'),
+            body: i18n.translate(locale, 'email.userExists.body'),
+            action: i18n.translate(locale, 'email.userExists.action'),
+            url: url.forWeb('/login').toString(),
+            signature: i18n.translate(locale, 'email.general.signature'),
+          },
         })
         return new HttpMessage(200, 'email sent')
       }
@@ -55,8 +64,14 @@ export default function register(chow: TypedChow) {
       // Send verification email
       emit<EmailEvent>('email', {
         to: email,
-        subject: 'Complete your registration',
-        text: `Hi,\n\nClick here to verify: ${link.toString()}`,
+        subject: i18n.translate(locale, 'email.pleaseVerify.subject'),
+        data: {
+          greeting: i18n.translate(locale, 'email.general.greeting'),
+          body: i18n.translate(locale, 'email.pleaseVerify.body'),
+          signature: i18n.translate(locale, 'email.general.signature'),
+          action: i18n.translate(locale, 'email.pleaseVerify.action'),
+          url: link.toString(),
+        },
       })
 
       return new HttpMessage(200, 'email sent')

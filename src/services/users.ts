@@ -10,7 +10,7 @@ export interface UsersService {
     checkVerification: boolean
   ): Promise<Registration | null>
   register(registration: RegisterBody): Promise<void>
-  verify(email: string): Promise<void>
+  verify(id: number): Promise<void>
   compareEmails(a: string, b: string): boolean
 }
 
@@ -47,11 +47,11 @@ async function addRegistration(client: PoolClient, r: RegisterBody) {
   `
 }
 
-async function verifyRegistration(client: PoolClient, email: string) {
+async function verifyRegistration(client: PoolClient, id: number) {
   await client.sql`
     UPDATE attendees
     SET verified = ${true}
-    WHERE email = ${email.toLowerCase()}
+    WHERE id = ${id}
   `
 }
 
@@ -61,7 +61,7 @@ export function createUsersService(pg: PostgresService): UsersService {
       return pg.run((c) => getRegistration(c, email, checkVerification))
     },
     register: (r) => pg.run((c) => addRegistration(c, r)),
-    verify: (e) => pg.run((c) => verifyRegistration(c, e)),
+    verify: (id) => pg.run((c) => verifyRegistration(c, id)),
     compareEmails,
   }
 }

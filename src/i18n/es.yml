@@ -1,0 +1,23 @@
+test:
+  simple: ¡Hola Mundo!
+  substituted: Hola, {{ name }}!
+
+email:
+  general:
+    greeting: _
+    signature: _
+
+  userExists:
+    subject: _
+    body: _
+    action: _
+
+  pleaseVerify:
+    subject: _
+    body: _
+    action: _
+
+  login:
+    subject: _
+    body: _
+    action: _

@@ -10,7 +10,7 @@ function getJwtFromEmail(emailText: string): any {
   return match && match[1]
 }
 
-function getJwtFromRedirect(location: string): any {
+function getJwtFromUrlToken(location: string): any {
   const url = new URL(location)
   return url.searchParams.get('token')
 }
@@ -37,15 +37,15 @@ test('Authentication flow', async () => {
   //  - It has a valid login token
   //
   const emailRequest = await agent.get('/login/email').query({ email })
-  const loginToken = getJwtFromEmail(
-    mocked<any>(chow.emit).mock.calls[0][1].text
+  const loginToken = getJwtFromUrlToken(
+    mocked<any>(chow.emit).mock.calls[0][1].data.url
   )
 
   expect(emailRequest.status).toEqual(200)
   expect(chow.emit).toBeCalledWith('email', {
     to: 'user@example.com',
     subject: expect.any(String),
-    text: expect.stringContaining(loginLink),
+    data: expect.anything(),
   })
   expect(jwt.verify(loginToken, JWT_SECRET)).toEqual({
     iat: expect.any(Number),
@@ -65,7 +65,7 @@ test('Authentication flow', async () => {
   const emailCallback = await agent
     .get('/login/email/callback')
     .query({ token: loginToken })
-  const authToken = getJwtFromRedirect(emailCallback.header.location)
+  const authToken = getJwtFromUrlToken(emailCallback.header.location)
 
   expect(emailCallback.status).toEqual(302)
   expect(emailCallback.header.location).toEqual(

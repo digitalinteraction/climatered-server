@@ -1,3 +1,7 @@
+test:
+  simple: Hello, world!
+  substituted: Hello, {{ name }}!
+
 email:
   general:
     greeting: Hi,

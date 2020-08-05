@@ -4,6 +4,9 @@ import registerRoute from '../register'
 let chow: TypedMockChow
 let emailSpy: jest.Mock
 
+// NOTE
+// - emails are tested against mock-localised strings see mockI18n for more
+
 beforeEach(() => {
   emailSpy = jest.fn()
   chow = createServer()
@@ -31,8 +34,14 @@ describe('POST /register', () => {
 
     expect(emailSpy).toBeCalledWith({
       to: 'new@example.com',
-      subject: expect.any(String),
-      text: expect.stringContaining(verifyUrl),
+      subject: 'en:email.pleaseVerify.subject',
+      data: {
+        greeting: 'en:email.general.greeting',
+        body: 'en:email.pleaseVerify.body',
+        signature: 'en:email.general.signature',
+        action: 'en:email.pleaseVerify.action',
+        url: verifyUrl,
+      },
     })
   })
 
@@ -82,12 +91,18 @@ describe('POST /register', () => {
 
     await chow.waitForEvents()
 
-    const verifyUrl = chow.env.SELF_URL + '/verify/some_fake_jwt_token'
+    const loginUrl = chow.env.WEB_URL + '/login'
 
     expect(emailSpy).toBeCalledWith({
       to: 'new@example.com',
-      subject: expect.any(String),
-      text: expect.not.stringContaining(verifyUrl),
+      subject: 'en:email.userExists.subject',
+      data: {
+        greeting: 'en:email.general.greeting',
+        body: 'en:email.userExists.body',
+        action: 'en:email.userExists.action',
+        url: loginUrl,
+        signature: 'en:email.general.signature',
+      },
     })
   })
 })

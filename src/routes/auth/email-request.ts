@@ -10,7 +10,7 @@ export default function emailRequest(chow: TypedChow) {
   chow.route(
     'get',
     '/login/email',
-    async ({ request, jwt, url, emit, users, redis }) => {
+    async ({ request, jwt, url, emit, users, redis, i18n }) => {
       //
       // Get and validate their email
       //
@@ -55,13 +55,22 @@ export default function emailRequest(chow: TypedChow) {
       const link = url.forSelf('/login/email/callback')
       link.searchParams.set('token', jwt.sign(token, { expiresIn: '30m' }))
 
+      // Work out a locale to send the email with
+      const locale: any = registration?.language ?? 'en'
+
       //
       // Send the user an email
       //
       emit<EmailEvent>('email', {
         to: email,
-        subject: 'Climate:Red Login',
-        text: `Hi,\n\nHere is your login link: ${link.toString()}`,
+        subject: i18n.translate(locale, 'email.login.subject'),
+        data: {
+          greeting: i18n.translate(locale, 'email.general.greeting'),
+          body: i18n.translate(locale, 'email.login.body'),
+          action: i18n.translate(locale, 'email.login.action'),
+          url: link.toString(),
+          signature: i18n.translate(locale, 'email.general.signature'),
+        },
       })
 
       return { message: 'ok' }

@@ -75,8 +75,14 @@ describe('GET /login/email', () => {
 
     expect(chow.emit).toBeCalledWith('email', {
       to: 'user@example.com',
-      subject: expect.any(String),
-      text: expect.stringContaining(expectedUrl),
+      subject: 'en:email.login.subject',
+      data: {
+        greeting: 'en:email.general.greeting',
+        body: 'en:email.login.body',
+        action: 'en:email.login.action',
+        url: expectedUrl,
+        signature: 'en:email.general.signature',
+      },
     })
   })
 
