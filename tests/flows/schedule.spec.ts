@@ -89,5 +89,6 @@ test('Schedule flow', async () => {
   expect(sessions.status).toEqual(200)
   expect(sessions.body.settings).toEqual({
     scheduleLive: false,
+    enableHelpdesk: false,
   })
 })

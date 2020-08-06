@@ -167,4 +167,5 @@ export const RegisterBodyStruct = object({
 export type ConfigSettings = StructType<typeof ConfigSettingsStruct>
 export const ConfigSettingsStruct = object({
   scheduleLive: boolean(),
+  enableHelpdesk: boolean(),
 })

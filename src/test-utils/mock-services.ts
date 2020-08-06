@@ -62,6 +62,7 @@ export function mockSchedule(): ScheduleService {
 
   const settings: ConfigSettings = {
     scheduleLive: false,
+    enableHelpdesk: false,
   }
 
   return {
