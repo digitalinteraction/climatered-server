@@ -153,3 +153,11 @@ export const RegisterBodyStruct = object({
   country: enums(countryCodes),
   affiliation: string(),
 })
+
+//
+// ConfigSettings
+//
+export type ConfigSettings = StructType<typeof ConfigSettingsStruct>
+export const ConfigSettingsStruct = object({
+  scheduleLive: boolean(),
+})

@@ -18,6 +18,7 @@ import {
   ThemeStruct,
   TranslatorStruct,
   SpeakerStruct,
+  ConfigSettingsStruct,
 } from '../structs'
 import IORedis = require('ioredis')
 
@@ -74,6 +75,26 @@ async function readAndParse<T>(
   // Return
   log(`pattern="${pattern}" errors=${errors.length} records=${records.length}`)
   return [errors, records] as [StructError[], T[]]
+}
+
+async function readAndParseJson<T>(
+  basePath: string,
+  file: string,
+  struct: Struct<T>
+): Promise<[StructError, undefined] | [undefined, T]> {
+  const log = debug.extend('readAndParseJson')
+
+  const fullPath = path.join(basePath, file)
+
+  log(`path="${fullPath}"`)
+  try {
+    const data = await fse.readJson(fullPath)
+
+    return validateStruct(data, struct)
+  } catch (error) {
+    error.stack = fullPath
+    return [error, undefined]
+  }
 }
 
 /** Wrap exec to debug log it */
@@ -134,6 +155,22 @@ export async function runScraper() {
 
       await redis.set(`schedule.${key}`, JSON.stringify(records))
     })
+
+    iterators.push(
+      (async function* () {
+        const [error, settings] = await readAndParseJson(
+          tmpdir,
+          'config/settings.json',
+          ConfigSettingsStruct
+        )
+
+        const errors = error ? [error] : []
+
+        yield errors
+
+        await redis.set('schedule.settings', JSON.stringify(settings!))
+      })()
+    )
 
     // Read, parse and find errors
     // - Runs upto yield errors above for each item of contentToParse
