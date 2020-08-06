@@ -72,7 +72,7 @@ async function readAndParse<T>(
   )
 
   // Return
-  log(`errors=${errors.length} records=${records.length}`)
+  log(`pattern="${pattern}" errors=${errors.length} records=${records.length}`)
   return [errors, records] as [StructError[], T[]]
 }
 
