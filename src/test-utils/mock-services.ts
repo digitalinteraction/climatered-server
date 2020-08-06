@@ -4,7 +4,7 @@ import { ScheduleService } from '../services/schedule'
 import { createSlot, createSession } from './fixtures'
 import { UrlService, createUrlService } from '../services/url'
 import { UsersService, compareEmails } from '../services/users'
-import { Registration } from '../structs'
+import { Registration, ConfigSettings } from '../structs'
 import { AuthService, createAuthService } from '../services/auth'
 import { PostgresService } from '../services/postgres'
 import { I18nService } from '../services/i18n'
@@ -54,6 +54,10 @@ export function mockSchedule(): ScheduleService {
     createSession('003-c', 'session', '003', false),
   ]
 
+  const settings: ConfigSettings = {
+    scheduleLive: false,
+  }
+
   return {
     getSlots: jest.fn(async () => slots),
     getSessions: jest.fn(async () => sessions),
@@ -63,6 +67,7 @@ export function mockSchedule(): ScheduleService {
     getTracks: jest.fn(),
     getThemes: jest.fn(),
     getSpeakers: jest.fn(),
+    getSettings: jest.fn(async () => settings),
   }
 }
 

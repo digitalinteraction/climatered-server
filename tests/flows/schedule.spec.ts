@@ -79,4 +79,13 @@ test('Schedule flow', async () => {
     url: expect.any(String),
     language: expect.any(String),
   })
+
+  //
+  // [4] Test settings are returned
+  //
+  const sessions = await agent.get('/schedule/settings')
+  expect(sessions.status).toEqual(200)
+  expect(sessions.body.settings).toEqual({
+    scheduleLive: false,
+  })
 })

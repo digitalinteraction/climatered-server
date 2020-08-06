@@ -23,6 +23,7 @@ import registerRoute from './routes/auth/register'
 import verifyRoute from './routes/auth/verify'
 import getSlotsRoute from './routes/schedule/get-slots'
 import getSessionsRoute from './routes/schedule/get-sessions'
+import getSettingsRoute from './routes/schedule/get-settings'
 
 import hiSocket from './sockets/hi'
 import authSocket from './sockets/auth'
@@ -84,7 +85,8 @@ export function setupRoutes(chow: TypedChow) {
     registerRoute,
     verifyRoute,
     getSlotsRoute,
-    getSessionsRoute
+    getSessionsRoute,
+    getSettingsRoute
   )
 }
 
