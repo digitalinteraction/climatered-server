@@ -26,6 +26,7 @@ test('Schedule flow', async () => {
   expect(slots.status).toEqual(200)
   expect(slots.body.slots).toHaveLength(3)
   expect(slots.body.slots[0]).toEqual({
+    slug: expect.any(String),
     id: expect.any(String),
     start: expect.any(String),
     end: expect.any(String),
