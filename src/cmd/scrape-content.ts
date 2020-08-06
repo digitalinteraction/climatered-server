@@ -45,7 +45,8 @@ async function readAndParse<T>(
   // Process each file that matched the glob
   await Promise.all(
     matches.map(async (file) => {
-      log(`file="${file}"`)
+      const slug = path.parse(file).name
+      log(`file="${file}" slug="${slug}"`)
 
       // Read in the file
       const fullPath = path.join(basePath, file)
@@ -54,6 +55,7 @@ async function readAndParse<T>(
       // Parse the frontmatter data
       // note - markdown content is ignored
       const { data } = parseFrontmatter(buffer)
+      data.slug = slug
 
       // Validate the structure of the frontmatter
       const [error, record] = validateStruct(data, struct)

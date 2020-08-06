@@ -1,7 +1,7 @@
 import { RedisService } from '../services/redis'
 import { JwtService, createJwtService } from '../services/jwt'
 import { ScheduleService } from '../services/schedule'
-import { createSlot, createSession } from './fixtures'
+import { createSlot, createSession, createSpeaker } from './fixtures'
 import { UrlService, createUrlService } from '../services/url'
 import { UsersService, compareEmails } from '../services/users'
 import { Registration, ConfigSettings } from '../structs'
@@ -54,6 +54,12 @@ export function mockSchedule(): ScheduleService {
     createSession('003-c', 'session', '003', false),
   ]
 
+  const speakers = [
+    createSpeaker('Geoff Testington', 'CTO Tech Corp'),
+    createSpeaker('Lisa Andrews', 'CFO Industry Ltd'),
+    createSpeaker('Sully Mathews', 'CEO Lemon Bros'),
+  ]
+
   const settings: ConfigSettings = {
     scheduleLive: false,
   }
@@ -66,7 +72,7 @@ export function mockSchedule(): ScheduleService {
     ),
     getTracks: jest.fn(),
     getThemes: jest.fn(),
-    getSpeakers: jest.fn(),
+    getSpeakers: jest.fn(async () => speakers),
     getSettings: jest.fn(async () => settings),
   }
 }

@@ -1,4 +1,4 @@
-import { Session, Slot, Registration } from '../structs'
+import { Session, Slot, Registration, Speaker } from '../structs'
 import { AuthJwt } from '../services/jwt'
 
 //
@@ -17,6 +17,7 @@ export const createSession = (
   slot: string | undefined,
   translated: boolean
 ): Session => ({
+  slug: id,
   id,
   type: type,
   slot,
@@ -44,6 +45,13 @@ export const createSession = (
   isRecorded: false,
   attendeeInteraction: 'view',
   attendeeDevices: 'all',
+})
+
+export const createSpeaker = (name: string, role: string): Speaker => ({
+  slug: name.replace(/\s+/g, '-').toLowerCase(),
+  name,
+  role,
+  headshot: '/uploads/speaker-default.svg',
 })
 
 export const createRegistration = (): Registration => ({

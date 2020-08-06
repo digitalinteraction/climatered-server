@@ -39,6 +39,7 @@ test('Schedule flow', async () => {
   expect(unauthedSessions.status).toEqual(200)
   expect(unauthedSessions.body.sessions).toHaveLength(5)
   expect(unauthedSessions.body.sessions[0]).toEqual({
+    slug: expect.any(String),
     id: expect.any(String),
     type: expect.any(String),
     slot: expect.any(String),

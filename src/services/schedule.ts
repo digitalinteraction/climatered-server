@@ -29,6 +29,7 @@ export function createScheduleService(redis: RedisService): ScheduleService {
     if (!slots) return []
 
     return slots.map((s) => ({
+      slug: s.slug,
       id: s.id,
       start: new Date(s.start),
       end: new Date(s.end),

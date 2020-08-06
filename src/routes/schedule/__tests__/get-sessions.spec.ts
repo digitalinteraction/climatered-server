@@ -50,4 +50,27 @@ describe('GET /schedule/sessions', () => {
 
     expect(res.sessions).toEqual(fakeSessions)
   })
+
+  it('should embed speakers', async () => {
+    const session = createSession('001', 'plenary', '001', true)
+    session.speakers = ['geoff-testington']
+    mocked(chow.schedule.getSessions).mockResolvedValue([session])
+
+    const res = await chow.http('get', '/schedule/sessions')
+
+    const speakers = [
+      {
+        slug: 'geoff-testington',
+        name: expect.any(String),
+        role: expect.any(String),
+        headshot: expect.any(String),
+      },
+    ]
+
+    expect(res.sessions).toContainEqual(
+      expect.objectContaining({
+        speakers,
+      })
+    )
+  })
 })

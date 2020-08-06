@@ -24,12 +24,14 @@ export {
 //
 export type Slot = StructType<typeof SlotStruct>
 export interface SlotJson {
+  slug: string
   id: string
   start: string
   end: string
 }
 
 export const SlotStruct = object({
+  slug: string(),
   id: string(),
   start: date(),
   end: date(),
@@ -61,6 +63,7 @@ export const LinkStruct = object({
 //
 export type Session = StructType<typeof SessionStruct>
 export const SessionStruct = object({
+  slug: string(),
   id: string(),
   type: enums([
     'ignite-talk',
@@ -92,6 +95,7 @@ export const SessionStruct = object({
 //
 export type Speaker = StructType<typeof SpeakerStruct>
 export const SpeakerStruct = object({
+  slug: string(),
   name: string(),
   role: string(),
   headshot: string(),
@@ -102,6 +106,7 @@ export const SpeakerStruct = object({
 //
 export type Track = StructType<typeof TrackStruct>
 export const TrackStruct = object({
+  slug: string(),
   id: string(),
   title: LocalisedStruct,
 })
@@ -111,6 +116,7 @@ export const TrackStruct = object({
 //
 export type Theme = StructType<typeof ThemeStruct>
 export const ThemeStruct = object({
+  slug: string(),
   id: string(),
   title: LocalisedStruct,
 })
@@ -120,6 +126,7 @@ export const ThemeStruct = object({
 //
 export type Translator = StructType<typeof TranslatorStruct>
 export const TranslatorStruct = object({
+  slug: string(),
   name: string(),
   email: string(),
 })
