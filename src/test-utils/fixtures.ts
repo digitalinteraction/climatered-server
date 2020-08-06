@@ -6,6 +6,7 @@ import { AuthJwt } from '../services/jwt'
 //
 
 export const createSlot = (id: string, start: number): Slot => ({
+  slug: id,
   id: id,
   start: new Date(`2020-06-15T${start}:00:00.000Z`),
   end: new Date(`2020-06-15T${start + 1}:00:00.000Z`),
