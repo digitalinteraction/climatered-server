@@ -4,20 +4,20 @@ test:
 
 email:
   general:
-    greeting: _
-    signature: _
+    greeting: Salut,
+    signature: Merci, l'équipe de Climate:Red
 
   userExists:
-    subject: _
-    body: _
-    action: _
+    subject: Votre inscription Climate:Red
+    body: Quelqu'un a essayé de s'inscrire avec votre adresse électronique. Si c'était vous, vous pouvez vous connecter en cliquant sur le lien ci-dessous.
+    action: Se connecter
 
   pleaseVerify:
-    subject: _
-    body: _
+    subject: Complétez votre inscription à Climate:Red
+    body: Merci pour votre inscription à Climate:Red  ! Vous y êtes presque, nous avons juste besoin de vérifier votre adresse e-mail. Pour ce faire, veuillez cliquer sur le lien ci-dessous.
     action: _
 
   login:
-    subject: _
-    body: _
-    action: _
+    subject: 'Connexion: Climate:Red'
+    body: Voici votre code de connexion Climate:Red. Pour vous connecter, cliquez sur le lien ci-dessous ou ouvrez-le dans votre navigateur.
+    action: Se connecter

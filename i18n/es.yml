@@ -4,20 +4,20 @@ test:
 
 email:
   general:
-    greeting: _
-    signature: _
+    greeting: Hola,
+    signature: Gracias, el equipo de Climate:Red
 
   userExists:
-    subject: _
-    body: _
-    action: _
+    subject: 'Su inscripción Climate:Red'
+    body: Alguien intentó registrarse con su correo electrónico. Si fue usted puede iniciar la sesión haciendo clic en el enlace de abajo.
+    action: Iniciar sesión
 
   pleaseVerify:
-    subject: _
-    body: _
+    subject: Complete su inscripción a Climate:Red
+    body: '¡Muchas gracias por registrarse en Climate: Red! Ya casi has terminado, solo necesitamos verificar tu dirección de correo electrónico. Para hacer esto, haga clic en el enlace de abajo.'
     action: _
 
   login:
-    subject: _
-    body: _
-    action: _
+    subject: 'Iniciar sesión: Climate:Red'
+    body: 'Aquí está su código para  iniciar sesión de Climate:Red. Para iniciar sesión, haga clic en el enlace de abajo o ábralo en su navegador.'
+    action: Iniciar sesión
