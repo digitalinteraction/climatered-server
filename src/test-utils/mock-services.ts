@@ -1,7 +1,14 @@
 import { RedisService } from '../services/redis'
 import { JwtService, createJwtService } from '../services/jwt'
 import { ScheduleService } from '../services/schedule'
-import { createSlot, createSession, createSpeaker } from './fixtures'
+import {
+  createSlot,
+  createSession,
+  createSpeaker,
+  createSessionType,
+  createTheme,
+  createTrack,
+} from './fixtures'
 import { UrlService, createUrlService } from '../services/url'
 import { UsersService, compareEmails } from '../services/users'
 import { Registration, ConfigSettings } from '../structs'
@@ -60,6 +67,24 @@ export function mockSchedule(): ScheduleService {
     createSpeaker('Sully Mathews', 'CEO Lemon Bros'),
   ]
 
+  const types = [
+    createSessionType('plenary'),
+    createSessionType('panel'),
+    createSessionType('session'),
+  ]
+
+  const themes = [
+    createTheme('theme-a'),
+    createTheme('theme-b'),
+    createTheme('theme-c'),
+  ]
+
+  const tracks = [
+    createTrack('track-a'),
+    createTrack('track-b'),
+    createTrack('track-c'),
+  ]
+
   const settings: ConfigSettings = {
     scheduleLive: false,
     enableHelpdesk: false,
@@ -71,9 +96,10 @@ export function mockSchedule(): ScheduleService {
     findSession: jest.fn(
       async (id) => sessions.find((e) => e.id === id) ?? null
     ),
-    getTracks: jest.fn(),
-    getThemes: jest.fn(),
+    getTracks: jest.fn(async () => tracks),
+    getThemes: jest.fn(async () => themes),
     getSpeakers: jest.fn(async () => speakers),
+    getTypes: jest.fn(async () => types),
     getSettings: jest.fn(async () => settings),
   }
 }

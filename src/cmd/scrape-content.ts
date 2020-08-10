@@ -19,6 +19,7 @@ import {
   TranslatorStruct,
   SpeakerStruct,
   ConfigSettingsStruct,
+  SessionTypeStruct,
 } from '../structs'
 import IORedis = require('ioredis')
 
@@ -142,6 +143,7 @@ export async function runScraper() {
       { key: 'themes', struct: ThemeStruct },
       { key: 'speakers', struct: SpeakerStruct },
       { key: 'translators', struct: TranslatorStruct },
+      { key: 'types', struct: SessionTypeStruct },
     ]
 
     // Generate an array of iterators that read in content and yield errors

@@ -1,5 +1,23 @@
-import { Session, Slot, Registration, Speaker } from '../structs'
+import {
+  Session,
+  Slot,
+  Registration,
+  Speaker,
+  SessionType,
+  Theme,
+  Track,
+} from '../structs'
 import { AuthJwt } from '../services/jwt'
+
+//
+// Utils
+//
+const fakeTranslated = (name: string) => ({
+  en: `${name} - en`,
+  fr: `${name} - fr`,
+  es: `${name} - es`,
+  ar: `${name} - ar`,
+})
 
 //
 // Functions to generate data for testing
@@ -24,35 +42,46 @@ export const createSession = (
   slot,
   track: 'act',
   themes: [],
-  title: {
-    en: 'Title - en',
-    fr: 'Title - fr',
-    es: 'Title - es',
-    ar: 'Title - ar',
-  },
-  content: {
-    en: 'Content - en',
-    fr: 'Content - fr',
-    es: 'Content - es',
-    ar: 'Content - ar',
-  },
+  title: fakeTranslated('Title'),
+  content: fakeTranslated('Content'),
   links: [
     { type: 'video', url: 'https://youtu.be/dQw4w9WgXcQ', language: 'en' },
   ],
-  hostLanguage: 'en',
+  hostLanguage: ['en'],
   enableTranslation: translated,
   speakers: [],
-  hostOrganisation: undefined,
+  hostOrganisation: fakeTranslated('IFRC'),
   isRecorded: false,
   attendeeInteraction: 'view',
   attendeeDevices: 'all',
+  isOfficial: false,
+  isDraft: false,
 })
 
 export const createSpeaker = (name: string, role: string): Speaker => ({
   slug: name.replace(/\s+/g, '-').toLowerCase(),
   name,
-  role,
+  role: fakeTranslated(role),
   headshot: '/uploads/speaker-default.svg',
+})
+
+export const createSessionType = (id: string): SessionType => ({
+  slug: id,
+  id: id,
+  icon: 'plenary.svg',
+  title: fakeTranslated(id),
+})
+
+export const createTheme = (id: string): Theme => ({
+  slug: id,
+  id: id,
+  title: fakeTranslated(id),
+})
+
+export const createTrack = (id: string): Track => ({
+  slug: id,
+  id: id,
+  title: fakeTranslated(id),
 })
 
 export const createRegistration = (): Registration => ({

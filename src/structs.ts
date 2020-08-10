@@ -17,6 +17,7 @@ export {
   assert as assertStruct,
   validate as validateStruct,
   coerce as coerceStruct,
+  Struct,
 } from 'superstruct'
 
 //
@@ -65,29 +66,22 @@ export type Session = StructType<typeof SessionStruct>
 export const SessionStruct = object({
   slug: string(),
   id: string(),
-  type: enums([
-    'ignite-talk',
-    'games',
-    'panel',
-    'workshop',
-    'virtual-tour',
-    'plenary',
-    'speaker',
-    'fishbowl',
-  ]),
+  type: string(),
   slot: optional(string()),
   track: string(),
   themes: array(string()),
   title: LocalisedStruct,
   content: LocalisedStruct,
   links: array(LinkStruct),
-  hostLanguage: string(),
+  hostLanguage: array(string()),
   enableTranslation: boolean(),
   speakers: array(string()),
-  hostOrganisation: optional(string()),
+  hostOrganisation: LocalisedStruct,
   isRecorded: boolean(),
   attendeeInteraction: enums(['interactive', 'view']),
   attendeeDevices: enums(['desktop', 'mobile', 'all']),
+  isOfficial: boolean(),
+  isDraft: boolean(),
 })
 
 //
@@ -97,7 +91,7 @@ export type Speaker = StructType<typeof SpeakerStruct>
 export const SpeakerStruct = object({
   slug: string(),
   name: string(),
-  role: string(),
+  role: LocalisedStruct,
   headshot: string(),
 })
 
@@ -118,6 +112,17 @@ export type Theme = StructType<typeof ThemeStruct>
 export const ThemeStruct = object({
   slug: string(),
   id: string(),
+  title: LocalisedStruct,
+})
+
+//
+// Type
+//
+export type SessionType = StructType<typeof SessionTypeStruct>
+export const SessionTypeStruct = object({
+  slug: string(),
+  id: string(),
+  icon: string(),
   title: LocalisedStruct,
 })
 

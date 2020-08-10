@@ -2,6 +2,11 @@ import { createServer } from '../../src/test-utils'
 import { setupRoutes } from '../../src/server'
 import supertest = require('supertest')
 import jwt = require('jsonwebtoken')
+import { Struct, assertStruct, SessionStruct } from '../../src/structs'
+
+// function asserter<T = any>(value: any, struct: Struct<T>) {
+//   return () => assertStruct(value, struct)
+// }
 
 test('Schedule flow', async () => {
   const chow = createServer()
@@ -39,33 +44,10 @@ test('Schedule flow', async () => {
 
   expect(unauthedSessions.status).toEqual(200)
   expect(unauthedSessions.body.sessions).toHaveLength(5)
-  expect(unauthedSessions.body.sessions[0]).toEqual({
-    slug: expect.any(String),
-    id: expect.any(String),
-    type: expect.any(String),
-    slot: expect.any(String),
-    title: {
-      en: expect.any(String),
-      fr: expect.any(String),
-      es: expect.any(String),
-      ar: expect.any(String),
-    },
-    content: {
-      en: expect.any(String),
-      fr: expect.any(String),
-      es: expect.any(String),
-      ar: expect.any(String),
-    },
-    links: [],
-    hostLanguage: expect.any(String),
-    enableTranslation: expect.any(Boolean),
-    isRecorded: expect.any(Boolean),
-    track: expect.any(String),
-    themes: expect.any(Array),
-    speakers: expect.any(Array),
-    attendeeInteraction: expect.any(String),
-    attendeeDevices: expect.any(String),
-  })
+
+  for (const s of unauthedSessions.body.sessions) {
+    expect(s.links).toHaveLength(0)
+  }
 
   //
   // [3] Test getting sessions with authentication
@@ -85,10 +67,42 @@ test('Schedule flow', async () => {
   //
   // [4] Test settings are returned
   //
-  const sessions = await agent.get('/schedule/settings')
-  expect(sessions.status).toEqual(200)
-  expect(sessions.body.settings).toEqual({
+  const settings = await agent.get('/schedule/settings')
+  expect(settings.status).toEqual(200)
+  expect(settings.body.settings).toEqual({
     scheduleLive: false,
     enableHelpdesk: false,
   })
+
+  //
+  // [5] Test speakers
+  //
+  const speakers = await agent.get('/schedule/speakers')
+
+  expect(speakers.status).toEqual(200)
+  expect(speakers.body.speakers).toHaveLength(3)
+
+  //
+  // [6] Test themes
+  //
+  const themes = await agent.get('/schedule/themes')
+
+  expect(themes.status).toEqual(200)
+  expect(themes.body.themes).toHaveLength(3)
+
+  //
+  // [7] Test tracks
+  //
+  const tracks = await agent.get('/schedule/tracks')
+
+  expect(tracks.status).toEqual(200)
+  expect(tracks.body.tracks).toHaveLength(3)
+
+  //
+  // [8] Test types
+  //
+  const types = await agent.get('/schedule/types')
+
+  expect(types.status).toEqual(200)
+  expect(types.body.types).toHaveLength(3)
 })

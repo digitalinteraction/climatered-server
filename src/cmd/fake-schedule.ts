@@ -22,6 +22,9 @@ function randomSession(
   speakers: string[],
   translated: boolean
 ): Session {
+  const locale = randomFrom(['en', 'fr', 'es', 'ar'])
+  const org = randomFrom(['Org A', 'Org B', 'Org C', 'Org D'])
+
   const session: Session = {
     slug: id,
     id,
@@ -44,13 +47,20 @@ function randomSession(
     links: [
       { type: 'video', url: 'https://youtu.be/dQw4w9WgXcQ', language: 'en' },
     ],
-    hostLanguage: randomFrom(['en', 'fr', 'es', 'ar']),
+    hostLanguage: [locale],
     enableTranslation: translated,
     speakers: [],
-    hostOrganisation: randomFrom(['Org A', 'Org B', 'Org C', 'Org D']),
+    hostOrganisation: {
+      en: org,
+      fr: org,
+      es: org,
+      ar: org,
+    },
     isRecorded: randomFrom([true, false]),
     attendeeInteraction: randomFrom(['interactive', 'view']),
     attendeeDevices: randomFrom(['desktop', 'mobile', 'all']),
+    isOfficial: false,
+    isDraft: false,
   }
 
   if (type === 'plenary' || type === 'panel') {
@@ -67,7 +77,12 @@ function createSpeaker(name: string, role: string): Speaker {
   return {
     slug: name.replace(/\s+/g, '-').toLowerCase(),
     name,
-    role,
+    role: {
+      en: `${role} - en`,
+      fr: `${role} - fr`,
+      es: `${role} - es`,
+      ar: `${role} - en`,
+    },
     headshot: '/uploads/speaker-default.svg',
   }
 }

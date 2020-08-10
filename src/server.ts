@@ -21,9 +21,14 @@ import emailRequestRoute from './routes/auth/email-request'
 import emailCallbackRoute from './routes/auth/email-callback'
 import registerRoute from './routes/auth/register'
 import verifyRoute from './routes/auth/verify'
+
 import getSlotsRoute from './routes/schedule/get-slots'
 import getSessionsRoute from './routes/schedule/get-sessions'
 import getSettingsRoute from './routes/schedule/get-settings'
+import getSpeakersRoute from './routes/schedule/get-speakers'
+import getThemesRoute from './routes/schedule/get-themes'
+import getTypesRoute from './routes/schedule/get-types'
+import getTracksRoute from './routes/schedule/get-tracks'
 
 import hiSocket from './sockets/hi'
 import authSocket from './sockets/auth'
@@ -86,7 +91,11 @@ export function setupRoutes(chow: TypedChow) {
     verifyRoute,
     getSlotsRoute,
     getSessionsRoute,
-    getSettingsRoute
+    getSettingsRoute,
+    getSpeakersRoute,
+    getThemesRoute,
+    getTracksRoute,
+    getTypesRoute
   )
 }
 

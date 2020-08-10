@@ -28,6 +28,8 @@ describe('GET /schedule/sessions', () => {
 
     const sessionsWithoutLinks = fakeSessions.map((e) => ({ ...e, links: [] }))
 
+    expect(res.sessions).toHaveLength(3)
+
     expect(res.sessions).toEqual(sessionsWithoutLinks)
   })
 
@@ -51,26 +53,14 @@ describe('GET /schedule/sessions', () => {
     expect(res.sessions).toEqual(fakeSessions)
   })
 
-  it('should embed speakers', async () => {
+  it('should not return draft sessions', async () => {
     const session = createSession('001', 'plenary', '001', true)
-    session.speakers = ['geoff-testington']
+    session.isDraft = true
+
     mocked(chow.schedule.getSessions).mockResolvedValue([session])
 
     const res = await chow.http('get', '/schedule/sessions')
 
-    const speakers = [
-      {
-        slug: 'geoff-testington',
-        name: expect.any(String),
-        role: expect.any(String),
-        headshot: expect.any(String),
-      },
-    ]
-
-    expect(res.sessions).toContainEqual(
-      expect.objectContaining({
-        speakers,
-      })
-    )
+    expect(res.sessions).toHaveLength(0)
   })
 })

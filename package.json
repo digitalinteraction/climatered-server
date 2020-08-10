@@ -17,7 +17,7 @@
     "dev": "node -r ts-node/register -r dotenv/config src/cli.ts",
     "debug": "node --inspect-brk -r ts-node/register -r dotenv/config src/cli.ts",
     "readme-toc": "md-toc -i",
-    "serve": "npm run -s dev -- serve"
+    "serve": "npm run -s dev -- serve --migrate --scrape"
   },
   "keywords": [],
   "engines": {

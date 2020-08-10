@@ -7,6 +7,7 @@ import {
   Track,
   Theme,
   ConfigSettings,
+  SessionType,
 } from '../structs'
 import { RedisService } from './redis'
 
@@ -20,6 +21,7 @@ export interface ScheduleService {
   getTracks(): Promise<Track[]>
   getThemes(): Promise<Theme[]>
   getSpeakers(): Promise<Speaker[]>
+  getTypes(): Promise<SessionType[]>
   getSettings(): Promise<ConfigSettings | null>
 }
 
@@ -40,6 +42,7 @@ export function createScheduleService(redis: RedisService): ScheduleService {
   const getTracks = () => redis.getJson('schedule.tracks', [])
   const getThemes = () => redis.getJson('schedule.themes', [])
   const getSpeakers = () => redis.getJson('schedule.speakers', [])
+  const getTypes = () => redis.getJson('schedule.types', [])
   const getSettings = () => redis.getJson('schedule.settings', null)
 
   async function findSession(id: string) {
@@ -54,6 +57,7 @@ export function createScheduleService(redis: RedisService): ScheduleService {
     getTracks,
     getThemes,
     getSpeakers,
+    getTypes,
     getSettings,
   }
 }
