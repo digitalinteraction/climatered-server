@@ -15,7 +15,7 @@ email:
   pleaseVerify:
     subject: Complete su inscripción a Climate:Red
     body: '¡Muchas gracias por registrarse en Climate: Red! Ya casi has terminado, solo necesitamos verificar tu dirección de correo electrónico. Para hacer esto, haga clic en el enlace de abajo.'
-    action: _
+    action: Verificar mi correo electrónico
 
   login:
     subject: 'Iniciar sesión: Climate:Red'

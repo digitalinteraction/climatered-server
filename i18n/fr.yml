@@ -15,7 +15,7 @@ email:
   pleaseVerify:
     subject: Complétez votre inscription à Climate:Red
     body: Merci pour votre inscription à Climate:Red  ! Vous y êtes presque, nous avons juste besoin de vérifier votre adresse e-mail. Pour ce faire, veuillez cliquer sur le lien ci-dessous.
-    action: _
+    action: Vérifier mon email
 
   login:
     subject: 'Connexion: Climate:Red'
