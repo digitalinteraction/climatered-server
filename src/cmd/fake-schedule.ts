@@ -98,7 +98,6 @@ function randomSession(
       type: 'video',
       language: '*',
       url: randomFrom([
-        'https://youtu.be/4LclSzrB4CY',
         'https://zoom.us/my/robjanderson',
         'https://teams.microsoft.com/l/meetup-join/19%3ameeting_MzliMDhmNDUtZjAwNS00NjQ5LWJkYzMtNTE2NTNhOTY0ZTAw%40thread.v2/0?context=%7b%22Tid%22%3a%229c5012c9-b616-44c2-a917-66814fbe3e87%22%2c%22Oid%22%3a%22ce849a55-9a39-48ec-a3a5-c2371bbc5c68%22%7d',
       ]),
