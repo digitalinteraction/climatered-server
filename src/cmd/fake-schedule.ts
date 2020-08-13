@@ -68,6 +68,27 @@ function randomSession(
     for (let i = 0; i < numSpeakers; i++) {
       session.speakers.push(randomFrom(speakers))
     }
+
+    session.links.push({
+      type: 'poll',
+      language: 'en',
+      url: 'https://app.sli.do/event/mfiv2k5j',
+    })
+    session.links.push({
+      type: 'poll',
+      language: 'fr',
+      url: 'https://app.sli.do/event/qsmtvg5a',
+    })
+    session.links.push({
+      type: 'poll',
+      language: 'es',
+      url: 'https://app.sli.do/event/j9oit3bk',
+    })
+    session.links.push({
+      type: 'poll',
+      language: 'en',
+      url: 'https://app.sli.do/event/vr8d1fgw',
+    })
   }
 
   return session
