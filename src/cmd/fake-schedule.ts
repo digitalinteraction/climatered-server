@@ -44,9 +44,7 @@ function randomSession(
       es: 'Content - es',
       ar: 'Content - ar',
     },
-    links: [
-      { type: 'video', url: 'https://youtu.be/dQw4w9WgXcQ', language: 'en' },
-    ],
+    links: [],
     hostLanguage: [locale],
     enableTranslation: translated,
     speakers: [],
@@ -70,6 +68,12 @@ function randomSession(
     }
 
     session.links.push({
+      type: 'video',
+      language: 'en',
+      url: 'https://youtu.be/4LclSzrB4CY',
+    })
+
+    session.links.push({
       type: 'poll',
       language: 'en',
       url: 'https://app.sli.do/event/mfiv2k5j',
@@ -88,6 +92,16 @@ function randomSession(
       type: 'poll',
       language: 'en',
       url: 'https://app.sli.do/event/vr8d1fgw',
+    })
+  } else {
+    session.links.push({
+      type: 'video',
+      language: '*',
+      url: randomFrom([
+        'https://youtu.be/4LclSzrB4CY',
+        'https://zoom.us/my/robjanderson',
+        'https://teams.microsoft.com/l/meetup-join/19%3ameeting_MzliMDhmNDUtZjAwNS00NjQ5LWJkYzMtNTE2NTNhOTY0ZTAw%40thread.v2/0?context=%7b%22Tid%22%3a%229c5012c9-b616-44c2-a917-66814fbe3e87%22%2c%22Oid%22%3a%22ce849a55-9a39-48ec-a3a5-c2371bbc5c68%22%7d',
+      ]),
     })
   }
 
