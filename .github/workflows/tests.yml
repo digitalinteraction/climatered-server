@@ -1,0 +1,48 @@
+#
+# Run node.js tests with GitHub actions
+# refs:
+# - https://docs.github.com/en/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# - https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows
+#
+# notes:
+# - Only caches ~/.npm not node_modules
+#
+
+name: Node.js automated tests
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12.x'
+
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: install dependencies
+        run: npm ci
+
+      - name: run the build
+        run: npm run build --if-present
+
+      - name: run tests
+        run: npm test
+        env:
+          CI: true

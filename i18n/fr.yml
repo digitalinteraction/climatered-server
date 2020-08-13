@@ -1,0 +1,23 @@
+test:
+  simple: Bonjour le monde!
+  substituted: Bonjour {{ name }}!
+
+email:
+  general:
+    greeting: Salut,
+    signature: Merci, l'équipe de Climate:Red
+
+  userExists:
+    subject: Votre inscription Climate:Red
+    body: Quelqu'un a essayé de s'inscrire avec votre adresse électronique. Si c'était vous, vous pouvez vous connecter en cliquant sur le lien ci-dessous.
+    action: Se connecter
+
+  pleaseVerify:
+    subject: Complétez votre inscription à Climate:Red
+    body: Merci pour votre inscription à Climate:Red  ! Vous y êtes presque, nous avons juste besoin de vérifier votre adresse e-mail. Pour ce faire, veuillez cliquer sur le lien ci-dessous.
+    action: Vérifier mon email
+
+  login:
+    subject: 'Connexion: Climate:Red'
+    body: Voici votre code de connexion Climate:Red. Pour vous connecter, cliquez sur le lien ci-dessous ou ouvrez-le dans votre navigateur.
+    action: Se connecter

@@ -47,9 +47,22 @@ These are the commands you'll regularly run to develop the API, in no particular
 ```bash
 # Start the docker dev stack
 # -> It runs a redis instance for socket.io to use and to store authentications
-# -> Remember "docker-compose" down afterwards to stop and remove containers
+# -> It runs postgres on localhost (see docker-compose.yml for connection details)
+# -> Remember "docker-compose down" afterwards to stop and remove containers
 # -> Runs in headless mode (-d)
 docker-compose up -d
+
+# Run the content scraper
+# -> Clones the schedule locally
+# -> Reads in content and validates it
+# -> Puts it into redis for the api
+npm run dev scrape-content
+
+# Run database migrations
+# -> Connects to database from .env
+# -> Sets up and maintains 'migrations' table to track migrations
+# -> Runs any new migrations
+npm run dev migrate
 
 # Run the dev server
 # -> Runs on port 3000
@@ -79,15 +92,21 @@ http :3000/login/email/callback token==$TOKEN
 
 ### Testing
 
-This is a very rough prototype, there aren't any unit tests.
-If there were, you would run them like this:
+There are unit tests alongside code in `__tests__` directories
+and integration tests in the `tests/` top-level directory.
+Tests are using [Jest](https://jestjs.io/)
+
+> Roughly, unit tests use jest's `it` and integration tests use `test`
 
 ```bash
 # Run the tests
-npm test -s
+npm run test
 
 # Generate code coverage
-npm run coverage -s
+npm run coverage
+
+# View the coverage report
+open coverage/lcov-report/index.html
 ```
 
 ### Irregular use
@@ -106,6 +125,9 @@ npm run lint
 
 # Generate the table-of-contents in this readme
 npm run readme-toc
+
+# Reset the jest cache
+npx jest --clearCache
 ```
 
 ### Code formatting
@@ -121,6 +143,10 @@ You can manually run the formatter with `npm run prettier` if you want.
 
 Prettier is slightly configured in [package.json#prettier](/package.json) under `"prettier"`
 and can ignores files using [.prettierignore](/.prettierignore).
+
+### Useful links
+
+- https://sendgrid.com/docs/for-developers/sending-email/using-handlebars/
 
 ## Deployment
 
@@ -141,11 +167,19 @@ and they can easily be deployed.
 
 ### env vars
 
+**required**
+
 - `SENDGRID_API_KEY`
 - `SENDGRID_FROM`
+- `SENDGRID_TRANSACTIONAL_TEMPLATE_ID`
 - `JWT_SECRET`
 - `SELF_URL`
 - `WEB_URL`
+- `REDIS_URL`
+- `SQL_URL`
+
+**optional**
+
 - `CORS_HOSTS`
 - `ENABLE_ACCESS_LOGS`
 - `DEBUG=api*`

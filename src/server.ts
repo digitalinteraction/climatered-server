@@ -1,92 +1,199 @@
-import http = require('http')
-import path = require('path')
-import express = require('express')
-
 import createDebug = require('debug')
-import Redis = require('ioredis')
-import socketIo = require('socket.io')
-import socketIoRedis = require('socket.io-redis')
+import dotenv = require('dotenv')
+import morgan = require('morgan')
+
 import { createTerminus } from '@godaddy/terminus'
+import { Chowish } from '@robb_j/chowchow'
 
-import sendgrid = require('@sendgrid/mail')
+import { createEnv, Env } from './env'
 
-import { createEnv } from './env'
-import { createRoutes } from './routes'
-import { pkg } from './pkg'
-import { createSockets } from './sockets'
+import { RedisService, createRedisService } from './services/redis'
+import { ScheduleService, createScheduleService } from './services/schedule'
+import { JwtService, createJwtService } from './services/jwt'
+import { UrlService, createUrlService } from './services/url'
+import { UsersService, createUsersService } from './services/users'
+import { AuthService, createAuthService } from './services/auth'
+import { PostgresService, createPostgresService } from './services/postgres'
+import { I18nService, createI18nService } from './services/i18n'
+
+import homeRoute from './routes/home'
+import emailRequestRoute from './routes/auth/email-request'
+import emailCallbackRoute from './routes/auth/email-callback'
+import registerRoute from './routes/auth/register'
+import verifyRoute from './routes/auth/verify'
+
+import getSlotsRoute from './routes/schedule/get-slots'
+import getSessionsRoute from './routes/schedule/get-sessions'
+import getSettingsRoute from './routes/schedule/get-settings'
+import getSpeakersRoute from './routes/schedule/get-speakers'
+import getThemesRoute from './routes/schedule/get-themes'
+import getTypesRoute from './routes/schedule/get-types'
+import getTracksRoute from './routes/schedule/get-tracks'
+
+import hiSocket from './sockets/hi'
+import authSocket from './sockets/auth'
+import deauthSocket from './sockets/deauth'
+import joinChannelSocket from './sockets/audio/join-channel'
+import leaveChannelSocket from './sockets/audio/leave-channel'
+import sendToChannelSocket from './sockets/audio/send-to-channel'
+import startChannelSocket from './sockets/audio/start-channel'
+import stopChannelSocket from './sockets/audio/stop-channel'
+
+import emailEvent from './events/email'
+import { SockChowish, SockChow, SockContext } from './sockchow'
 
 const debug = createDebug('api:server')
 
-async function onSignal(redis: Redis.Redis) {
-  console.log('Starting cleanup')
-
-  await redis.quit()
+export interface Context extends SockContext<Env> {
+  redis: RedisService
+  schedule: ScheduleService
+  jwt: JwtService
+  url: UrlService
+  users: UsersService
+  auth: AuthService
+  pg: PostgresService
+  i18n: I18nService
 }
 
-async function healthcheck(redis: Redis.Redis) {
-  debug('GET /healthz')
-  await redis.ping()
+export type TypedChow = SockChowish<Env, Context> & Chowish<Env, Context>
+
+export function setupMiddleware(chow: TypedChow) {
+  chow.middleware((app) => {
+    //
+    // Log requests for debugging
+    //
+    app.use((req, res, next) => {
+      debug(`${req.method}: ${req.path}`)
+      next()
+    })
+
+    //
+    // Optionally enable access logs
+    //
+    if (chow.env.ENABLE_ACCESS_LOGS) {
+      app.use(morgan('tiny'))
+    }
+  })
 }
 
-// So there is enough time for k8s to find out the pod is terminating
-async function beforeShutdown(nodeEnv: string) {
-  if (nodeEnv === 'development') return
-  return new Promise((resolve) => setTimeout(resolve, 5000))
+export function setupEvents(chow: TypedChow) {
+  debug('#setupEvents')
+  chow.apply(emailEvent)
+}
+
+export function setupRoutes(chow: TypedChow) {
+  debug('#setupRoutes')
+  chow.apply(
+    homeRoute,
+    emailRequestRoute,
+    emailCallbackRoute,
+    registerRoute,
+    verifyRoute,
+    getSlotsRoute,
+    getSessionsRoute,
+    getSettingsRoute,
+    getSpeakersRoute,
+    getThemesRoute,
+    getTracksRoute,
+    getTypesRoute
+  )
+}
+
+export function setupSockets(chow: TypedChow) {
+  debug('#setupSockets')
+  chow.apply(
+    hiSocket,
+    authSocket,
+    deauthSocket,
+    joinChannelSocket,
+    leaveChannelSocket,
+    sendToChannelSocket,
+    startChannelSocket,
+    stopChannelSocket
+  )
 }
 
 export async function runServer() {
-  debug(`#runServer pkg=${pkg.name}, version=${pkg.version}`)
-
-  const env = createEnv()
-  debug('environment ok')
-
-  const selfUrl = new URL(env.SELF_URL)
-
+  debug('#runServer')
   //
-  // Create express and socket io apps
+  // Load variables from environment variables
   //
-  // const socketPath = path.join(selfUrl.pathname, '/socket.io')
-  const app = express()
-  const server = http.createServer(app)
-  const io = socketIo(server)
-  io.adapter(socketIoRedis(env.REDIS_URL))
+  dotenv.config()
 
   //
-  // Connect to redis
+  // Create our custom environment
   //
-  debug(`connecting to redis=${env.REDIS_URL}`)
-  const redis = new Redis(env.REDIS_URL)
+  debug('#runServer creating env')
+  const env = createEnv(process.env)
 
   //
-  // Setup sendgrid
+  // Setup services
   //
-  sendgrid.setApiKey(env.SENDGRID_API_KEY)
+  debug('#runServer setting up services')
+  const redis = createRedisService(env.REDIS_URL)
+  const schedule = createScheduleService(redis)
+  const jwt = createJwtService(env.JWT_SECRET)
+  const url = createUrlService(env.SELF_URL, env.WEB_URL)
+  const auth = createAuthService(redis, jwt)
+  const pg = createPostgresService(env.SQL_URL)
+  const users = createUsersService(pg)
+  const i18n = await createI18nService()
 
   //
-  // Setup our routes
+  // Create our chow instance
   //
-  app.use(createRoutes(selfUrl, io, env))
+  debug('#runServer creating server')
+  const ctxFactory: (ctx: SockContext<Env>) => Context = (base) => ({
+    ...base,
+    redis,
+    schedule,
+    jwt,
+    url,
+    users,
+    auth,
+    pg,
+    i18n,
+  })
+  const chow = new SockChow(ctxFactory, env)
+  chow.addHelpers({
+    trustProxy: true,
+    jsonBody: true,
+    urlEncodedBody: true,
+    corsHosts: env.CORS_HOSTS,
+  })
+  setupEvents(chow)
+  setupRoutes(chow)
+  setupSockets(chow)
 
   //
-  // Setup our sockets
+  // Start our server
   //
-  createSockets(io, redis, env)
-
-  //
-  // Ensure the server shuts down consistently for k8s
-  //
-  createTerminus(server, {
-    healthChecks: {
-      '/healthz': () => healthcheck(redis),
-    },
-    signals: ['SIGINT', 'SIGTERM'],
-    onSignal: () => onSignal(redis),
-    beforeShutdown: () => beforeShutdown(env.NODE_ENV),
+  debug('#runServer starting')
+  await chow.start({
+    port: 3000,
+    handle404s: true,
+    outputUrl: true,
   })
 
   //
-  // Start listening
+  // Make sure the server shuts down consistently
   //
-  await new Promise((resolve) => server.listen(3000, resolve))
-  console.log('Listening on :3000')
+  createTerminus(chow.server, {
+    healthChecks: {
+      '/healthz': async () => {
+        debug('GET /healthz')
+        await redis.ping()
+      },
+    },
+    signals: ['SIGINT', 'SIGTERM'],
+    onSignal: async () => {
+      debug('onSignal')
+      await redis.quit()
+    },
+    beforeShutdown: () => {
+      debug('beforeShutdown')
+      if (env.NODE_ENV === 'development') return Promise.resolve()
+      return new Promise((resolve) => setTimeout(resolve, 5000))
+    },
+  })
 }
