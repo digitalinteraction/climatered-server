@@ -10,8 +10,6 @@ import {
 let chow: TypedMockChow
 let translator: AuthJwt
 
-const sixHours = 6 * 60 * 60
-
 beforeEach(() => {
   chow = createServer()
   translator = createAuthToken(['translator'])
@@ -19,7 +17,7 @@ beforeEach(() => {
 })
 
 describe('@start-channel(sessionId, channel)', () => {
-  it('should mark the translator as current', async () => {
+  it('should mark the translator as current for 30s', async () => {
     const socket = chow.io()
 
     mocked(chow.auth.fromSocket).mockResolvedValue(translator)
@@ -29,11 +27,11 @@ describe('@start-channel(sessionId, channel)', () => {
     expect(chow.redis.setAndExpire).toBeCalledWith(
       'translator_001_fr',
       socket.id,
-      sixHours
+      30
     )
   })
 
-  it('should store the translator packet', async () => {
+  it('should store the translator packet for 6h', async () => {
     const socket = chow.io()
 
     mocked(chow.auth.fromSocket).mockResolvedValue(translator)
@@ -44,20 +42,19 @@ describe('@start-channel(sessionId, channel)', () => {
     expect(chow.redis.setAndExpire).toBeCalledWith(
       'translator_' + socket.id,
       translatorPacket,
-      sixHours
+      6 * 60 * 60
     )
   })
 
-  it('should tell the existing translator to stop', async () => {
+  it('should return false if there is already a translator', async () => {
     const socket = chow.io()
 
     const oldTranslator = `translator_not_${socket.id}`
     mocked(chow.auth.fromSocket).mockResolvedValue(translator)
     await chow.redis.set('translator_001_fr', oldTranslator)
 
-    await socket.emit('start-channel', '001', 'fr')
+    const response = await socket.emit('start-channel', '001', 'fr')
 
-    expect(chow.redis.del).toBeCalledWith(`translator_${socket.id}`)
-    expect(chow.emitToRoom).toBeCalledWith(oldTranslator, 'channel-takeover')
+    expect(response).toEqual(false)
   })
 })

@@ -5,6 +5,7 @@ import createDebug = require('debug')
 const debug = createDebug('api:socket:start-channel')
 
 const sixHours = 6 * 60 * 60
+const thirtySeconds = 30
 
 export default function startChannel(chow: TypedChow) {
   //
@@ -45,20 +46,23 @@ export default function startChannel(chow: TypedChow) {
     //
     const existingTranslator = await redis.get(channelKey)
     if (existingTranslator && existingTranslator !== socket.id) {
-      debug(`kick translator "${existingTranslator}"`)
-      await redis.del(translatorKey)
-      emitToRoom(existingTranslator, 'channel-takeover')
+      return false
+      // debug(`kick translator "${existingTranslator}"`)
+      // await redis.del(translatorKey)
+      // emitToRoom(existingTranslator, 'channel-takeover')
     }
 
     //
     // Store the socket id of the translator for this session-channel
     //
-    await redis.setAndExpire(channelKey, socket.id, sixHours)
+    await redis.setAndExpire(channelKey, socket.id, thirtySeconds)
 
     //
     // Store a packet to quickly know which session to broadcast to
     //
     const packet = [session.id, channel].join(';')
     await redis.setAndExpire(translatorKey, packet, sixHours)
+
+    return true
   })
 }

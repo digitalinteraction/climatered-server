@@ -10,11 +10,14 @@ export interface RedisService {
   getJson<T>(key: string, fallback: T): Promise<T>
   set(key: string, value: string): Promise<void>
   setAndExpire(key: string, value: string, duration: number): Promise<void>
+  expire(key: string, duration: number): Promise<void>
   del(key: string): Promise<number>
 }
 
 export function createRedisService(redisUrl: string): RedisService {
   const redis = new Redis(redisUrl)
+
+  redis.expireat('', 500)
 
   return {
     ping: () => {
@@ -31,6 +34,7 @@ export function createRedisService(redisUrl: string): RedisService {
     },
     set: (k, v) => redis.set(k, v) as any,
     setAndExpire: async (k, v, d) => redis.set(k, v, 'EX', d) as any,
+    expire: async (k, d) => redis.expire(k, d) as any,
     del: (k) => redis.del(k),
   }
 }

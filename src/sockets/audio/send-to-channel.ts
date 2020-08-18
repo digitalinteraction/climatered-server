@@ -1,6 +1,8 @@
 import { TypedChow } from '../../server'
 import createDebug = require('debug')
 
+const thirtySeconds = 30
+
 const debug = createDebug('api:socket:send-to-channel')
 
 export default function sendToChannel(chow: TypedChow) {
@@ -28,5 +30,11 @@ export default function sendToChannel(chow: TypedChow) {
     // Emit the raw data to the room
     //
     emitToRoom(key, 'channel-data', rawData)
+
+    //
+    // Refresh the translator packet
+    //
+    const channelKey = `translator_${sessionId}_${channel}`
+    await redis.expire(channelKey, thirtySeconds)
   })
 }

@@ -89,7 +89,7 @@ function fakeIo<E, C extends SockContext<E>>(
       }
 
       const ctx = await chow.makeContext()
-      await handler({ ...ctx, socket, sendError, emitToRoom }, ...args)
+      return await handler({ ...ctx, socket, sendError, emitToRoom }, ...args)
     })
 
     // Create and return our socket
