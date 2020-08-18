@@ -14,6 +14,10 @@ function randomFrom<T>(arr: T[]) {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
+function badShuffle<T>(arr: T[]) {
+  return Array.from(arr).sort(() => randomFrom([-1, 1]))
+}
+
 function randomSession(
   id: string,
   type: string,
@@ -45,7 +49,7 @@ function randomSession(
       ar: 'Content - ar',
     },
     links: [],
-    hostLanguage: [locale],
+    hostLanguage: translated ? badShuffle(['en', 'fr', 'es', 'ar']) : [locale],
     enableTranslation: translated,
     speakers: [],
     hostOrganisation: {
