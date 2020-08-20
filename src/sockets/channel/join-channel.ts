@@ -1,18 +1,23 @@
 import { TypedChow } from '../../server'
+import { ChannelStruct, isStruct } from '../../structs'
 import createDebug = require('debug')
+import { getChannelRoom } from '../interpret/interpret-utils'
 
 const debug = createDebug('api:socket:join-channel')
-
-export function validChannel(channel: string) {
-  return ['en', 'fr', 'es', 'ar'].includes(channel)
-}
 
 export default function joinChannel(chow: TypedChow) {
   //
   // @join-channel(sessionId, channel)
   //
   chow.socket('join-channel', async (ctx, sessionId, channel) => {
-    const { socket, schedule, auth, sendError } = ctx
+    const {
+      socket,
+      schedule,
+      auth,
+      sendError,
+      emitToRoom,
+      getRoomClients,
+    } = ctx
 
     debug(`socket="${socket.id}" sessionId="${sessionId}" channel="${channel}"`)
 
@@ -33,13 +38,24 @@ export default function joinChannel(chow: TypedChow) {
     // Find the session they want to subscribe to
     //
     const session = await schedule.findSession(sessionId)
-    if (!session || !session.enableTranslation || !validChannel(channel)) {
+    if (
+      !session ||
+      !session.enableTranslation ||
+      !isStruct(channel, ChannelStruct)
+    ) {
       return sendError('Session not found')
     }
 
     //
     // If they passed all checks, subscribe them for audio
     //
-    socket.join(`channel-${session.id}-${channel}`)
+    const room = getChannelRoom(session.id, channel)
+    socket.join(room)
+
+    //
+    // Emit the room size to everyone in it
+    //
+    const clients = await getRoomClients([room])
+    emitToRoom(room, 'channel-occupancy', clients.length)
   })
 }

@@ -6,8 +6,11 @@ import {
   SessionType,
   Theme,
   Track,
+  Translator,
 } from '../structs'
 import { AuthJwt } from '../services/jwt'
+
+const slugify = (str: string) => str.trim().replace(/\s+/g, '-').toLowerCase()
 
 //
 // Utils
@@ -47,7 +50,7 @@ export const createSession = (
   links: [
     { type: 'video', url: 'https://youtu.be/dQw4w9WgXcQ', language: 'en' },
   ],
-  hostLanguage: ['en'],
+  hostLanguage: translated ? ['en', 'fr', 'es', 'ar'] : ['en'],
   enableTranslation: translated,
   speakers: [],
   hostOrganisation: fakeTranslated('IFRC'),
@@ -59,7 +62,7 @@ export const createSession = (
 })
 
 export const createSpeaker = (name: string, role: string): Speaker => ({
-  slug: name.replace(/\s+/g, '-').toLowerCase(),
+  slug: slugify(name),
   name,
   role: fakeTranslated(role),
   headshot: '/uploads/speaker-default.svg',
@@ -101,4 +104,10 @@ export const createAuthToken = (roles: string[]): AuthJwt => ({
   sub: 'user@example.com',
   user_roles: roles,
   user_lang: 'en',
+})
+
+export const createTranslator = (name: string): Translator => ({
+  slug: slugify(name),
+  name: name,
+  email: 'user@example.com',
 })

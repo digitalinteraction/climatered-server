@@ -33,11 +33,18 @@ import getTracksRoute from './routes/schedule/get-tracks'
 import hiSocket from './sockets/hi'
 import authSocket from './sockets/auth'
 import deauthSocket from './sockets/deauth'
-import joinChannelSocket from './sockets/interpret/join-channel'
-import leaveChannelSocket from './sockets/interpret/leave-channel'
-import sendToChannelSocket from './sockets/interpret/send-to-channel'
-import startChannelSocket from './sockets/interpret/start-channel'
-import stopChannelSocket from './sockets/interpret/stop-channel'
+
+import joinChannelSocket from './sockets/channel/join-channel'
+import leaveChannelSocket from './sockets/channel/leave-channel'
+
+import acceptInterpretSocket from './sockets/interpret/accept-interpret'
+import joinInterpretSocket from './sockets/interpret/join-interpret'
+import leaveInterpretSocket from './sockets/interpret/leave-interpret'
+import messageInterpretSocket from './sockets/interpret/message-interpret'
+import requestInterpretSocket from './sockets/interpret/request-interpret'
+import sendInterpretSocket from './sockets/interpret/send-interpret'
+import startInterpretSocket from './sockets/interpret/start-interpret'
+import stopInterpretSocket from './sockets/interpret/stop-interpret'
 
 import emailEvent from './events/email'
 import { SockChowish, SockChow, SockContext } from './sockchow'
@@ -105,11 +112,18 @@ export function setupSockets(chow: TypedChow) {
     hiSocket,
     authSocket,
     deauthSocket,
+
     joinChannelSocket,
     leaveChannelSocket,
-    sendToChannelSocket,
-    startChannelSocket,
-    stopChannelSocket
+
+    acceptInterpretSocket,
+    joinInterpretSocket,
+    leaveInterpretSocket,
+    messageInterpretSocket,
+    requestInterpretSocket,
+    sendInterpretSocket,
+    startInterpretSocket,
+    stopInterpretSocket
   )
 }
 

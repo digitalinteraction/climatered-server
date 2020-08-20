@@ -1,4 +1,4 @@
-import sendToChannelSocket from '../send-to-channel'
+import sendToChannelSocket from '../send-interpret'
 import { TypedMockChow, createServer } from '../../../test-utils'
 
 let chow: TypedMockChow
@@ -8,18 +8,18 @@ beforeEach(() => {
   sendToChannelSocket(chow)
 })
 
-describe('@send-to-channel(rawData)', () => {
+describe('@send-interpret(rawData)', () => {
   it('should emit the date to that room', async () => {
     const socket = chow.io()
 
-    await chow.redis.set(`translator_${socket.id}`, '001;fr')
+    await chow.redis.set(`interpreter_${socket.id}`, '001;fr')
 
     const rawData = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-    await socket.emit('send-to-channel', rawData)
+    await socket.emit('send-interpret', rawData)
 
     expect(chow.emitToRoom).toBeCalledWith(
-      'channel-001-fr',
+      'channel_001_fr',
       'channel-data',
       rawData
     )
@@ -28,12 +28,12 @@ describe('@send-to-channel(rawData)', () => {
   it('should lengthen the expire on the translator lock', async () => {
     const socket = chow.io()
 
-    await chow.redis.set(`translator_${socket.id}`, '001;fr')
+    await chow.redis.set(`interpreter_${socket.id}`, '001;fr')
 
     const rawData = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-    await socket.emit('send-to-channel', rawData)
+    await socket.emit('send-interpret', rawData)
 
-    expect(chow.redis.expire).toBeCalledWith('translator_001_fr', 30)
+    expect(chow.redis.expire).toBeCalledWith('interpreter_001_fr', 30)
   })
 })

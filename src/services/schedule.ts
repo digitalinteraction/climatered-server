@@ -8,6 +8,7 @@ import {
   Theme,
   ConfigSettings,
   SessionType,
+  Translator,
 } from '../structs'
 import { RedisService } from './redis'
 
@@ -23,6 +24,8 @@ export interface ScheduleService {
   getSpeakers(): Promise<Speaker[]>
   getTypes(): Promise<SessionType[]>
   getSettings(): Promise<ConfigSettings | null>
+  getTranslators(): Promise<Translator[]>
+  findTranslator(email: string): Promise<Translator | null>
 }
 
 export function createScheduleService(redis: RedisService): ScheduleService {
@@ -43,11 +46,17 @@ export function createScheduleService(redis: RedisService): ScheduleService {
   const getThemes = () => redis.getJson('schedule.themes', [])
   const getSpeakers = () => redis.getJson('schedule.speakers', [])
   const getTypes = () => redis.getJson('schedule.types', [])
+  const getTranslators = () => redis.getJson('schedule.translators', [])
   const getSettings = () => redis.getJson('schedule.settings', null)
 
   async function findSession(id: string) {
     const sessions: Session[] = await getSessions()
     return sessions.find((s) => s.id === id) ?? null
+  }
+
+  async function findTranslator(email: string) {
+    const translators: Translator[] = await getTranslators()
+    return translators.find((t) => t.email === email) ?? null
   }
 
   return {
@@ -59,5 +68,7 @@ export function createScheduleService(redis: RedisService): ScheduleService {
     getSpeakers,
     getTypes,
     getSettings,
+    getTranslators,
+    findTranslator,
   }
 }

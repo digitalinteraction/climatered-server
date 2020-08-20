@@ -8,6 +8,7 @@ import {
   createSessionType,
   createTheme,
   createTrack,
+  createTranslator,
 } from './fixtures'
 import { UrlService, createUrlService } from '../services/url'
 import { UsersService, compareEmails } from '../services/users'
@@ -91,6 +92,8 @@ export function mockSchedule(): ScheduleService {
     enableHelpdesk: false,
   }
 
+  const translators = [createTranslator('Rob Anderson')]
+
   return {
     getSlots: jest.fn(async () => slots),
     getSessions: jest.fn(async () => sessions),
@@ -102,6 +105,10 @@ export function mockSchedule(): ScheduleService {
     getSpeakers: jest.fn(async () => speakers),
     getTypes: jest.fn(async () => types),
     getSettings: jest.fn(async () => settings),
+    getTranslators: jest.fn(async () => translators),
+    findTranslator: jest.fn(
+      async (email) => translators.find((t) => t.email === email) ?? null
+    ),
   }
 }
 

@@ -137,6 +137,11 @@ export const TranslatorStruct = object({
 })
 
 //
+// Channels
+//
+export const ChannelStruct = enums(['en', 'fr', 'es', 'ar'])
+
+//
 // Registration
 //
 const countryCodes = Object.keys(countries.getNames('en'))
@@ -147,7 +152,7 @@ export const RegistrationStruct = object({
   created: date(),
   name: string(),
   email: string(),
-  language: enums(['en', 'fr', 'es', 'ar']),
+  language: ChannelStruct,
   country: enums(countryCodes),
   affiliation: string(),
   verified: boolean(),
@@ -173,4 +178,13 @@ export type ConfigSettings = StructType<typeof ConfigSettingsStruct>
 export const ConfigSettingsStruct = object({
   scheduleLive: boolean(),
   enableHelpdesk: boolean(),
+})
+
+//
+// SessionChannel
+//
+export type SessionChannel = StructType<typeof SessionChannelStruct>
+export const SessionChannelStruct = object({
+  sessionId: string(),
+  channel: ChannelStruct,
 })

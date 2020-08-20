@@ -13,7 +13,7 @@ export default function hi(chow: TypedChow) {
     const { socket } = ctx
     debug(`socket="${socket.id}"`)
 
-    socket.emit('hi', {
+    socket.emitBack('hi', {
       message: 'Hello, world!',
       pkg: {
         name: pkg.name,

@@ -62,7 +62,7 @@ type MockSocket = {
  */
 function fakeIo<E, C extends SockContext<E>>(
   chow: SockChow<E, C>,
-  emitToRoom: EmitToRoomFn
+  ctxOverrides: Partial<C>
 ) {
   return () => {
     // Generate a unique id for this socket
@@ -72,6 +72,7 @@ function fakeIo<E, C extends SockContext<E>>(
     // Mock out generic socket functions so they can be tested
     const join = jest.fn()
     const leave = jest.fn()
+    const emitBack = jest.fn()
     const sendError = jest.fn((message) => {
       throw new Error(`#sendError called with: ` + message)
     })
@@ -89,11 +90,14 @@ function fakeIo<E, C extends SockContext<E>>(
       }
 
       const ctx = await chow.makeContext()
-      return await handler({ ...ctx, socket, sendError, emitToRoom }, ...args)
+      return await handler(
+        { ...ctx, socket, sendError, ...ctxOverrides },
+        ...args
+      )
     })
 
     // Create and return our socket
-    const socket: MockSocket = { id, join, leave, emit, sendError }
+    const socket: MockSocket = { id, join, leave, emit, emitBack, sendError }
     return socket
   }
 }
@@ -123,7 +127,9 @@ export function createServer(): TypedMockChow {
     chow.emitToRoom(room, message, ...args)
   })
 
-  const io = fakeIo(chow, emitToRoom)
+  const getRoomClients = jest.fn(async () => [])
+
+  const io = fakeIo(chow, { emitToRoom, getRoomClients })
 
   const extras: TestExtras = {
     redis,
@@ -139,5 +145,9 @@ export function createServer(): TypedMockChow {
     i18n,
   }
 
-  return Object.assign(mockchow(chow, extras), { socket, emitToRoom })
+  return Object.assign(mockchow(chow, extras), {
+    socket,
+    emitToRoom,
+    getRoomClients,
+  })
 }

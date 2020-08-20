@@ -24,6 +24,20 @@ describe('@leave-channel(sessionId', () => {
 
     await socket.emit('leave-channel', '001', 'fr')
 
-    expect(socket.leave).toBeCalledWith('channel-001-fr')
+    expect(socket.leave).toBeCalledWith('channel_001_fr')
+  })
+  it('should broadcast the new channel occupancy', async () => {
+    const socket = chow.io()
+
+    mocked(chow.auth.fromSocket).mockResolvedValue(attendee)
+    mocked(chow.getRoomClients).mockResolvedValue(['client-a', 'client-b'])
+
+    await socket.emit('leave-channel', '001', 'fr')
+
+    expect(chow.emitToRoom).toBeCalledWith(
+      'channel_001_fr',
+      'channel-occupancy',
+      2
+    )
   })
 })

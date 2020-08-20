@@ -7,15 +7,20 @@ export interface EmitToRoomFn {
   (room: string, message: string, ...args: any[]): void
 }
 
+export interface GetRoomClientFn {
+  (rooms: string[]): Promise<string[]>
+}
+
 export interface SockContext<E> extends BaseContext<E> {
   emitToRoom: EmitToRoomFn
+  getRoomClients: GetRoomClientFn
 }
 
 export interface ChowSocket {
   id: string
   join(room: string): void
   leave(room: string): void
-  emit(message: string, ...args: any[]): void
+  emitBack(message: string, ...args: any[]): void
 }
 
 interface SocketSendError {
@@ -32,6 +37,7 @@ interface SockHandler<C> {
 export interface SockChowish<E, C extends SockContext<E>> {
   socket(message: string, handler: SockHandler<C>): void
   emitToRoom: EmitToRoomFn
+  getRoomClients: GetRoomClientFn
 }
 
 function createSocket(socket: socketIo.Socket): ChowSocket {
@@ -39,7 +45,7 @@ function createSocket(socket: socketIo.Socket): ChowSocket {
     id: socket.id,
     join: (room) => socket.join(room),
     leave: (room) => socket.leave(room),
-    emit: (message, ...args) => socket.emit(message, ...args),
+    emitBack: (message, ...args) => socket.emit(message, ...args),
   }
 }
 
@@ -99,9 +105,20 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
   baseContext(): SockContext<E> {
     return {
       ...super.baseContext(),
-      emitToRoom: (room, message, ...args) =>
-        this.emitToRoom(room, message, ...args),
+      emitToRoom: (...args) => this.emitToRoom(...args),
+      getRoomClients: (...args) => this.getRoomClients(...args),
     }
+  }
+
+  getRoomClients(rooms: string[]) {
+    const adapter = this.io.of('/').adapter as socketIoRedis.RedisAdapter
+
+    return new Promise<string[]>((resolve, reject) => {
+      adapter.clients(rooms, (err, clients) => {
+        if (err) reject(err)
+        else resolve(clients)
+      })
+    })
   }
 
   catchSocketError(socket: socketIo.Socket, message: string, error: any) {
