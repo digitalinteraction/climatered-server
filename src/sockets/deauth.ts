@@ -8,7 +8,7 @@ export default function deauth(chow: TypedChow) {
   // @deauth()
   //
   chow.socket('deauth', async (ctx) => {
-    const { socket, jwt, redis } = ctx
+    const { socket, redis } = ctx
 
     debug(`socket="${socket.id}"`)
 
