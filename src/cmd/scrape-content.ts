@@ -106,6 +106,12 @@ function debugExec(cmd: string) {
   return exec(cmd)
 }
 
+const {
+  SCHEDULE_GIT_URL,
+  REDIS_URL,
+  SCHEDULE_GIT_BRANCH = 'master',
+} = process.env as Record<string, string>
+
 export async function runScraper() {
   const tmpdir = await fse.mkdtemp(path.join(os.tmpdir(), 'schedule-clone-'))
 
@@ -115,7 +121,6 @@ export async function runScraper() {
   validateEnv(['SCHEDULE_GIT_URL', 'REDIS_URL'])
 
   // Extract environment variables
-  const { SCHEDULE_GIT_URL, REDIS_URL } = process.env as Record<string, string>
   debug(`redisUrl="${REDIS_URL}" gitUrl="${SCHEDULE_GIT_URL}"`)
 
   // Connect to redis
@@ -133,7 +138,9 @@ export async function runScraper() {
     if (stderr) throw new Error(stderr)
 
     // Clone the schedule repo into the temp folder
-    await debugExec(`git clone ${SCHEDULE_GIT_URL} ${tmpdir}`)
+    await debugExec(
+      `git clone --branch ${SCHEDULE_GIT_BRANCH} ${SCHEDULE_GIT_URL} ${tmpdir}`
+    )
 
     // Create a list of content to parse and validate
     const contentToParse: { key: string; struct: Struct<any> }[] = [
