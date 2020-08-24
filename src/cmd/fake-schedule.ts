@@ -36,6 +36,7 @@ function randomSession(
     slot: randomFrom(slotIds),
     track: randomFrom(trackIds),
     themes: [],
+    coverImage: '/uploads/default-cover.jpg',
     title: {
       en: 'Title - en',
       fr: 'Title - fr',
@@ -49,9 +50,11 @@ function randomSession(
       ar: 'Content - ar',
     },
     links: [],
-    hostLanguage: translated ? badShuffle(['en', 'fr', 'es', 'ar']) : [locale],
     enableTranslation: translated,
     speakers: [],
+    hostName: 'Geoff Testington',
+    hostEmail: 'user@example.com',
+    hostLanguage: translated ? badShuffle(['en', 'fr', 'es', 'ar']) : [locale],
     hostOrganisation: {
       en: org,
       fr: org,

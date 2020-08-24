@@ -1,4 +1,5 @@
 import { TypedChow } from '../../server'
+import { Session } from '../../structs'
 
 export default function getSessions(chow: TypedChow) {
   //
@@ -16,14 +17,18 @@ export default function getSessions(chow: TypedChow) {
       //
       // Load sessions from the schedule
       //
-      let sessions = await schedule.getSessions()
+      let sessions: any[] = await schedule.getSessions()
       sessions = sessions.filter((s) => !s.isDraft)
 
       //
       // Remove links from the sessions if they aren't logged in
       //
       if (!authToken) {
-        sessions = sessions.map((s) => ({ ...s, links: [] }))
+        sessions = sessions.map((s) => ({
+          ...s,
+          links: [],
+          hostEmail: null,
+        }))
       }
 
       //

@@ -56,6 +56,7 @@ export type Link = StructType<typeof LinkStruct>
 export const LinkStruct = object({
   type: enums(['video', 'poll', 'tool']),
   url: string(),
+  title: optional(string()),
   language: string(),
 })
 
@@ -70,9 +71,12 @@ export const SessionStruct = object({
   slot: optional(string()),
   track: string(),
   themes: array(string()),
+  coverImage: string(),
   title: LocalisedStruct,
   content: LocalisedStruct,
   links: array(LinkStruct),
+  hostName: string(),
+  hostEmail: string(),
   hostLanguage: array(string()),
   enableTranslation: boolean(),
   speakers: array(string()),

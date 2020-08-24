@@ -186,7 +186,7 @@ and they can easily be deployed.
 
 ## Future work
 
-- ...
+- send an email when a scrape fails
 
 ---
 

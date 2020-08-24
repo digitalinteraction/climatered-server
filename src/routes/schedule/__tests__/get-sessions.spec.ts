@@ -22,35 +22,57 @@ beforeEach(async () => {
   mocked(chow.schedule.getSessions).mockResolvedValue(fakeSessions)
 })
 
+function authSetup() {
+  let authToken = jwt.sign(
+    {
+      typ: 'auth',
+      sub: 'user@example.com',
+      user_roles: ['attendee'],
+      user_lang: 'en',
+    },
+    chow.env.JWT_SECRET
+  )
+
+  const headers = {
+    authorization: `Bearer ${authToken}`,
+  }
+
+  return { authToken, headers }
+}
+
 describe('GET /schedule/sessions', () => {
   it('should return the sessions in the schedule', async () => {
     const res = await chow.http('get', '/schedule/sessions')
 
-    const sessionsWithoutLinks = fakeSessions.map((e) => ({ ...e, links: [] }))
+    const unauthedSessions = fakeSessions.map((e) => ({
+      ...e,
+      links: [],
+      hostEmail: null,
+    }))
 
     expect(res.sessions).toHaveLength(3)
 
-    expect(res.sessions).toEqual(sessionsWithoutLinks)
+    expect(res.sessions).toEqual(unauthedSessions)
   })
 
-  it('should add links when authenticated', async () => {
-    let authToken = jwt.sign(
-      {
-        typ: 'auth',
-        sub: 'user@example.com',
-        user_roles: ['attendee'],
-        user_lang: 'en',
-      },
-      chow.env.JWT_SECRET
-    )
-
-    const headers = {
-      authorization: `Bearer ${authToken}`,
-    }
+  it('should return full sessions when authenticated', async () => {
+    const { headers } = authSetup()
 
     const res = await chow.http('get', '/schedule/sessions', { headers })
 
     expect(res.sessions).toEqual(fakeSessions)
+  })
+
+  it('should add links when authenticated', async () => {
+    const { headers } = authSetup()
+
+    const res = await chow.http('get', '/schedule/sessions', { headers })
+
+    expect(res.sessions[0].links[0]).toEqual({
+      url: expect.any(String),
+      type: expect.any(String),
+      language: expect.any(String),
+    })
   })
 
   it('should not return draft sessions', async () => {
@@ -62,5 +84,13 @@ describe('GET /schedule/sessions', () => {
     const res = await chow.http('get', '/schedule/sessions')
 
     expect(res.sessions).toHaveLength(0)
+  })
+
+  it('should add the host email when authenticated', async () => {
+    const { headers } = authSetup()
+
+    const res = await chow.http('get', '/schedule/sessions', { headers })
+
+    expect(res.sessions[0].hostEmail).toEqual(expect.any(String))
   })
 })
