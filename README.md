@@ -128,6 +128,12 @@ npm run readme-toc
 
 # Reset the jest cache
 npx jest --clearCache
+
+# Generate an authentication token
+# -> pass --email user@example.com to specify an email
+# -> pass --url to output it as a login url instead
+# -> pass --lang en/fr/es/ar to specify a user_lang
+npm run dev fake-auth
 ```
 
 ### Code formatting
