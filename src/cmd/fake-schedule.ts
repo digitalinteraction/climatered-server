@@ -18,6 +18,14 @@ function badShuffle<T>(arr: T[]) {
   return Array.from(arr).sort(() => randomFrom([-1, 1]))
 }
 
+const loremIpsum = `Donec sed odio dui. Curabitur blandit tempus porttitor. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
+
+Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Maecenas faucibus mollis interdum. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Donec id elit non mi porta gravida at eget metus.
+
+Cras justo odio, dapibus ac facilisis in, egestas eget quam. Curabitur blandit tempus porttitor. Nullam id dolor id nibh ultricies vehicula ut id elit. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Sed posuere consectetur est at lobortis. Vestibulum id ligula porta felis euismod semper.
+
+Cras mattis consectetur purus sit amet fermentum. Etiam porta sem malesuada magna mollis euismod. Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Etiam porta sem malesuada magna mollis euismod. Vestibulum id ligula porta felis euismod semper.`
+
 function randomSession(
   id: string,
   type: string,
@@ -44,10 +52,10 @@ function randomSession(
       ar: 'Title - ar',
     },
     content: {
-      en: 'Content - en',
-      fr: 'Content - fr',
-      es: 'Content - es',
-      ar: 'Content - ar',
+      en: '[en] ' + loremIpsum,
+      fr: '[fr] ' + loremIpsum,
+      es: '[es] ' + loremIpsum,
+      ar: '[ar] ' + loremIpsum,
     },
     links: [],
     enableTranslation: translated,
