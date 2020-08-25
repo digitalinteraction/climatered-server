@@ -83,6 +83,10 @@ yargs.command(
         type: 'string',
         default: 'en',
         choices: ['en', 'fr', 'es', 'ar'],
+      })
+      .option('url', {
+        type: 'boolean',
+        default: false,
       }),
   handleFail(async (args) => {
     validateEnv(['JWT_SECRET'])
@@ -92,7 +96,13 @@ yargs.command(
       user_roles: ['translator', 'attendee'],
       user_lang: args.lang,
     }
-    console.log(jwt.sign(auth, process.env.JWT_SECRET!))
+    const token = jwt.sign(auth, process.env.JWT_SECRET!)
+    if (args.url) {
+      validateEnv(['WEB_URL'])
+      console.log(`${process.env.WEB_URL}/_token?token=${token}`)
+    } else {
+      console.log(token)
+    }
   })
 )
 
