@@ -49,7 +49,7 @@ export default function startInterpret(chow: TypedChow) {
     if (activeInterpreter && activeInterpreter !== socket.id) {
       debug(`kick translator "${activeInterpreter}"`)
       await redis.del(packetKey)
-      emitToRoom(activeInterpreter, 'channel-takeover', translator)
+      emitToRoom(activeInterpreter, 'interpret-takeover', translator)
     }
 
     //

@@ -55,11 +55,15 @@ describe('@start-interpret(sessionId, channel)', () => {
 
     await socket.emit('start-interpret', '001', 'fr')
 
-    expect(chow.emitToRoom).toBeCalledWith(oldTranslator, 'channel-takeover', {
-      slug: expect.any(String),
-      name: expect.any(String),
-      email: expect.any(String),
-    })
+    expect(chow.emitToRoom).toBeCalledWith(
+      oldTranslator,
+      'interpret-takeover',
+      {
+        slug: expect.any(String),
+        name: expect.any(String),
+        email: expect.any(String),
+      }
+    )
   })
 
   it('should emit the translator to the interpreter room', async () => {
