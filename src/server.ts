@@ -71,7 +71,9 @@ export function setupMiddleware(chow: TypedChow) {
     // Log requests for debugging
     //
     app.use((req, res, next) => {
-      debug(`${req.method}: ${req.path}`)
+      if (req.path !== 'req.path') {
+        debug(`${req.method}: ${req.path}`)
+      }
       next()
     })
 
