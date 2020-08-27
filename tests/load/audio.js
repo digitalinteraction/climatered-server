@@ -2,32 +2,18 @@ require('dotenv').config()
 const { validateEnv } = require('valid-env')
 const io = require('socket.io-client')
 const ms = require('ms')
-const jwt = require('jsonwebtoken')
 const debug = require('debug')('api')
 
-validateEnv(['JWT_SECRET'])
+validateEnv(['ATTENDEE_TOKEN', 'TRANSLATOR_TOKEN'])
 const {
   SERVER_URL = 'http://localhost:3000',
-  JWT_SECRET,
-  TEST_SESSION = 'test-plenary',
+  ATTENDEE_TOKEN,
+  TRANSLATOR_TOKEN,
+  TEST_SESSION = 'dev-001',
   TEST_CHANNEL = 'fr',
 } = process.env
 
 const SOCKET_URL = SERVER_URL.replace(/^http/, 'ws')
-
-const translatorToken = {
-  typ: 'auth',
-  sub: 'translator@example.com',
-  user_roles: ['translator'],
-  user_lang: 'en',
-}
-
-const attendeeToken = {
-  typ: 'auth',
-  sub: 'attendee@example.com',
-  user_roles: ['attendee'],
-  user_lang: 'en',
-}
 
 /**
  * @returns {Promise<SocketIOClient.Socket>} name
@@ -45,10 +31,6 @@ async function addSocket() {
   }
 
   return socket
-}
-
-function sign(contents) {
-  return jwt.sign(contents, JWT_SECRET)
 }
 
 async function time(name, block) {
@@ -72,7 +54,7 @@ function pause(ms) {
     //
     // Test 1
     //
-    // await helloWorld()
+    await helloWorld()
 
     //
     // Test 2
@@ -134,15 +116,16 @@ async function loadTest(numAttendees, packetSize, numPackets) {
   let t
   let startup = await time('auth translator', async () => {
     t = await addSocket()
-    await t.emitAndWait('auth', sign(translatorToken))
-    await t.emitAndWait('start-channel', TEST_SESSION, TEST_CHANNEL)
+    await t.emitAndWait('auth', TRANSLATOR_TOKEN)
+    await t.emitAndWait('join-interpret', TEST_SESSION, TEST_CHANNEL)
+    await t.emitAndWait('start-interpret', TEST_SESSION, TEST_CHANNEL)
   })
 
   const attendees = []
   startup += await time('add attendees', async () => {
     for (let i = 0; i < numAttendees; i++) {
       const a = await addSocket()
-      await a.emitAndWait('auth', sign(attendeeToken))
+      await a.emitAndWait('auth', ATTENDEE_TOKEN)
       await a.emitAndWait('join-channel', TEST_SESSION, TEST_CHANNEL)
       attendees.push(a)
     }
@@ -158,7 +141,7 @@ async function loadTest(numAttendees, packetSize, numPackets) {
     const whiteNoise = makeNoise(packetSize)
 
     await time(`send data ${i + 1}`, async () => {
-      await t.emitAndWait('send-to-channel', whiteNoise)
+      await t.emitAndWait('send-interpret', whiteNoise)
       await Promise.all(attendees.map((a) => waitForData(a)))
     })
   }
@@ -173,6 +156,8 @@ async function loadTest(numAttendees, packetSize, numPackets) {
   })
 
   shutdown += await time('deauth translator', async () => {
+    await t.emit('stop-interpret')
+    await t.emit('leave-interpret', TEST_SESSION, TEST_CHANNEL)
     await t.emitAndWait('deauth')
     t.close()
   })
