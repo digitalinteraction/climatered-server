@@ -177,6 +177,7 @@ export async function runServer() {
     urlEncodedBody: true,
     corsHosts: env.CORS_HOSTS,
   })
+  setupMiddleware(chow)
   setupEvents(chow)
   setupRoutes(chow)
   setupSockets(chow)
