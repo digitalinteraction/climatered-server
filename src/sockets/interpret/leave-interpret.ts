@@ -24,7 +24,7 @@ export default function leaveInterpret(chow: TypedChow) {
     const interpretRoom = getInterpretRoom(session.id, channel)
 
     //
-    // Grab the translator is leaving
+    // Grab the translator who is leaving
     //
     const translator = await schedule.findTranslator(authToken.sub)
     if (!translator) throw new Error('Bad authentication')
