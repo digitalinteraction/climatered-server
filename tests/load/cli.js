@@ -123,29 +123,61 @@ yargs.command(
       .option('url', { type: 'string', default: process.env.TEST_SERVER })
       .option('token', { type: 'string', default: process.env.TEST_TOKEN }),
   async (args) => {
-    debug('load-up')
+    try {
+      debug('load-up')
 
-    /** @type {SocketIOClient.Socket[]} */
-    const sockets = []
+      /** @type {SocketIOClient.Socket[]} */
+      const sockets = []
 
-    process.on('SIGINT', async () => {
-      setTimeout(() => die('Failed to disconnect'), 2000)
+      process.on('SIGINT', async () => {
+        setTimeout(() => die('Failed to disconnect'), 2000 + args.count * 200)
+
+        if (timerId) clearInterval(timerId)
+
+        await Promise.all(
+          sockets.map(async (s) => {
+            await s.emitAndWait('leave-channel', args.session, args.channel)
+            s.close()
+          })
+        )
+
+        die('Recieved SIGINT')
+      })
+
+      for (let i = 0; i < args.count; i++) {
+        sockets.push(addSocket(args.url))
+      }
+
+      await Promise.all(sockets.map((s) => s.emitAndWait('auth', args.token)))
+      debug('authed')
 
       await Promise.all(
-        sockets.map(async (s) => {
-          await s.emitAndWait('leave-channel', args.session, args.channel)
-          s.close()
-        })
+        sockets.map((s) =>
+          s.emitAndWait('join-channel', args.session, args.channel)
+        )
+      )
+      debug('authed')
+
+      await Promise.all(
+        sockets.map((s) =>
+          s.on('channel-data', () => {
+            messages++
+          })
+        )
       )
 
-      die('Recieved SIGINT')
-    })
+      debug('subbed')
 
-    for (let i = 0; i < args.count; i++) {
-      sockets.push(addSocket(args.url))
+      let messages = 0
+
+      let timerId = setInterval(() => {
+        console.log('recieved: ', messages)
+        messages = 0
+      }, 1000)
+    } catch (error) {
+      console.error(error)
+      process.exit(1)
     }
-
-    await Promise.all(sockets.map((s) => s.emitAndWait('auth', args.token)))
   }
 )
 
