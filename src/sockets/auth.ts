@@ -3,6 +3,7 @@ import { AuthJwt } from '../services/jwt'
 import createDebug = require('debug')
 
 const debug = createDebug('api:socket:auth')
+const sixHours = 6 * 60 * 60
 
 export default function auth(chow: TypedChow) {
   //
@@ -25,7 +26,7 @@ export default function auth(chow: TypedChow) {
       // THOUGHT – store the jwt here, or just JSON encode it?
       // - is it easier to jwt.decode or JSON.parse the info on the other side
       //
-      redis.set('auth_' + socket.id, JSON.stringify(auth))
+      redis.setAndExpire('auth_' + socket.id, JSON.stringify(auth), sixHours)
 
       debug('valid auth')
       return true

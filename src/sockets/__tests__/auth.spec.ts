@@ -24,9 +24,10 @@ describe('@auth(token)', () => {
 
     await socket.emit('auth', token)
 
-    expect(chow.redis.set).toBeCalledWith(
+    expect(chow.redis.setAndExpire).toBeCalledWith(
       `auth_${socket.id}`,
-      JSON.stringify(jwt.decode(token))
+      JSON.stringify(jwt.decode(token)),
+      expect.any(Number)
     )
   })
 
