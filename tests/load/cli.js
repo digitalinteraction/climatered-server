@@ -8,11 +8,13 @@ const AUDIO_SAMPLE_RATE = 44100 // per second
 
 yargs.help().alias('h', 'help').demandCommand().recommendCommands()
 
-async function addSocket(apiUrl) {
+function addSocket(apiUrl) {
   const pathname = new URL(apiUrl).pathname.replace(/\/?$/, '/socket.io')
 
   const socketUrl = new URL(apiUrl)
   socketUrl.pathname = '/'
+
+  debug(`addSocket url="${socketUrl.toString()}" pathname="${pathname}"`)
 
   const socket = io(socketUrl.toString(), {
     path: pathname,
@@ -34,9 +36,11 @@ function pause(seconds) {
 }
 
 function makeNoise(size) {
-  const arr = new Float32Array(size / 4)
+  const arr = new Float32Array(size)
+  const volume = 0.7
+
   for (let i in arr) {
-    arr[i] = Math.random() * 2 - 1
+    arr[i] = volume * (Math.random() * 2 - 1)
   }
   return arr.buffer
 }
@@ -57,32 +61,28 @@ yargs.command(
   'Become a translator and transmit white noise',
   (yargs) =>
     yargs
-      .option('url', {
-        type: 'string',
-        default: 'wss://dev.climate.red/api/',
-      })
-      .option('token', {
-        type: 'string',
-        default: process.env.TRANSLATOR_TOKEN,
-      })
-      .positional('session', {
-        type: 'string',
-      })
-      .positional('channel', {
-        type: 'string',
-      }),
+      .option('url', { type: 'string', default: process.env.TEST_SERVER })
+      .option('token', { type: 'string', default: process.env.TEST_TOKEN })
+      .positional('session', { type: 'string' })
+      .positional('channel', { type: 'string' }),
   async (args) => {
     try {
       debug('translator')
 
-      const socket = await addSocket(args.url)
+      const socket = addSocket(args.url)
+      let timerId = null
 
       process.on('SIGINT', async () => {
+        setTimeout(() => die('Failed to disconnect'), 2000)
+
         await socket.emitAndWait('stop-interpret', args.session, args.channel)
         debug('stop-interpret')
 
         await socket.emitAndWait('leave-interpret', args.session, args.channel)
         debug('leave-interpret')
+
+        socket.close()
+        clearInterval(timerId)
 
         die('Recieved SIGINT')
       })
@@ -98,16 +98,54 @@ yargs.command(
 
       const sampleLengthSeconds = 0.5
 
-      setInterval(async () => {
-        const noise = makeNoise(sampleLengthSeconds * AUDIO_SAMPLE_RATE)
-
-        await socket.emitAndWait('send-interpret', noise)
+      timerId = setInterval(async () => {
+        await socket.emitAndWait(
+          'send-interpret',
+          makeNoise(sampleLengthSeconds * AUDIO_SAMPLE_RATE)
+        )
         debug('send-interpret')
       }, sampleLengthSeconds * 1000)
     } catch (error) {
       console.error(error)
       process.exit(1)
     }
+  }
+)
+
+yargs.command(
+  'load-up <count> <session> <channel>',
+  'Add attendees to a session',
+  (yargs) =>
+    yargs
+      .positional('count', { type: 'number' })
+      .positional('session', { type: 'string' })
+      .positional('channel', { type: 'string' })
+      .option('url', { type: 'string', default: process.env.TEST_SERVER })
+      .option('token', { type: 'string', default: process.env.TEST_TOKEN }),
+  async (args) => {
+    debug('load-up')
+
+    /** @type {SocketIOClient.Socket[]} */
+    const sockets = []
+
+    process.on('SIGINT', async () => {
+      setTimeout(() => die('Failed to disconnect'), 2000)
+
+      await Promise.all(
+        sockets.map(async (s) => {
+          await s.emitAndWait('leave-channel', args.session, args.channel)
+          s.close()
+        })
+      )
+
+      die('Recieved SIGINT')
+    })
+
+    for (let i = 0; i < args.count; i++) {
+      sockets.push(addSocket(args.url))
+    }
+
+    await Promise.all(sockets.map((s) => s.emitAndWait('auth', args.token)))
   }
 )
 
