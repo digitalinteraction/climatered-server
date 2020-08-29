@@ -4,16 +4,21 @@ import socketIo = require('socket.io')
 import socketIoRedis = require('socket.io-redis')
 
 export interface EmitToRoomFn {
-  (room: string, message: string, ...args: any[]): void
+  (room: string, eventName: string, ...args: any[]): void
 }
 
 export interface GetRoomClientFn {
   (rooms: string[]): Promise<string[]>
 }
 
+export interface GetClientRoomsFn {
+  (clientId: string): Promise<string[]>
+}
+
 export interface SockContext<E> extends BaseContext<E> {
   emitToRoom: EmitToRoomFn
   getRoomClients: GetRoomClientFn
+  getClientRooms: GetClientRoomsFn
 }
 
 export interface ChowSocket {
@@ -70,8 +75,8 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
     this.socketHandlers.set(message, handler)
   }
 
-  emitToRoom(room: string, message: string, ...args: any[]) {
-    this.io.in(room).emit(message, ...args)
+  emitToRoom(room: string, eventName: string, ...args: any[]) {
+    this.io.in(room).emit(eventName, ...args)
   }
 
   handleSocket(socket: socketIo.Socket) {
@@ -107,6 +112,7 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
       ...super.baseContext(),
       emitToRoom: (...args) => this.emitToRoom(...args),
       getRoomClients: (...args) => this.getRoomClients(...args),
+      getClientRooms: (...args) => this.getClientRooms(...args),
     }
   }
 
@@ -117,6 +123,17 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
       adapter.clients(rooms, (err, clients) => {
         if (err) reject(err)
         else resolve(clients)
+      })
+    })
+  }
+
+  getClientRooms(clientId: string) {
+    const adapter = this.io.of('/').adapter as socketIoRedis.RedisAdapter
+
+    return new Promise<string[]>((resolve, reject) => {
+      adapter.clientRooms(clientId, (err, rooms) => {
+        if (err) reject(err)
+        else resolve(rooms)
       })
     })
   }
