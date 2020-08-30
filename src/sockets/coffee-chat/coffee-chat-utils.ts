@@ -2,8 +2,8 @@ export function getCoffeeChatRoom(sessionId: string, channel: string) {
   return `coffee_chat_${sessionId}_${channel}`
 }
 
-export function getUserJoinedAckEvent(toUser: string) {
-  return `user-joined-ack-${toUser}`
+export function getUserAckEvent(toUser: string) {
+  return `user-ack-${toUser}`
 }
 
 export function getUserOfferEvent(fromUser: string, toUser: string) {
