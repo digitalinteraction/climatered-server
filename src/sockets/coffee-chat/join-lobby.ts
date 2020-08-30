@@ -12,6 +12,6 @@ export default function joinLobby(chow: TypedChow) {
 
     // TODO: Push onto lobby queue
 
-    socket.emitBack('lobby-joined', { numOnline: 10 })
+    socket.emitBack('lobby-joined', 10)
   })
 }

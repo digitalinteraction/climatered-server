@@ -4,7 +4,7 @@ import createDebug = require('debug')
 const debug = createDebug('api:socket:user-joined')
 
 export default function userJoined(chow: TypedChow) {
-  chow.socket('join-lobby', async (ctx, room, user) => {
+  chow.socket('user-joined', async (ctx, room, user) => {
     const { socket, emitToRoom } = ctx
     debug(`socket="${socket.id}" room="${room}" user="${user}"`)
 

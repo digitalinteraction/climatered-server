@@ -5,10 +5,12 @@ import { getUserJoinedAckEvent } from './coffee-chat-utils'
 const debug = createDebug('api:socket:user-joined-ack')
 
 export default function userJoinedAck(chow: TypedChow) {
-  chow.socket('user-joined-ack', async (ctx, room, toUser) => {
+  chow.socket('user-joined-ack', async (ctx, room, fromUser, toUser) => {
     const { socket, emitToRoom } = ctx
-    debug(`socket="${socket.id}" room="${room}" toUser="${toUser}"`)
+    debug(
+      `socket="${socket.id}" room="${room}" fromUser="${fromUser}" toUser="${toUser}"`
+    )
 
-    emitToRoom(room, getUserJoinedAckEvent(toUser))
+    emitToRoom(room, getUserJoinedAckEvent(toUser), fromUser)
   })
 }

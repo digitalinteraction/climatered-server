@@ -25,7 +25,7 @@ export interface ChowSocket {
   id: string
   join(room: string): void
   leave(room: string): void
-  emitBack(message: string, ...args: any[]): void
+  emitBack(eventName: string, ...args: any[]): void
 }
 
 interface SocketSendError {
