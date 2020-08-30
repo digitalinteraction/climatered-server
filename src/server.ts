@@ -47,14 +47,16 @@ import sendInterpretSocket from './sockets/interpret/send-interpret'
 import startInterpretSocket from './sockets/interpret/start-interpret'
 import stopInterpretSocket from './sockets/interpret/stop-interpret'
 
-import emailEvent from './events/email'
-import { SockChowish, SockChow, SockContext } from './sockchow'
 import joinLobby from './sockets/coffee-chat/join-lobby'
-import userJoined from './sockets/coffee-chat/user-joined'
+import joinRoom from './sockets/coffee-chat/join-room'
+import leaveRoom from './sockets/coffee-chat/leave-room'
 import userJoinedAck from './sockets/coffee-chat/user-joined-ack'
 import sendOffer from './sockets/coffee-chat/send-offer'
 import sendAnswer from './sockets/coffee-chat/send-answer'
 import sendIce from './sockets/coffee-chat/send-ice'
+
+import emailEvent from './events/email'
+import { SockChowish, SockChow, SockContext } from './sockchow'
 
 const debug = createDebug('api:server')
 
@@ -136,7 +138,8 @@ export function setupSockets(chow: TypedChow) {
     stopInterpretSocket,
 
     joinLobby,
-    userJoined,
+    joinRoom,
+    leaveRoom,
     userJoinedAck,
     sendOffer,
     sendAnswer,
