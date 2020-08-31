@@ -200,7 +200,6 @@ export async function runServer() {
   createTerminus(chow.server, {
     healthChecks: {
       '/healthz': async () => {
-        debug('GET /healthz')
         await redis.ping()
       },
     },
