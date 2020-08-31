@@ -26,6 +26,8 @@ import IORedis = require('ioredis')
 const exec = promisify(cp.exec)
 const debug = createDebug('api:content-scrape')
 
+const LOCK_KEY = 'schedule_is_fetching'
+
 /** See what files are in a directory, read them in and validate against a struct */
 async function readAndParse<T>(
   basePath: string,
@@ -133,6 +135,17 @@ export async function runScraper() {
       redis.once('error', (e) => reject(e))
     })
 
+    // Check the lock, do nothing if already fetching
+    const lockHost = await redis.get(LOCK_KEY)
+    debug(`checking lock lockHost="${lockHost}"`)
+
+    if (lockHost !== null) {
+      console.log(`skipping: ${lockHost} is fetching`)
+      return
+    }
+    const fiveMins = 5 * 60
+    await redis.set(LOCK_KEY, os.hostname(), 'EX', fiveMins)
+
     // Ensure we were passed a valid url
     const { stderr } = await debugExec(`git ls-remote ${SCHEDULE_GIT_URL}`)
     if (stderr) throw new Error(stderr)
@@ -199,6 +212,9 @@ export async function runScraper() {
     // Write to redis
     debug('storing in redis')
     await Promise.all(iterators.map((it) => it.next()))
+
+    // Remove the lock
+    await redis.del(LOCK_KEY)
   } catch (error) {
     //
     // Catch any errors and exit with a failure
