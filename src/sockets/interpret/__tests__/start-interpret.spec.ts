@@ -27,7 +27,7 @@ describe('@start-interpret(sessionId, channel)', () => {
     expect(chow.redis.setAndExpire).toBeCalledWith(
       'interpreter_001_fr',
       socket.id,
-      6 * 60 * 60
+      5 * 60
     )
   })
 

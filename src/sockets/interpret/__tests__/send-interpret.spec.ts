@@ -34,6 +34,6 @@ describe('@send-interpret(rawData)', () => {
 
     await socket.emit('send-interpret', rawData)
 
-    expect(chow.redis.expire).toBeCalledWith('interpreter_001_fr', 30)
+    expect(chow.redis.expire).toBeCalledWith('interpreter_001_fr', 5 * 60)
   })
 })

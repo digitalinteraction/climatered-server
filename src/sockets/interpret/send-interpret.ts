@@ -2,7 +2,7 @@ import { TypedChow } from '../../server'
 import createDebug = require('debug')
 import { getPacketKey, getChannelRoom, getActiveKey } from './interpret-utils'
 
-const thirtySeconds = 30
+const fiveMinsInSeconds = 5 * 60
 
 const debug = createDebug('api:socket:send-interpret')
 
@@ -36,6 +36,6 @@ export default function sendInterpret(chow: TypedChow) {
     // Refresh the translator packet
     //
     const activeKey = getActiveKey(sessionId, channel)
-    await redis.expire(activeKey, thirtySeconds)
+    await redis.expire(activeKey, fiveMinsInSeconds)
   })
 }
