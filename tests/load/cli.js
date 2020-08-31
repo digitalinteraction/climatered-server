@@ -1,27 +1,68 @@
 require('dotenv').config()
 const yargs = require('yargs')
+const ms = require('ms')
 const { validateEnv } = require('valid-env')
 const io = require('socket.io-client')
 const debug = require('debug')('api')
 
 const AUDIO_SAMPLE_RATE = 16000 // per second
+const AUDIO_CHUNK_SIZE = 128 * 128 // bit per chunk
 
 yargs.help().alias('h', 'help').demandCommand().recommendCommands()
 
-function addSocket(apiUrl) {
+async function dotty(pre, countOrIterator, block) {
+  process.stdout.write(`${pre}: `)
+  const start = Date.now()
+  const promises = []
+
+  const dot = () => process.stdout.write(`.`)
+
+  if (countOrIterator[Symbol.iterator]) {
+    for (const key in countOrIterator) {
+      const object = countOrIterator[key]
+      promises.push(block(object, key).then(dot))
+    }
+  } else if (typeof countOrIterator === 'number') {
+    for (let i = 0; i < countOrIterator; i++) {
+      promises.push(block(i).then(dot))
+    }
+  } else {
+    throw new Error('#dotty countOrIterator not an iterator or number')
+  }
+
+  await Promise.all(promises)
+
+  const dt = ms(Date.now() - start)
+  process.stdout.write(` (${dt}) \n`)
+}
+
+function parseSocketUrl(apiUrl) {
   const pathname = new URL(apiUrl).pathname.replace(/\/?$/, '/socket.io')
 
   const socketUrl = new URL(apiUrl)
   socketUrl.pathname = '/'
 
-  debug(`addSocket url="${socketUrl.toString()}" pathname="${pathname}"`)
+  debug(`parseSocketUrl url="${socketUrl.toString()}" pathname="${pathname}"`)
 
-  const socket = io(socketUrl.toString(), {
+  return [socketUrl.toString(), pathname]
+}
+
+async function addSocket(socketUrl, pathname) {
+  const socket = io(socketUrl, {
     path: pathname,
-    reconnection: false,
-    timeout: 1000,
-    multiplex: false,
-    forceNew: true,
+    transports: ['websocket'],
+    autoConnect: false,
+  })
+
+  //
+  // RUN WITH socket debug to see where ping timeouts are coming from
+  //
+
+  socket.connect()
+
+  await new Promise((resolve, reject) => {
+    socket.once('connect', resolve)
+    socket.once('connect_error', reject)
   })
 
   socket.emitAndWait = (...args) => {
@@ -29,6 +70,15 @@ function addSocket(apiUrl) {
       socket.emit(...[...args, resolve])
     })
   }
+
+  socket.on('disconnect', (reason) => {
+    if (reason === 'io client disconnect') return
+    console.log('socket disconnect:', reason)
+  })
+
+  // socket.on('connect_error', (err) => {
+  //   console.error(err)
+  // })
 
   return socket
 }
@@ -75,10 +125,12 @@ yargs.command(
     try {
       debug('translator')
 
-      const socket = addSocket(args.url)
+      const [socketUrl, pathname] = parseSocketUrl(args.url)
+
+      const socket = await addSocket(socketUrl, pathname)
       let timerId = null
 
-      process.on('SIGINT', async () => {
+      signal('SIGINT', async () => {
         setTimeout(() => die('Failed to disconnect'), 2000)
 
         await socket.emitAndWait('stop-interpret', args.session, args.channel)
@@ -136,61 +188,65 @@ yargs.command(
       const sockets = []
       let timerId = null
 
-      process.on('SIGINT', async () => {
+      onSignal('SIGINT', async () => {
+        console.log()
         setTimeout(() => die('Failed to disconnect'), 2000 + args.count * 200)
 
         if (timerId) clearInterval(timerId)
 
-        await Promise.all(
-          sockets.map(async (s) => {
-            await s.emitAndWait('leave-channel', args.session, args.channel)
-            s.close()
-          })
+        await dotty(
+          `leave-channel ${args.session} ${args.channel}`,
+          sockets.filter((s) => s.connected),
+          async (sock) => {
+            await sock.emitAndWait('leave-channel', args.session, args.channel)
+            sock.close()
+          }
         )
 
         die('recieved SIGINT')
       })
 
-      for (let i = 0; i < args.count; i++) {
-        sockets.push(addSocket(args.url))
-      }
+      const [socketUrl, pathname] = parseSocketUrl(args.url)
 
-      debug('authing...')
+      await dotty(`adding ${args.count} sockets`, args.count, async () => {
+        sockets.push(await addSocket(socketUrl, pathname))
+      })
+
+      await dotty('auth + join', sockets, async (sock) => {
+        await sock.emitAndWait('auth', args.token)
+        await sock.emitAndWait('join-channel', args.session, args.channel)
+      })
+
       for (const sock of sockets) {
-        sock.emit('auth', args.token)
-        await pause(Math.random() * 300)
+        sock.on('channel-data', () => {
+          messages++
+        })
       }
-      // await Promise.all(sockets.map((s) => s.emitAndWait('auth', args.token)))
-      // debug('authed')
-
-      await Promise.all(
-        sockets.map((s) =>
-          s.emitAndWait('join-channel', args.session, args.channel)
-        )
-      )
-      debug('authed')
-
-      await Promise.all(
-        sockets.map((s) =>
-          s.on('channel-data', () => {
-            messages++
-          })
-        )
-      )
-
-      debug('subbed')
 
       let messages = 0
+      const interval = (AUDIO_SAMPLE_RATE / AUDIO_CHUNK_SIZE) * 1000
 
       timerId = setInterval(() => {
         console.log('recieved: ', messages)
         messages = 0
-      }, 1000)
+      }, interval * 2)
     } catch (error) {
       console.error(error)
       process.exit(1)
     }
   }
 )
+
+function onSignal(signal, block) {
+  let called = false
+  process.on(signal, async () => {
+    if (called) {
+      console.log('Forcing leave')
+      process.exit(1)
+    }
+    called = true
+    await block()
+  })
+}
 
 yargs.parse()
