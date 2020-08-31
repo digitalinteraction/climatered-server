@@ -21,6 +21,7 @@ function addSocket(apiUrl) {
     reconnection: false,
     timeout: 1000,
     multiplex: false,
+    forceNew: true,
   })
 
   socket.emitAndWait = (...args) => {
@@ -32,8 +33,12 @@ function addSocket(apiUrl) {
   return socket
 }
 
-function pause(seconds) {
-  return new Promise((resolve) => setTimeout(resolve, seconds * 1000))
+function pause(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+function randomFrom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)]
 }
 
 function makeNoise(size) {
@@ -85,7 +90,7 @@ yargs.command(
         socket.close()
         clearInterval(timerId)
 
-        die('Recieved SIGINT')
+        die('recieved SIGINT')
       })
 
       await socket.emitAndWait('auth', args.token)
@@ -129,6 +134,7 @@ yargs.command(
 
       /** @type {SocketIOClient.Socket[]} */
       const sockets = []
+      let timerId = null
 
       process.on('SIGINT', async () => {
         setTimeout(() => die('Failed to disconnect'), 2000 + args.count * 200)
@@ -142,15 +148,20 @@ yargs.command(
           })
         )
 
-        die('Recieved SIGINT')
+        die('recieved SIGINT')
       })
 
       for (let i = 0; i < args.count; i++) {
         sockets.push(addSocket(args.url))
       }
 
-      await Promise.all(sockets.map((s) => s.emitAndWait('auth', args.token)))
-      debug('authed')
+      debug('authing...')
+      for (const sock of sockets) {
+        sock.emit('auth', args.token)
+        await pause(Math.random() * 300)
+      }
+      // await Promise.all(sockets.map((s) => s.emitAndWait('auth', args.token)))
+      // debug('authed')
 
       await Promise.all(
         sockets.map((s) =>
@@ -171,7 +182,7 @@ yargs.command(
 
       let messages = 0
 
-      let timerId = setInterval(() => {
+      timerId = setInterval(() => {
         console.log('recieved: ', messages)
         messages = 0
       }, 1000)
