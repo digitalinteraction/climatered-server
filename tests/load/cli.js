@@ -4,7 +4,7 @@ const { validateEnv } = require('valid-env')
 const io = require('socket.io-client')
 const debug = require('debug')('api')
 
-const AUDIO_SAMPLE_RATE = 44100 // per second
+const AUDIO_SAMPLE_RATE = 16000 // per second
 
 yargs.help().alias('h', 'help').demandCommand().recommendCommands()
 
@@ -20,6 +20,7 @@ function addSocket(apiUrl) {
     path: pathname,
     reconnection: false,
     timeout: 1000,
+    multiplex: false,
   })
 
   socket.emitAndWait = (...args) => {
