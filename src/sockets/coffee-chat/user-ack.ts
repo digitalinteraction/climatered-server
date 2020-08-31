@@ -2,7 +2,7 @@ import { TypedChow } from '../../server'
 import createDebug = require('debug')
 import { getUserAckEvent } from './coffee-chat-utils'
 
-const debug = createDebug('api:socket:user-joined-ack')
+const debug = createDebug('api:socket:user-ack')
 
 export default function userJoinedAck(chow: TypedChow) {
   chow.socket('user-ack', async (ctx, room, fromUser, toUser) => {

@@ -10,6 +10,6 @@ export default function joinRoom(chow: TypedChow) {
 
     socket.join(room)
 
-    emitToRoom('user-joined', user)
+    emitToRoom(room, 'user-joined', user)
   })
 }
