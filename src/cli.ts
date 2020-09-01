@@ -6,6 +6,7 @@ import { runScraper } from './cmd/scrape-content'
 import { runMigrator } from './cmd/migrate'
 import { AuthJwt } from './test-utils'
 import { fakeSchedule } from './cmd/fake-schedule'
+import { appendUrl } from './services/url'
 
 yargs.help().alias('h', 'help').demandCommand().recommendCommands()
 
@@ -99,7 +100,9 @@ yargs.command(
     const token = jwt.sign(auth, process.env.JWT_SECRET!)
     if (args.url) {
       validateEnv(['WEB_URL'])
-      console.log(`${process.env.WEB_URL}/_token?token=${token}`)
+      console.log(
+        appendUrl(new URL(process.env.WEB_URL!), '/_token?token=${token}')
+      )
     } else {
       console.log(token)
     }
