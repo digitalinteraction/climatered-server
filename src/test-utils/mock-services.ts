@@ -90,6 +90,7 @@ export function mockSchedule(): ScheduleService {
   const settings: ConfigSettings = {
     scheduleLive: false,
     enableHelpdesk: false,
+    enableCoffeechat: false,
   }
 
   const translators = [createTranslator('Rob Anderson')]

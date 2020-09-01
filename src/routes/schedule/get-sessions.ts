@@ -18,7 +18,7 @@ export default function getSessions(chow: TypedChow) {
       // Load sessions from the schedule
       //
       let sessions: any[] = await schedule.getSessions()
-      sessions = sessions.filter((s) => !s.isDraft)
+      sessions = sessions.filter((s) => s.isDraft !== true)
 
       //
       // Remove links from the sessions if they aren't logged in
