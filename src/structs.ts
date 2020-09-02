@@ -82,7 +82,7 @@ export const SessionStruct = object({
   speakers: array(string()),
   hostOrganisation: LocalisedStruct,
   isRecorded: boolean(),
-  attendeeInteraction: enums(['interactive', 'view']),
+  attendeeInteraction: enums(['view', 'q-and-a', 'workshop', 'games']),
   attendeeDevices: enums(['desktop', 'mobile', 'all']),
   isOfficial: boolean(),
   isDraft: boolean(),
