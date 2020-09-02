@@ -100,9 +100,8 @@ yargs.command(
     const token = jwt.sign(auth, process.env.JWT_SECRET!)
     if (args.url) {
       validateEnv(['WEB_URL'])
-      console.log(
-        appendUrl(new URL(process.env.WEB_URL!), '/_token?token=${token}')
-      )
+      const base = new URL(process.env.WEB_URL!)
+      console.log(appendUrl(base, '/_token?token=${token}').toString())
     } else {
       console.log(token)
     }
