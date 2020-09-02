@@ -30,6 +30,7 @@ import getSpeakersRoute from './routes/schedule/get-speakers'
 import getThemesRoute from './routes/schedule/get-themes'
 import getTypesRoute from './routes/schedule/get-types'
 import getTracksRoute from './routes/schedule/get-tracks'
+import getIcsRoute from './routes/schedule/get-ics'
 
 import hiSocket from './sockets/hi'
 import authSocket from './sockets/auth'
@@ -106,7 +107,8 @@ export function setupRoutes(chow: TypedChow) {
     getSpeakersRoute,
     getThemesRoute,
     getTracksRoute,
-    getTypesRoute
+    getTypesRoute,
+    getIcsRoute
   )
 }
 
