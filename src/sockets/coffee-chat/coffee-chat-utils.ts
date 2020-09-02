@@ -1,5 +1,9 @@
-export function getCoffeeChatRoom(sessionId: string, channel: string) {
-  return `coffee_chat_${sessionId}_${channel}`
+export function getLobbyKey(lang: string, topic: string) {
+  return `${lang}-${topic}`
+}
+
+export function getLobbyUserSet(socketId: string) {
+  return `inlobby-${socketId}`
 }
 
 export function getUserAckEvent(toUser: string) {

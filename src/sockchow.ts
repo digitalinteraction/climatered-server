@@ -15,8 +15,13 @@ export interface GetClientRoomsFn {
   (clientId: string): Promise<string[]>
 }
 
+export interface EmitToSocketfn {
+  (socketId: string, eventName: string, ...args: any[]): void
+}
+
 export interface SockContext<E> extends BaseContext<E> {
   emitToRoom: EmitToRoomFn
+  emitToSocket: EmitToSocketfn
   getRoomClients: GetRoomClientFn
   getClientRooms: GetClientRoomsFn
 }
@@ -111,9 +116,14 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
     return {
       ...super.baseContext(),
       emitToRoom: (...args) => this.emitToRoom(...args),
+      emitToSocket: (...args) => this.emitToSocket(...args),
       getRoomClients: (...args) => this.getRoomClients(...args),
       getClientRooms: (...args) => this.getClientRooms(...args),
     }
+  }
+
+  emitToSocket(socketId: string, eventName: string, ...args: any[]) {
+    this.io.to(socketId).emit(eventName, ...args)
   }
 
   getRoomClients(rooms: string[]) {
