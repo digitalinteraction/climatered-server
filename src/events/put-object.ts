@@ -22,11 +22,15 @@ export default function s3(chow: TypedChow) {
     secretAccessKey: SPACES_SECRET,
   })
 
+  debug('bucket="%s" endpoint="%s"', SPACES_BUCKET, SPACES_ENDPOINT)
+
   //
   // uplaod to s3 event
   //
   chow.event<S3Event>('put-object', async ({ event }) => {
     const { key, body, acl } = event.payload
+
+    debug('put enabled=%b key="%s" acl="%s"', key, acl)
 
     await s3
       .putObject({
