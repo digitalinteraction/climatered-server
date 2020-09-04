@@ -16,7 +16,6 @@ import { Registration, ConfigSettings } from '../structs'
 import { AuthService, createAuthService } from '../services/auth'
 import { PostgresService } from '../services/postgres'
 import { I18nService } from '../services/i18n'
-import { S3Service } from '../services/s3'
 
 //
 // redis
