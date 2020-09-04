@@ -7,6 +7,7 @@ import {
   Theme,
   Track,
   Translator,
+  Attendance,
 } from '../structs'
 import { AuthJwt } from '../services/jwt'
 
@@ -115,4 +116,14 @@ export const createTranslator = (name: string): Translator => ({
   slug: slugify(name),
   name: name,
   email: 'user@example.com',
+})
+
+export const createAttendance = (
+  attendee: number,
+  session: string
+): Attendance => ({
+  id: 1,
+  created: new Date(),
+  session,
+  attendee,
 })

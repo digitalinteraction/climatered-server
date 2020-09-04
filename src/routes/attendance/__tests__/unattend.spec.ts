@@ -5,7 +5,6 @@ import {
   mocked,
   createRegistration,
 } from '../../../test-utils'
-import { chown } from 'fs'
 
 //
 // Experimental format like ./attend.spec.ts
@@ -32,7 +31,7 @@ describe('POST /unattend/:session', () => {
     expect(res).toEqual('ok')
   })
 
-  it('should return an "ok"', async () => {
+  it('should remove the attendance', async () => {
     const { chow, reg } = setup()
 
     await chow.http('post', '/unattend/002')

@@ -34,6 +34,7 @@ import getIcsRoute from './routes/schedule/get-ics'
 
 import attendRoute from './routes/attendance/attend'
 import unattendRoute from './routes/attendance/unattend'
+import userAttendanceRoute from './routes/attendance/user-attendance'
 
 import hiSocket from './sockets/hi'
 import authSocket from './sockets/auth'
@@ -118,7 +119,8 @@ export function setupRoutes(chow: TypedChow) {
     getTypesRoute,
     getIcsRoute,
     attendRoute,
-    unattendRoute
+    unattendRoute,
+    userAttendanceRoute
   )
 }
 

@@ -5,7 +5,6 @@ interface SessionAttendance {
   session: string
   count: number
 }
-
 /**
  * A service for retrieving registered users
  */
@@ -20,6 +19,7 @@ export interface UsersService {
   attend(attendee: number, session: string): Promise<void>
   unattend(attendee: number, session: string): Promise<void>
   getAttendance(): Promise<Map<string, number>>
+  getUserAttendance(attendee: number): Promise<Attendance[]>
 }
 
 export function compareEmails(a: string, b: string) {
@@ -102,6 +102,14 @@ async function getAttendance(client: PoolClient) {
   return map
 }
 
+async function getUserAttendance(client: PoolClient, attendee: number) {
+  return await client.sql<Attendance>`
+    SELECT id, created, attendee, session
+    FROM attendance
+    WHERE attendee=${attendee}
+  `
+}
+
 export function createUsersService(pg: PostgresService): UsersService {
   return {
     getRegistration: (email, checkVerification) => {
@@ -113,5 +121,6 @@ export function createUsersService(pg: PostgresService): UsersService {
     attend: (a, s) => pg.run((c) => attend(c, a, s)),
     unattend: (a, s) => pg.run((c) => unattend(c, a, s)),
     getAttendance: () => pg.run((c) => getAttendance(c)),
+    getUserAttendance: (a) => pg.run((c) => getUserAttendance(c, a)),
   }
 }
