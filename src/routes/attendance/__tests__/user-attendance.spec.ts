@@ -51,7 +51,10 @@ describe('GET /attendance/:session', () => {
 
     expect(res).toEqual({
       isAttending: true,
-      attendance,
+      attendance: {
+        ...attendance,
+        created: expect.any(Date),
+      },
     })
   })
 })
