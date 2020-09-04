@@ -27,6 +27,7 @@
     "@godaddy/terminus": "^4.4.1",
     "@robb_j/chowchow": "^0.7.2",
     "@sendgrid/mail": "^7.2.0",
+    "aws-sdk": "^2.745.0",
     "cors": "^2.8.5",
     "debug": "^4.1.1",
     "dot-prop": "^5.2.0",

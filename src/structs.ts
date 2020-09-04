@@ -195,3 +195,14 @@ export const SessionChannelStruct = object({
   sessionId: string(),
   channel: ChannelStruct,
 })
+
+//
+// Attendance
+//
+export type Attendance = StructType<typeof AttendanceStruct>
+export const AttendanceStruct = object({
+  id: number(),
+  created: date(),
+  attendee: number(),
+  session: string(),
+})

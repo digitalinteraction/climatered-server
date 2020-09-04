@@ -32,6 +32,9 @@ import getTypesRoute from './routes/schedule/get-types'
 import getTracksRoute from './routes/schedule/get-tracks'
 import getIcsRoute from './routes/schedule/get-ics'
 
+import attendRoute from './routes/attendance/attend'
+import unattendRoute from './routes/attendance/unattend'
+
 import hiSocket from './sockets/hi'
 import authSocket from './sockets/auth'
 import deauthSocket from './sockets/deauth'
@@ -49,7 +52,12 @@ import startInterpretSocket from './sockets/interpret/start-interpret'
 import stopInterpretSocket from './sockets/interpret/stop-interpret'
 
 import emailEvent from './events/email'
+import logEvent from './events/log'
+import putObjectEvent from './events/put-object'
+
 import { SockChowish, SockChow, SockContext } from './sockchow'
+
+export * from './errors'
 
 const debug = createDebug('api:server')
 
@@ -89,7 +97,7 @@ export function setupMiddleware(chow: TypedChow) {
 
 export function setupEvents(chow: TypedChow) {
   debug('#setupEvents')
-  chow.apply(emailEvent)
+  chow.apply(emailEvent, logEvent, putObjectEvent)
 }
 
 export function setupRoutes(chow: TypedChow) {
@@ -108,7 +116,9 @@ export function setupRoutes(chow: TypedChow) {
     getThemesRoute,
     getTracksRoute,
     getTypesRoute,
-    getIcsRoute
+    getIcsRoute,
+    attendRoute,
+    unattendRoute
   )
 }
 

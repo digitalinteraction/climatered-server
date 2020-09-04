@@ -12,6 +12,9 @@ export function createEnv(processEnv: Record<string, string | undefined>) {
     'WEB_URL',
     'REDIS_URL',
     'SQL_URL',
+    'SPACES_KEY',
+    'SPACES_SECRET',
+    'SPACES_BUCKET',
   ])
 
   const {
@@ -24,6 +27,10 @@ export function createEnv(processEnv: Record<string, string | undefined>) {
     WEB_URL,
     REDIS_URL,
     SQL_URL,
+    SPACES_KEY,
+    SPACES_SECRET,
+    SPACES_ENDPOINT = 'ams3.digitaloceanspaces.com',
+    SPACES_BUCKET,
   } = processEnv as Record<string, string>
 
   const ENABLE_ACCESS_LOGS = Boolean(process.env.ENABLE_ACCESS_LOGS)
@@ -41,6 +48,10 @@ export function createEnv(processEnv: Record<string, string | undefined>) {
     REDIS_URL,
     ENABLE_ACCESS_LOGS,
     SQL_URL,
+    SPACES_ENDPOINT,
+    SPACES_KEY,
+    SPACES_SECRET,
+    SPACES_BUCKET,
   }
 }
 
@@ -57,5 +68,9 @@ export function createTestEnv(): Env {
     ENABLE_ACCESS_LOGS: false,
     SQL_URL: 'postgresql://user:secret@localhost:5432/test',
     SENDGRID_TRANSACTIONAL_TEMPLATE_ID: 'aaabbbcccdddeeefff',
+    SPACES_ENDPOINT: 'nyc3.digitaloceanspaces.com',
+    SPACES_KEY: 'fake-spaces-key',
+    SPACES_SECRET: 'fake-spaces-secret',
+    SPACES_BUCKET: 'fake-bucket',
   }
 }

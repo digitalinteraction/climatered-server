@@ -16,6 +16,7 @@ import { Registration, ConfigSettings } from '../structs'
 import { AuthService, createAuthService } from '../services/auth'
 import { PostgresService } from '../services/postgres'
 import { I18nService } from '../services/i18n'
+import { S3Service } from '../services/s3'
 
 //
 // redis
@@ -147,6 +148,9 @@ export function mockUsers(): UsersService {
     register: jest.fn(),
     verify: jest.fn(),
     compareEmails,
+    attend: jest.fn(),
+    unattend: jest.fn(),
+    getAttendance: jest.fn(async () => new Map()),
   }
 }
 
