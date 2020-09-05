@@ -13,7 +13,7 @@ export interface PoolClient {
  * A client for connecting to and querying a postgres database
  */
 export interface PostgresService {
-  run<T>(block: (c: PoolClient) => Promise<T>): Promise<T>
+  run<T>(block: (c: PoolClient) => Promise<T>, reuse?: PoolClient): Promise<T>
   client(): Promise<PoolClient>
   close(): Promise<void>
 }
@@ -50,11 +50,11 @@ export function createPostgresService(sqlUrl: string): PostgresService {
   return {
     client: () => makeClient(pool),
     close: () => pool.end(),
-    run: async (block) => {
+    run: async (block, reuseClient) => {
       let client: PoolClient | undefined
 
       try {
-        client = await makeClient(pool)
+        client = reuseClient ?? (await makeClient(pool))
 
         // Run their block with the client
         const result = await block(client)
@@ -62,7 +62,7 @@ export function createPostgresService(sqlUrl: string): PostgresService {
       } catch (error) {
         throw error
       } finally {
-        client?.release()
+        if (!reuseClient) client?.release()
       }
     },
   }

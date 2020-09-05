@@ -149,6 +149,12 @@ function createSpeaker(name: string, role: string): Speaker {
       es: `${role} - es`,
       ar: `${role} - en`,
     },
+    bio: {
+      en: '[en] ' + loremIpsum,
+      fr: '[fr] ' + loremIpsum,
+      es: '[es] ' + loremIpsum,
+      ar: '[ar] ' + loremIpsum,
+    },
     headshot: '/uploads/speaker-default.svg',
   }
 }

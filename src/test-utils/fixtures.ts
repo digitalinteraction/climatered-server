@@ -7,6 +7,7 @@ import {
   Theme,
   Track,
   Translator,
+  Attendance,
 } from '../structs'
 import { AuthJwt } from '../services/jwt'
 
@@ -68,6 +69,7 @@ export const createSpeaker = (name: string, role: string): Speaker => ({
   slug: slugify(name),
   name,
   role: fakeTranslated(role),
+  bio: fakeTranslated('bio'),
   headshot: '/uploads/speaker-default.svg',
 })
 
@@ -75,6 +77,7 @@ export const createSessionType = (id: string): SessionType => ({
   slug: id,
   id: id,
   icon: 'plenary.svg',
+  layout: 'auditorium',
   title: fakeTranslated(id),
 })
 
@@ -113,4 +116,14 @@ export const createTranslator = (name: string): Translator => ({
   slug: slugify(name),
   name: name,
   email: 'user@example.com',
+})
+
+export const createAttendance = (
+  attendee: number,
+  session: string
+): Attendance => ({
+  id: 1,
+  created: new Date(),
+  session,
+  attendee,
 })

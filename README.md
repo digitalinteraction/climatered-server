@@ -134,6 +134,12 @@ npx jest --clearCache
 # -> pass --url to output it as a login url instead
 # -> pass --lang en/fr/es/ar to specify a user_lang
 npm run dev fake-auth
+
+# Reset the redis scrape-content lock
+# -> runs redis-cli in the redis container
+# -> removes the hostname lock key
+# -> can happen if the scrape catastrophically fails
+docker-compose exec redis redis-cli del schedule_is_fetching
 ```
 
 ### Code formatting
@@ -183,12 +189,18 @@ and they can easily be deployed.
 - `WEB_URL`
 - `REDIS_URL`
 - `SQL_URL`
+- `SPACES_KEY`
+- `SPACES_SECRET`
+- `SPACES_BUCKET`
+- `SCHEDULE_GIT_URL`
 
 **optional**
 
 - `CORS_HOSTS`
 - `ENABLE_ACCESS_LOGS`
 - `DEBUG=api*`
+- `NODE_ENV
+- `SCHEDULE_GIT_BRANCH` - choose a branch to scrape frmo
 
 ## Future work
 

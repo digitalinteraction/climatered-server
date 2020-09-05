@@ -82,7 +82,7 @@ export const SessionStruct = object({
   speakers: array(string()),
   hostOrganisation: LocalisedStruct,
   isRecorded: boolean(),
-  attendeeInteraction: enums(['interactive', 'view']),
+  attendeeInteraction: enums(['view', 'q-and-a', 'workshop', 'games']),
   attendeeDevices: enums(['desktop', 'mobile', 'all']),
   isOfficial: boolean(),
   isDraft: boolean(),
@@ -96,6 +96,7 @@ export const SpeakerStruct = object({
   slug: string(),
   name: string(),
   role: LocalisedStruct,
+  bio: LocalisedStruct,
   headshot: string(),
 })
 
@@ -127,6 +128,7 @@ export const SessionTypeStruct = object({
   slug: string(),
   id: string(),
   icon: string(),
+  layout: string(),
   title: LocalisedStruct,
 })
 
@@ -182,6 +184,7 @@ export type ConfigSettings = StructType<typeof ConfigSettingsStruct>
 export const ConfigSettingsStruct = object({
   scheduleLive: boolean(),
   enableHelpdesk: boolean(),
+  enableCoffeechat: boolean(),
 })
 
 //
@@ -191,4 +194,15 @@ export type SessionChannel = StructType<typeof SessionChannelStruct>
 export const SessionChannelStruct = object({
   sessionId: string(),
   channel: ChannelStruct,
+})
+
+//
+// Attendance
+//
+export type Attendance = StructType<typeof AttendanceStruct>
+export const AttendanceStruct = object({
+  id: number(),
+  created: date(),
+  attendee: number(),
+  session: string(),
 })

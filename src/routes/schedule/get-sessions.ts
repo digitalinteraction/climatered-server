@@ -8,7 +8,7 @@ export default function getSessions(chow: TypedChow) {
   chow.route(
     'get',
     '/schedule/sessions',
-    async ({ request, schedule, auth }) => {
+    async ({ request, schedule, auth, users }) => {
       //
       // Get the user's auth from the request
       //
@@ -18,7 +18,15 @@ export default function getSessions(chow: TypedChow) {
       // Load sessions from the schedule
       //
       let sessions: any[] = await schedule.getSessions()
-      sessions = sessions.filter((s) => !s.isDraft)
+      sessions = sessions.filter((s) => s.isDraft !== true)
+
+      //
+      // Add on attendance
+      //
+      const attendance = await users.getAttendance()
+      for (const s of sessions) {
+        s.attendance = attendance.get(s.id) || 0
+      }
 
       //
       // Remove links from the sessions if they aren't logged in

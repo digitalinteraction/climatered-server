@@ -30,6 +30,11 @@ import getSpeakersRoute from './routes/schedule/get-speakers'
 import getThemesRoute from './routes/schedule/get-themes'
 import getTypesRoute from './routes/schedule/get-types'
 import getTracksRoute from './routes/schedule/get-tracks'
+import getIcsRoute from './routes/schedule/get-ics'
+
+import attendRoute from './routes/attendance/attend'
+import unattendRoute from './routes/attendance/unattend'
+import userAttendanceRoute from './routes/attendance/user-attendance'
 
 import hiSocket from './sockets/hi'
 import authSocket from './sockets/auth'
@@ -56,7 +61,12 @@ import sendAnswer from './sockets/coffee-chat/send-answer'
 import sendIce from './sockets/coffee-chat/send-ice'
 
 import emailEvent from './events/email'
+import logEvent from './events/log'
+import putObjectEvent from './events/put-object'
+
 import { SockChowish, SockChow, SockContext } from './sockchow'
+
+export * from './errors'
 
 const debug = createDebug('api:server')
 
@@ -96,7 +106,7 @@ export function setupMiddleware(chow: TypedChow) {
 
 export function setupEvents(chow: TypedChow) {
   debug('#setupEvents')
-  chow.apply(emailEvent)
+  chow.apply(emailEvent, logEvent, putObjectEvent)
 }
 
 export function setupRoutes(chow: TypedChow) {
@@ -114,7 +124,11 @@ export function setupRoutes(chow: TypedChow) {
     getSpeakersRoute,
     getThemesRoute,
     getTracksRoute,
-    getTypesRoute
+    getTypesRoute,
+    getIcsRoute,
+    attendRoute,
+    unattendRoute,
+    userAttendanceRoute
   )
 }
 
@@ -216,7 +230,6 @@ export async function runServer() {
   createTerminus(chow.server, {
     healthChecks: {
       '/healthz': async () => {
-        debug('GET /healthz')
         await redis.ping()
       },
     },

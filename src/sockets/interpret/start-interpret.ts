@@ -13,7 +13,8 @@ const debug = createDebug('api:socket:start-interpret')
 
 // Store keys for longer then they'd ever need to interpret for
 // but expire so as not to clog up redis
-const sixHours = 6 * 60 * 60
+const sixHoursInSeconds = 6 * 60 * 60
+const fiveMinsInSeconds = 5 * 60
 
 export default function startInterpret(chow: TypedChow) {
   //
@@ -55,13 +56,13 @@ export default function startInterpret(chow: TypedChow) {
     //
     // Store the socket id of the translator for this session-channel
     //
-    await redis.setAndExpire(activeKey, socket.id, sixHours)
+    await redis.setAndExpire(activeKey, socket.id, fiveMinsInSeconds)
 
     //
     // Store a packet to quickly know which session to broadcast to
     //
     const packet = [session.id, channel].join(';')
-    await redis.setAndExpire(packetKey, packet, sixHours)
+    await redis.setAndExpire(packetKey, packet, sixHoursInSeconds)
 
     //
     // Let interpreters know who's in charge
