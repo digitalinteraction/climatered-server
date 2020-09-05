@@ -13,7 +13,7 @@ let attendee: AuthJwt
 beforeEach(() => {
   attendee = createAuthToken(['attendee'])
   chow = createServer()
-  chow.apply(route)
+  route(chow)
 })
 
 describe('DELETE /me', () => {

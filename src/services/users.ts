@@ -14,6 +14,7 @@ export interface UsersService {
     checkVerification: boolean
   ): Promise<Registration | null>
   register(registration: RegisterBody): Promise<void>
+  unregister(email: string): Promise<void>
   verify(id: number): Promise<void>
   compareEmails(a: string, b: string): boolean
   attend(attendee: number, session: string): Promise<void>
@@ -110,12 +111,20 @@ async function getUserAttendance(client: PoolClient, attendee: number) {
   `
 }
 
+async function unregister(client: PoolClient, email: string) {
+  await client.sql`
+    DELETE FROM attendees
+    WHERE email=${email}
+  `
+}
+
 export function createUsersService(pg: PostgresService): UsersService {
   return {
     getRegistration: (email, checkVerification) => {
       return pg.run((c) => getRegistration(c, email, checkVerification))
     },
     register: (r) => pg.run((c) => addRegistration(c, r)),
+    unregister: (e) => pg.run((c) => unregister(c, e)),
     verify: (id) => pg.run((c) => verifyRegistration(c, id)),
     compareEmails,
     attend: (a, s) => pg.run((c) => attend(c, a, s)),
