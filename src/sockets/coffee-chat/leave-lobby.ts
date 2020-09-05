@@ -36,9 +36,7 @@ export default function updateLobbyOptions(chow: TypedChow) {
       `socket="${socket.id}" languagePrefs="${languagePrefs}" topicPrefs="${topicPrefs}"`
     )
     const match = await checkForCurrentMatch(redis, languagePrefs, topicPrefs)
-    if (match) {
-      await removeMatchedUser(redis, match)
-      socket.emitBack('left-lobby', true)
-    }
+    await removeMatchedUser(redis, socket.id)
+    socket.emitBack('left-lobby')
   })
 }
