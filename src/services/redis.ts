@@ -14,6 +14,8 @@ export interface RedisService {
   setPop(set: string): Promise<string | null>
   setRemove(set: string, value: string): Promise<number>
   setMembers(set: string): Promise<string[]>
+  setCardinality(set: string): Promise<number>
+  setUnionStore(newSet: string, set: string[]): Promise<number>
   expire(key: string, duration: number): Promise<void>
   del(key: string): Promise<number>
 }
@@ -42,6 +44,8 @@ export function createRedisService(redisUrl: string): RedisService {
     setPop: (s) => redis.spop(s),
     setRemove: (s, v) => redis.srem(s, v),
     setMembers: (s) => redis.smembers(s),
+    setCardinality: (s) => redis.scard(s),
+    setUnionStore: (ns, ...ss) => redis.sunionstore(ns, ...ss),
     expire: async (k, d) => redis.expire(k, d) as any,
     del: (k) => redis.del(k),
   }

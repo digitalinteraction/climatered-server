@@ -1,7 +1,11 @@
 import { TypedChow } from '../../server'
 import createDebug = require('debug')
 import { RedisService } from '../../services/redis'
-import { getLobbyKey, getLobbyUserSet } from './coffee-chat-utils'
+import {
+  getLobbyKey,
+  getLobbyUserSet,
+  removeMatchedUser,
+} from './coffee-chat-utils'
 
 const debug = createDebug('api:socket:join-lobby')
 
@@ -37,16 +41,6 @@ function addToLobby(
   return Promise.all(promises)
 }
 
-async function removeMatchedUser(redis: RedisService, socketId: string) {
-  const promises = []
-  const inLobby = await redis.setMembers(`inlobby-${socketId}`)
-  for (let lobby of inLobby) {
-    promises.push(redis.setRemove(lobby, socketId))
-    promises.push(redis.setRemove(getLobbyUserSet(socketId), lobby))
-  }
-  return Promise.all(promises)
-}
-
 export default function joinLobby(chow: TypedChow) {
   chow.socket('join-lobby', async (ctx, languagePrefs, topicPrefs) => {
     const { socket, redis, emitToSocket } = ctx
@@ -57,7 +51,10 @@ export default function joinLobby(chow: TypedChow) {
     const match = await checkForCurrentMatch(redis, languagePrefs, topicPrefs)
 
     if (match) {
-      await removeMatchedUser(redis, match)
+      await Promise.all([
+        removeMatchedUser(redis, match),
+        removeMatchedUser(redis, socket.id),
+      ])
       const room = `chat-${socket.id}-${match}`
       emitToSocket(match, 'room-found', room)
       socket.emitBack('room-found', room)

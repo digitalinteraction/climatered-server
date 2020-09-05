@@ -1,3 +1,5 @@
+import { RedisService } from '../../services/redis'
+
 export function getLobbyKey(lang: string, topic: string) {
   return `${lang}-${topic}`
 }
@@ -20,4 +22,14 @@ export function getUserAnswerEvent(fromUser: string, toUser: string) {
 
 export function getUserIceEvent(fromUser: string, toUser: string) {
   return `ice-${fromUser}-${toUser}`
+}
+
+export async function removeMatchedUser(redis: RedisService, socketId: string) {
+  const promises = []
+  const inLobby = await redis.setMembers(`inlobby-${socketId}`)
+  for (let lobby of inLobby) {
+    promises.push(redis.setRemove(lobby, socketId))
+    promises.push(redis.setRemove(getLobbyUserSet(socketId), lobby))
+  }
+  return Promise.all(promises)
 }

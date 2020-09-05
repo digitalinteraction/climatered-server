@@ -65,6 +65,8 @@ import logEvent from './events/log'
 import putObjectEvent from './events/put-object'
 
 import { SockChowish, SockChow, SockContext } from './sockchow'
+import leaveLobby from './sockets/coffee-chat/leave-lobby'
+import queryLobby from './sockets/coffee-chat/query-lobby'
 
 export * from './errors'
 
@@ -152,6 +154,8 @@ export function setupSockets(chow: TypedChow) {
     stopInterpretSocket,
 
     joinLobby,
+    leaveLobby,
+    queryLobby,
     joinRoom,
     leaveRoom,
     userJoinedAck,
