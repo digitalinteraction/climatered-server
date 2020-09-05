@@ -4,6 +4,7 @@ import { validateEnv } from 'valid-env'
 import { runServer } from './server'
 import { runScraper } from './cmd/scrape-content'
 import { runMigrator } from './cmd/migrate'
+import { runRebuilder } from './cmd/rebuild-audio'
 import { AuthJwt } from './test-utils'
 import { fakeSchedule } from './cmd/fake-schedule'
 import { appendUrl } from './services/url'
@@ -105,6 +106,18 @@ yargs.command(
     } else {
       console.log(token)
     }
+  })
+)
+
+yargs.command(
+  'rebuild-audio <path> <file>',
+  'Rebuild audio in a given folder',
+  (yargs) =>
+    yargs
+      .positional('path', { type: 'string', demandOption: true })
+      .positional('file', { type: 'string', demandOption: true }),
+  handleFail(async (args) => {
+    await runRebuilder(args.path, args.file)
   })
 )
 
