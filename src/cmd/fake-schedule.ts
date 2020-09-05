@@ -74,6 +74,8 @@ function randomSession(
     attendeeDevices: randomFrom(['desktop', 'mobile', 'all']),
     isOfficial: false,
     isDraft: false,
+    isFeatured: false,
+    proxyUrl: '',
   }
 
   if (type === 'plenary' || type === 'panel') {

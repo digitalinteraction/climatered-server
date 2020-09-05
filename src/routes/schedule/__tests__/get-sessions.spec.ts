@@ -15,11 +15,18 @@ let fakeSessions = [
   createSession('003', 'session', '003', false),
 ]
 
+// Only create 2 so the third is assigned to test that too
+const fakeAttendance = new Map([
+  ['001', 5],
+  ['002', 3],
+])
+
 beforeEach(async () => {
   chow = createServer()
   getSessionsRoute(chow)
 
   mocked(chow.schedule.getSessions).mockResolvedValue(fakeSessions)
+  mocked(chow.users.getAttendance).mockResolvedValue(fakeAttendance)
 })
 
 function authSetup() {
@@ -52,7 +59,9 @@ describe('GET /schedule/sessions', () => {
 
     expect(res.sessions).toHaveLength(3)
 
-    expect(res.sessions).toEqual(unauthedSessions)
+    expect(res.sessions[0]).toEqual({ ...unauthedSessions[0], attendance: 5 })
+    expect(res.sessions[1]).toEqual({ ...unauthedSessions[1], attendance: 3 })
+    expect(res.sessions[2]).toEqual({ ...unauthedSessions[2], attendance: 0 })
   })
 
   it('should return full sessions when authenticated', async () => {

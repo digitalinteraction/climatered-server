@@ -189,12 +189,18 @@ and they can easily be deployed.
 - `WEB_URL`
 - `REDIS_URL`
 - `SQL_URL`
+- `SPACES_KEY`
+- `SPACES_SECRET`
+- `SPACES_BUCKET`
+- `SCHEDULE_GIT_URL`
 
 **optional**
 
 - `CORS_HOSTS`
 - `ENABLE_ACCESS_LOGS`
 - `DEBUG=api*`
+- `NODE_ENV
+- `SCHEDULE_GIT_BRANCH` - choose a branch to scrape frmo
 
 ## Future work
 

@@ -9,6 +9,7 @@ export default function getSlots(chow: TypedChow) {
     // Get and send back the schedule's slots
     //
     const slots = await schedule.getSlots()
+    slots.sort((a, b) => a.id.localeCompare(b.id))
     return { slots }
   })
 }

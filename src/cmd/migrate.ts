@@ -30,6 +30,8 @@ export async function runMigrator() {
 
     await runMigrations(client, {
       addAttendees,
+      addLogs,
+      addAttendance,
     })
   })
 
@@ -144,6 +146,30 @@ async function addAttendees(client: PoolClient) {
       "affiliation" varchar(255) NOT NULL,
       "verified" boolean DEFAULT false,
       "consented" timestamp DEFAULT CURRENT_TIMESTAMP
+    );
+  `
+}
+
+async function addLogs(client: PoolClient) {
+  await client.sql`
+    CREATE TABLE "logs" (
+      "id" serial PRIMARY KEY,
+      "created" timestamp DEFAULT CURRENT_TIMESTAMP,
+      "attendee" integer REFERENCES attendees(id) ON DELETE CASCADE,
+      "socket" varchar(100),
+      "event" varchar(100) NOT NULL,
+      "data" json DEFAULT '{}'
+    );
+  `
+}
+
+async function addAttendance(client: PoolClient) {
+  await client.sql`
+    CREATE TABLE "attendance" (
+      "id" serial PRIMARY KEY,
+      "created" timestamp DEFAULT CURRENT_TIMESTAMP,
+      "attendee" integer NOT NULL references attendees(id) ON DELETE CASCADE,
+      "session" varchar(100) NOT NULL
     );
   `
 }

@@ -147,6 +147,10 @@ export function mockUsers(): UsersService {
     register: jest.fn(),
     verify: jest.fn(),
     compareEmails,
+    attend: jest.fn(),
+    unattend: jest.fn(),
+    getAttendance: jest.fn(async () => new Map()),
+    getUserAttendance: jest.fn(async () => []),
   }
 }
 

@@ -2,10 +2,20 @@ import sendToChannelSocket from '../send-interpret'
 import { TypedMockChow, createServer } from '../../../test-utils'
 
 let chow: TypedMockChow
+let payload: any
+let putObject: jest.Mock
 
 beforeEach(() => {
+  payload = {
+    sampleRate: 16000,
+    arrayBuffer: new ArrayBuffer(16),
+  }
+
   chow = createServer()
+  putObject = jest.fn()
   sendToChannelSocket(chow)
+
+  chow.event('put-object', (ctx) => putObject(ctx.event.payload))
 })
 
 describe('@send-interpret(rawData)', () => {
@@ -14,14 +24,12 @@ describe('@send-interpret(rawData)', () => {
 
     await chow.redis.set(`interpreter_${socket.id}`, '001;fr')
 
-    const rawData = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-    await socket.emit('send-interpret', rawData)
+    await socket.emit('send-interpret', payload)
 
     expect(chow.emitToRoom).toBeCalledWith(
       'channel_001_fr',
       'channel-data',
-      rawData
+      payload
     )
   })
 
@@ -30,10 +38,22 @@ describe('@send-interpret(rawData)', () => {
 
     await chow.redis.set(`interpreter_${socket.id}`, '001;fr')
 
-    const rawData = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
-    await socket.emit('send-interpret', rawData)
+    await socket.emit('send-interpret', payload)
 
     expect(chow.redis.expire).toBeCalledWith('interpreter_001_fr', 5 * 60)
+  })
+
+  it('should upload the buffer to s3', async () => {
+    const socket = chow.io()
+
+    await chow.redis.set(`interpreter_${socket.id}`, '001;fr')
+
+    await socket.emit('send-interpret', payload)
+
+    expect(putObject).toBeCalledWith({
+      key: expect.stringMatching(/^interpret\/001\/fr\/\d+.pcm$/),
+      body: expect.any(Buffer),
+      acl: 'private',
+    })
   })
 })

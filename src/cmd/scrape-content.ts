@@ -212,9 +212,6 @@ export async function runScraper() {
     // Write to redis
     debug('storing in redis')
     await Promise.all(iterators.map((it) => it.next()))
-
-    // Remove the lock
-    await redis.del(LOCK_KEY)
   } catch (error) {
     //
     // Catch any errors and exit with a failure
@@ -229,6 +226,9 @@ export async function runScraper() {
     await new Promise((resolve, reject) =>
       rimraf(tmpdir, (err) => (err ? reject(err) : resolve(err)))
     )
+
+    // Remove the lock
+    await redis.del(LOCK_KEY)
 
     debug('disconnect from redis')
     await redis.quit()
