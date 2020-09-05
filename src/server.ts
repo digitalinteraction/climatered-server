@@ -21,6 +21,7 @@ import meRoute from './routes/auth/me'
 import emailRequestRoute from './routes/auth/email-request'
 import emailCallbackRoute from './routes/auth/email-callback'
 import registerRoute from './routes/auth/register'
+import unregisterRoute from './routes/auth/unregister'
 import verifyRoute from './routes/auth/verify'
 
 import getSlotsRoute from './routes/schedule/get-slots'
@@ -109,6 +110,7 @@ export function setupRoutes(chow: TypedChow) {
     emailRequestRoute,
     emailCallbackRoute,
     registerRoute,
+    unregisterRoute,
     verifyRoute,
     getSlotsRoute,
     getSessionsRoute,
