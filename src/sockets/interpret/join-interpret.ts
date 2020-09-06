@@ -89,5 +89,16 @@ export default function joinInterpret(chow: TypedChow) {
         socket.emitBack('interpret-started', translator)
       }
     }
+
+    //
+    // If an interpreter disconnects, ensure everyone knows
+    // Don't do anything if they've already left
+    //
+    socket.once('disconnect', async () => {
+      const occupants = await getRoomClients([interpretRoom])
+      if (!occupants.includes(socket.id)) return
+
+      emitToRoom(interpretRoom, 'interpret-left', self)
+    })
   })
 }
