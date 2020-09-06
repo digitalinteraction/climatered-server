@@ -101,7 +101,7 @@ yargs.command(
     if (args.url) {
       validateEnv(['WEB_URL'])
       const base = new URL(process.env.WEB_URL!)
-      console.log(appendUrl(base, '/_token?token=${token}').toString())
+      console.log(appendUrl(base, `/_token?token=${token}`).toString())
     } else {
       console.log(token)
     }
