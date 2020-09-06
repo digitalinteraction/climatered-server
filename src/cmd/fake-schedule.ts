@@ -6,7 +6,7 @@ import { createSession } from '../test-utils/fixtures'
 import { runScraper } from './scrape-content'
 import { createRedisService } from '../services/redis'
 import validateEnv from 'valid-env'
-import { Slot, Session, Speaker } from '../structs'
+import { Slot, Session, Speaker, Translator } from '../structs'
 
 interface FakeScheduleArgs {}
 
@@ -161,6 +161,10 @@ function createSpeaker(name: string, role: string): Speaker {
   }
 }
 
+function createTranslator(slug: string): Translator {
+  return { slug, name: slug, email: `${slug}@example.com` }
+}
+
 export async function fakeSchedule(args: FakeScheduleArgs = {}) {
   debug('#fakeSchedule args=%O', args)
 
@@ -188,7 +192,14 @@ export async function fakeSchedule(args: FakeScheduleArgs = {}) {
   const official = ['official']
 
   const sessions = [
-    randomSession('plenary', 'plenary', slotIds, official, speakerIds, true),
+    randomSession(
+      'test-plenary',
+      'plenary',
+      slotIds,
+      official,
+      speakerIds,
+      true
+    ),
     randomSession('panel-01', 'panel', slotIds, official, speakerIds, true),
     randomSession('panel-02', 'panel', slotIds, trackIds, speakerIds, true),
     randomSession('talk', 'ignite-talk', slotIds, trackIds, speakerIds, true),
@@ -198,8 +209,24 @@ export async function fakeSchedule(args: FakeScheduleArgs = {}) {
     randomSession('fishbowl', 'fishbowl', slotIds, trackIds, speakerIds, true),
   ]
 
+  const translators = await redis.getJson<Translator[]>(
+    'schedule.translators',
+    []
+  )
+
+  translators.push(
+    createTranslator('dev-001'),
+    createTranslator('dev-002'),
+    createTranslator('dev-003'),
+    createTranslator('dev-004'),
+    createTranslator('dev-005'),
+    createTranslator('dev-006'),
+    createTranslator('dev-007')
+  )
+
   await redis.set('schedule.sessions', JSON.stringify(sessions))
   await redis.set('schedule.speakers', JSON.stringify(speakers))
+  await redis.set('schedule.translators', JSON.stringify(translators))
 
   await redis.quit()
 }
