@@ -23,7 +23,7 @@ describe('@join-room', () => {
     const user = {}
     await socket.emit('join-room', 'some-room', user)
 
-    expect(socket.join).toBeCalledWith('some-room')
+    expect(socket.join).toBeCalledWith('chat-some-room')
   })
 
   it('should emit the user to participants of that room', async () => {
@@ -32,6 +32,10 @@ describe('@join-room', () => {
     const user = {}
     await socket.emit('join-room', 'some-room', user)
 
-    expect(chow.emitToRoom).toBeCalledWith('some-room', 'user-joined', user)
+    expect(chow.emitToRoom).toBeCalledWith(
+      'chat-some-room',
+      'user-joined',
+      user
+    )
   })
 })
