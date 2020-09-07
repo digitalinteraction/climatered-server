@@ -8,6 +8,10 @@ export function getLobbyUserSet(socketId: string) {
   return `inlobby-${socketId}`
 }
 
+export function getRoom(room: string) {
+  return `chat-${room}`
+}
+
 export function getUserAckEvent(toUser: string) {
   return `user-ack-${toUser}`
 }

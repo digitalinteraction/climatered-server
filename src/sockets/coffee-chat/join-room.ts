@@ -1,5 +1,6 @@
 import { TypedChow } from '../../server'
 import createDebug = require('debug')
+import { getRoom } from './coffee-chat-utils'
 
 const debug = createDebug('api:socket:join-room')
 
@@ -8,8 +9,8 @@ export default function joinRoom(chow: TypedChow) {
     const { socket, emitToRoom } = ctx
     debug(`socket="${socket.id}" room="${room}" user="${user}"`)
 
-    socket.join(room)
+    socket.join(getRoom(room))
 
-    emitToRoom(room, 'user-joined', user)
+    emitToRoom(getRoom(room), 'user-joined', user)
   })
 }

@@ -1,6 +1,6 @@
 import { TypedChow } from '../../server'
 import createDebug = require('debug')
-import { getUserOfferEvent } from './coffee-chat-utils'
+import { getUserOfferEvent, getRoom } from './coffee-chat-utils'
 
 const debug = createDebug('api:socket:send-offer')
 
@@ -11,6 +11,6 @@ export default function sendOffer(chow: TypedChow) {
       `socket="${socket.id}" room="${room}" fromUser="${fromUser}" toUser="${toUser}"`
     )
 
-    emitToRoom(room, getUserOfferEvent(fromUser, toUser), offer)
+    emitToRoom(getRoom(room), getUserOfferEvent(fromUser, toUser), offer)
   })
 }

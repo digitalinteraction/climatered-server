@@ -1,6 +1,6 @@
 import { TypedChow } from '../../server'
 import createDebug = require('debug')
-import { getUserIceEvent } from './coffee-chat-utils'
+import { getUserIceEvent, getRoom } from './coffee-chat-utils'
 
 const debug = createDebug('api:socket:send-ice')
 
@@ -11,6 +11,6 @@ export default function sendIce(chow: TypedChow) {
       `socket="${socket.id}" room="${room}" fromUser="${fromUser}" toUser="${toUser}"`
     )
 
-    emitToRoom(room, getUserIceEvent(fromUser, toUser), ice)
+    emitToRoom(getRoom(room), getUserIceEvent(fromUser, toUser), ice)
   })
 }

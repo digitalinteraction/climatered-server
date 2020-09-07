@@ -1,5 +1,6 @@
 import { TypedChow } from '../../server'
 import createDebug = require('debug')
+import { getRoom } from './coffee-chat-utils'
 
 const debug = createDebug('api:socket:leave-room')
 
@@ -8,8 +9,8 @@ export default function leaveRoom(chow: TypedChow) {
     const { socket, emitToRoom } = ctx
     debug(`socket="${socket.id}" room="${room}" user="${user}"`)
 
-    socket.leave(room)
+    socket.leave(getRoom(room))
 
-    emitToRoom(room, 'user-left', user)
+    emitToRoom(getRoom(room), 'user-left', user)
   })
 }

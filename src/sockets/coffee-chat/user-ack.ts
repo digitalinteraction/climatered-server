@@ -1,6 +1,6 @@
 import { TypedChow } from '../../server'
 import createDebug = require('debug')
-import { getUserAckEvent } from './coffee-chat-utils'
+import { getUserAckEvent, getRoom } from './coffee-chat-utils'
 
 const debug = createDebug('api:socket:user-ack')
 
@@ -11,6 +11,6 @@ export default function userJoinedAck(chow: TypedChow) {
       `socket="${socket.id}" room="${room}" fromUser="${fromUser}" toUser="${toUser}"`
     )
 
-    emitToRoom(room, getUserAckEvent(toUser), fromUser)
+    emitToRoom(getRoom(room), getUserAckEvent(toUser), fromUser)
   })
 }

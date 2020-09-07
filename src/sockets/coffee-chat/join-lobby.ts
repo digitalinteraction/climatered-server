@@ -55,7 +55,7 @@ export default function joinLobby(chow: TypedChow) {
         removeMatchedUser(redis, match),
         removeMatchedUser(redis, socket.id),
       ])
-      const room = `chat-${socket.id}-${match}`
+      const room = `${socket.id}-${match}`
       emitToSocket(match, 'room-found', room)
       socket.emitBack('room-found', room)
     } else {
