@@ -151,6 +151,7 @@ export function mockUsers(): UsersService {
   return {
     getRegistration: jest.fn(async (email) => registrations[email]),
     register: jest.fn(),
+    unregister: jest.fn(),
     verify: jest.fn(),
     compareEmails,
     attend: jest.fn(),

@@ -63,6 +63,8 @@ export const createSession = (
   attendeeDevices: 'all',
   isOfficial: false,
   isDraft: false,
+  isFeatured: false,
+  proxyUrl: '',
 })
 
 export const createSpeaker = (name: string, role: string): Speaker => ({
