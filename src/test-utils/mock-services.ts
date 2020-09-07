@@ -38,6 +38,8 @@ export function mockRedis(): RedisService {
     setRemove: jest.fn(),
     setMembers: jest.fn(),
     setPop: jest.fn(),
+    setCardinality: jest.fn(),
+    setUnionStore: jest.fn(),
   }
 }
 
