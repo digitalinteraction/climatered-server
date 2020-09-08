@@ -34,6 +34,12 @@ export function mockRedis(): RedisService {
     setAndExpire: jest.fn(async (k, v) => data.set(k, v) as any),
     expire: jest.fn(),
     del: jest.fn(async (k) => (data.delete(k), 1)),
+    setAdd: jest.fn(),
+    setRemove: jest.fn(),
+    setMembers: jest.fn(),
+    setPop: jest.fn(),
+    setCardinality: jest.fn(),
+    setUnionStore: jest.fn(),
   }
 }
 

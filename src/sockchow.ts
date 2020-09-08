@@ -5,17 +5,27 @@ import socketIoRedis = require('socket.io-redis')
 import { eventNames } from 'process'
 
 export interface EmitToRoomFn {
-  (room: string, message: string, ...args: any[]): void
+  (room: string, eventName: string, ...args: any[]): void
 }
 
 export interface GetRoomClientFn {
   (rooms: string[]): Promise<string[]>
 }
 
+export interface GetClientRoomsFn {
+  (clientId: string): Promise<string[]>
+}
+
+export interface EmitToSocketfn {
+  (socketId: string, eventName: string, ...args: any[]): void
+}
+
 export interface SockContext<E> extends BaseContext<E> {
   emitToEveryone(eventName: string, ...args: any[]): void
   emitToRoom: EmitToRoomFn
+  emitToSocket: EmitToSocketfn
   getRoomClients: GetRoomClientFn
+  getClientRooms: GetClientRoomsFn
   getSocketCount(): Promise<number>
 }
 
@@ -77,8 +87,8 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
     this.socketHandlers.set(message, handler)
   }
 
-  emitToRoom(room: string, message: string, ...args: any[]) {
-    this.io.in(room).emit(message, ...args)
+  emitToRoom(room: string, eventName: string, ...args: any[]) {
+    this.io.in(room).emit(eventName, ...args)
   }
 
   handleSocket(socket: socketIo.Socket) {
@@ -131,10 +141,16 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
     return {
       ...super.baseContext(),
       emitToRoom: (...args) => this.emitToRoom(...args),
+      emitToSocket: (...args) => this.emitToSocket(...args),
       getRoomClients: (...args) => this.getRoomClients(...args),
+      getClientRooms: (...args) => this.getClientRooms(...args),
       emitToEveryone: (...args) => this.emitToEveryone(...args),
       getSocketCount: () => this.getSocketCount(),
     }
+  }
+
+  emitToSocket(socketId: string, eventName: string, ...args: any[]) {
+    this.io.to(socketId).emit(eventName, ...args)
   }
 
   getRoomClients(rooms: string[]) {
@@ -144,6 +160,17 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
       adapter.clients(rooms, (err, clients) => {
         if (err) reject(err)
         else resolve(clients)
+      })
+    })
+  }
+
+  getClientRooms(clientId: string) {
+    const adapter = this.io.of('/').adapter as socketIoRedis.RedisAdapter
+
+    return new Promise<string[]>((resolve, reject) => {
+      adapter.clientRooms(clientId, (err, rooms) => {
+        if (err) reject(err)
+        else resolve(rooms)
       })
     })
   }

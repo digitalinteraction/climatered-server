@@ -54,11 +54,21 @@ import sendInterpretSocket from './sockets/interpret/send-interpret'
 import startInterpretSocket from './sockets/interpret/start-interpret'
 import stopInterpretSocket from './sockets/interpret/stop-interpret'
 
+import joinLobby from './sockets/coffee-chat/join-lobby'
+import joinRoom from './sockets/coffee-chat/join-room'
+import leaveRoom from './sockets/coffee-chat/leave-room'
+import userJoinedAck from './sockets/coffee-chat/user-ack'
+import sendOffer from './sockets/coffee-chat/send-offer'
+import sendAnswer from './sockets/coffee-chat/send-answer'
+import sendIce from './sockets/coffee-chat/send-ice'
+
 import emailEvent from './events/email'
 import logEvent from './events/log'
 import putObjectEvent from './events/put-object'
 
 import { SockChowish, SockChow, SockContext } from './sockchow'
+import leaveLobby from './sockets/coffee-chat/leave-lobby'
+import queryLobby from './sockets/coffee-chat/query-lobby'
 
 export * from './errors'
 
@@ -145,7 +155,17 @@ export function setupSockets(chow: TypedChow) {
     requestInterpretSocket,
     sendInterpretSocket,
     startInterpretSocket,
-    stopInterpretSocket
+    stopInterpretSocket,
+
+    joinLobby,
+    leaveLobby,
+    queryLobby,
+    joinRoom,
+    leaveRoom,
+    userJoinedAck,
+    sendOffer,
+    sendAnswer,
+    sendIce
   )
 }
 
