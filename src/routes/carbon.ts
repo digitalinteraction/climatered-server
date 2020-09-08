@@ -2,6 +2,9 @@ import { TypedChow } from '../server'
 import dataset = require('../data/countries-latlng.json')
 import distance = require('haversine-distance')
 
+// For an entire airplane, 0.85kg per kilometer
+const CARBON_FACTOR = 0.85
+
 interface Location {
   code: string
   name: string
@@ -53,9 +56,12 @@ export default function carbon(chow: TypedChow) {
     // Outbound and return trips
     totalDistance *= 2
 
+    // At 0.85 kg of CO2 per kilometer
+    const carbonNotEmitted = (totalDistance * CARBON_FACTOR) / 1000
+
     return {
       totalDistance,
-      carbonNotEmitted: 0,
+      carbonNotEmitted,
     }
   })
 }
