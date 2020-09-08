@@ -5,6 +5,7 @@ import { runServer } from './server'
 import { runScraper } from './cmd/scrape-content'
 import { runMigrator } from './cmd/migrate'
 import { runRebuilder } from './cmd/rebuild-audio'
+import { runGeocode } from './cmd/geocode'
 import { AuthJwt } from './test-utils'
 import { fakeSchedule } from './cmd/fake-schedule'
 import { appendUrl } from './services/url'
@@ -127,6 +128,15 @@ yargs.command(
   (yargs) => yargs,
   handleFail(async (args) => {
     await fakeSchedule()
+  })
+)
+
+yargs.command(
+  'geocode',
+  'Generate countries geocoded json',
+  (yargs) => yargs,
+  handleFail(async (args) => {
+    await runGeocode()
   })
 )
 
