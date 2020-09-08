@@ -17,6 +17,7 @@ import { PostgresService, createPostgresService } from './services/postgres'
 import { I18nService, createI18nService } from './services/i18n'
 
 import homeRoute from './routes/home'
+import carbonRoute from './routes/carbon'
 import meRoute from './routes/auth/me'
 import emailRequestRoute from './routes/auth/email-request'
 import emailCallbackRoute from './routes/auth/email-callback'
@@ -117,6 +118,7 @@ export function setupRoutes(chow: TypedChow) {
   debug('#setupRoutes')
   chow.apply(
     homeRoute,
+    carbonRoute,
     meRoute,
     emailRequestRoute,
     emailCallbackRoute,
