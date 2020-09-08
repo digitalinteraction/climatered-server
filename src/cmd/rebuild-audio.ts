@@ -33,7 +33,7 @@ export async function runRebuilder(directory: string, outfile: string) {
   buffers.unshift(
     waveheader(totalLength * 8, {
       sampleRate: 16000,
-      bitDepth: 8,
+      bitDepth: 16,
     })
   )
 
