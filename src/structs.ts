@@ -88,6 +88,8 @@ export const SessionStruct = object({
   isDraft: boolean(),
   isFeatured: boolean(),
   proxyUrl: string(),
+  hideFromSchedule: optional(boolean()),
+  isCancelled: optional(boolean()),
 })
 
 //
