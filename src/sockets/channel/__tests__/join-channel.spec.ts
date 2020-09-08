@@ -45,4 +45,15 @@ describe('@join-channel(sessionId, channel)', () => {
       3
     )
   })
+
+  it('should emit a channel-started if already active', async () => {
+    const socket = chow.io()
+
+    mocked(chow.auth.fromSocket).mockResolvedValue(attendee)
+    await chow.redis.set('interpreter_001_fr', 'some-long-id')
+
+    await socket.emit('join-channel', '001', 'fr')
+
+    expect(chow.emitToRoom).toBeCalledWith(socket.id, 'channel-started')
+  })
 })
