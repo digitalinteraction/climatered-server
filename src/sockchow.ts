@@ -2,6 +2,7 @@ import { Chow, BaseContext, Chowish } from '@robb_j/chowchow'
 
 import socketIo = require('socket.io')
 import socketIoRedis = require('socket.io-redis')
+import { eventNames } from 'process'
 
 export interface EmitToRoomFn {
   (room: string, message: string, ...args: any[]): void
@@ -12,15 +13,19 @@ export interface GetRoomClientFn {
 }
 
 export interface SockContext<E> extends BaseContext<E> {
+  emitToEveryone(eventName: string, ...args: any[]): void
   emitToRoom: EmitToRoomFn
   getRoomClients: GetRoomClientFn
+  getSocketCount(): Promise<number>
 }
 
 export interface ChowSocket {
   id: string
   join(room: string): void
   leave(room: string): void
-  emitBack(message: string, ...args: any[]): void
+  emitBack(eventName: string, ...args: any[]): void
+  on(eventName: string, listener: (...args: any[]) => void): void
+  once(eventName: string, listener: (...args: any[]) => void): void
 }
 
 interface SocketSendError {
@@ -45,7 +50,9 @@ function createSocket(socket: socketIo.Socket): ChowSocket {
     id: socket.id,
     join: (room) => socket.join(room),
     leave: (room) => socket.leave(room),
-    emitBack: (message, ...args) => socket.emit(message, ...args),
+    emitBack: (eventName, ...args) => socket.emit(eventName, ...args),
+    on: (eventName, listener) => socket.on(eventName, listener),
+    once: (eventName, listener) => socket.on(eventName, listener),
   }
 }
 
@@ -102,11 +109,31 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
     }
   }
 
+  emitToEveryone(eventName: string, ...args: any[]) {
+    this.io.emit(eventName, ...args)
+  }
+
+  async getSocketCount(): Promise<number> {
+    const adapter = this.io.of('/').adapter as socketIoRedis.RedisAdapter
+
+    const allRooms = await new Promise<string[]>((resolve, reject) => {
+      adapter.allRooms((err, rooms) => {
+        err ? reject(err) : resolve(rooms)
+      })
+    })
+
+    const clients = await this.getRoomClients(allRooms)
+
+    return clients.length
+  }
+
   baseContext(): SockContext<E> {
     return {
       ...super.baseContext(),
       emitToRoom: (...args) => this.emitToRoom(...args),
       getRoomClients: (...args) => this.getRoomClients(...args),
+      emitToEveryone: (...args) => this.emitToEveryone(...args),
+      getSocketCount: () => this.getSocketCount(),
     }
   }
 

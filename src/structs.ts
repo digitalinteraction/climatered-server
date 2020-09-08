@@ -86,6 +86,10 @@ export const SessionStruct = object({
   attendeeDevices: enums(['desktop', 'mobile', 'all']),
   isOfficial: boolean(),
   isDraft: boolean(),
+  isFeatured: boolean(),
+  proxyUrl: string(),
+  hideFromSchedule: optional(boolean()),
+  isCancelled: optional(boolean()),
 })
 
 //

@@ -1,7 +1,7 @@
 import { TypedChow } from '../../server'
 import { ChannelStruct, isStruct } from '../../structs'
 import createDebug = require('debug')
-import { getChannelRoom } from '../interpret/interpret-utils'
+import { getChannelRoom, getActiveKey } from '../interpret/interpret-utils'
 
 const debug = createDebug('api:socket:join-channel')
 
@@ -17,6 +17,7 @@ export default function joinChannel(chow: TypedChow) {
       sendError,
       emitToRoom,
       getRoomClients,
+      redis,
     } = ctx
 
     debug(`socket="${socket.id}" sessionId="${sessionId}" channel="${channel}"`)
@@ -57,5 +58,12 @@ export default function joinChannel(chow: TypedChow) {
     //
     const clients = await getRoomClients([room])
     emitToRoom(room, 'channel-occupancy', clients.length)
+
+    //
+    // If there is an active interpreter, let the new joiner know
+    //
+    const activeKey = getActiveKey(sessionId, channel)
+    const active = await redis.get(activeKey)
+    if (active) emitToRoom(socket.id, 'channel-started')
   })
 }

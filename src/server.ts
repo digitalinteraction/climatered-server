@@ -21,6 +21,7 @@ import meRoute from './routes/auth/me'
 import emailRequestRoute from './routes/auth/email-request'
 import emailCallbackRoute from './routes/auth/email-callback'
 import registerRoute from './routes/auth/register'
+import unregisterRoute from './routes/auth/unregister'
 import verifyRoute from './routes/auth/verify'
 
 import getSlotsRoute from './routes/schedule/get-slots'
@@ -37,6 +38,7 @@ import unattendRoute from './routes/attendance/unattend'
 import userAttendanceRoute from './routes/attendance/user-attendance'
 
 import hiSocket from './sockets/hi'
+import onlineSocket from './sockets/online'
 import authSocket from './sockets/auth'
 import deauthSocket from './sockets/deauth'
 
@@ -109,6 +111,7 @@ export function setupRoutes(chow: TypedChow) {
     emailRequestRoute,
     emailCallbackRoute,
     registerRoute,
+    unregisterRoute,
     verifyRoute,
     getSlotsRoute,
     getSessionsRoute,
@@ -128,6 +131,7 @@ export function setupSockets(chow: TypedChow) {
   debug('#setupSockets')
   chow.apply(
     hiSocket,
+    onlineSocket,
     authSocket,
     deauthSocket,
 
@@ -193,6 +197,8 @@ export async function runServer() {
     urlEncodedBody: true,
     corsHosts: env.CORS_HOSTS,
   })
+  chow.useRedis(env.REDIS_URL)
+
   setupMiddleware(chow)
   setupEvents(chow)
   setupRoutes(chow)

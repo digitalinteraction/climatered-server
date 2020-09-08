@@ -96,8 +96,20 @@ function fakeIo<E, C extends SockContext<E>>(
       )
     })
 
+    const on = jest.fn()
+    const once = jest.fn()
+
     // Create and return our socket
-    const socket: MockSocket = { id, join, leave, emit, emitBack, sendError }
+    const socket: MockSocket = {
+      id,
+      join,
+      leave,
+      emit,
+      emitBack,
+      sendError,
+      on,
+      once,
+    }
     return socket
   }
 }
@@ -128,6 +140,8 @@ export function createServer(): TypedMockChow {
   })
 
   const getRoomClients = jest.fn(async () => [])
+  const emitToEveryone = jest.fn(async () => {})
+  const getSocketCount = jest.fn(async () => 0)
 
   const io = fakeIo(chow, { emitToRoom, getRoomClients })
 
@@ -149,5 +163,7 @@ export function createServer(): TypedMockChow {
     socket,
     emitToRoom,
     getRoomClients,
+    emitToEveryone,
+    getSocketCount,
   })
 }
