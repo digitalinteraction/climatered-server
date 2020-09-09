@@ -51,19 +51,6 @@ export default function sendInterpret(chow: TypedChow) {
       acl: 'private',
     })
 
-    //
-    // Log an event
-    //
-    emit<LogEvent>('log', {
-      action: 'send-interpret',
-      socket: socket.id,
-      data: {
-        sessionId,
-        channel,
-        timestamp,
-      },
-    })
-
     return true
   })
 }

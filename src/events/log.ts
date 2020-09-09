@@ -16,23 +16,26 @@ export interface LogEvent {
 }
 
 export default function log(chow: TypedChow) {
+  debug('enabled=' + chow.env.ENABLE_EVENT_LOGS)
   //
   // log an event to postgres
   //
   chow.event<LogEvent>('log', async ({ event, pg }) => {
-    // const {
-    //   action,
-    //   data = null,
-    //   attendee = null,
-    //   socket = null,
-    //   client = undefined,
-    // } = event.payload
-    // debug(`action=${action} socket=${socket}, attendee=${attendee}`)
-    // await pg.run((client) => {
-    //   return client.sql`
-    //     INSERT INTO logs (event, attendee, socket, data)
-    //     VALUES (${action}, ${attendee}, ${socket}, ${data})
-    //   `
-    // }, client)
+    if (chow.env.ENABLE_EVENT_LOGS === false) return
+
+    const {
+      action,
+      data = null,
+      attendee = null,
+      socket = null,
+      client = undefined,
+    } = event.payload
+    debug(`action=${action} socket=${socket}, attendee=${attendee}`)
+    await pg.run((client) => {
+      return client.sql`
+        INSERT INTO logs (event, attendee, socket, data)
+        VALUES (${action}, ${attendee}, ${socket}, ${data})
+      `
+    }, client)
   })
 }

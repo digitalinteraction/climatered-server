@@ -34,6 +34,7 @@ export function createEnv(processEnv: Record<string, string | undefined>) {
   } = processEnv as Record<string, string>
 
   const ENABLE_ACCESS_LOGS = Boolean(process.env.ENABLE_ACCESS_LOGS)
+  const ENABLE_EVENT_LOGS = Boolean(process.env.ENABLE_EVENT_LOGS)
   const CORS_HOSTS = processEnv.CORS_HOSTS?.split(',') ?? []
 
   return {
@@ -52,6 +53,7 @@ export function createEnv(processEnv: Record<string, string | undefined>) {
     SPACES_KEY,
     SPACES_SECRET,
     SPACES_BUCKET,
+    ENABLE_EVENT_LOGS,
   }
 }
 
@@ -72,5 +74,6 @@ export function createTestEnv(): Env {
     SPACES_KEY: 'fake-spaces-key',
     SPACES_SECRET: 'fake-spaces-secret',
     SPACES_BUCKET: 'fake-bucket',
+    ENABLE_EVENT_LOGS: true,
   }
 }

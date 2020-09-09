@@ -59,22 +59,4 @@ describe('@send-interpret(rawData)', () => {
       acl: 'private',
     })
   })
-
-  it('should log an event', async () => {
-    const socket = chow.io()
-
-    await chow.redis.set(`interpreter_${socket.id}`, '001;fr')
-
-    await socket.emit('send-interpret', payload)
-
-    expect(logSpy).toBeCalledWith({
-      action: 'send-interpret',
-      socket: socket.id,
-      data: {
-        sessionId: '001',
-        channel: 'fr',
-        timestamp: expect.any(Number),
-      },
-    })
-  })
 })
