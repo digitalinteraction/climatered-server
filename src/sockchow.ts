@@ -5,6 +5,8 @@ import socketIoRedis = require('socket.io-redis')
 import { eventNames } from 'process'
 import redis = require('redis')
 
+// https://stackoverflow.com/questions/61875554/ssl-connections-to-redis-instance-for-socket-io-adapter
+
 export interface EmitToRoomFn {
   (room: string, eventName: string, ...args: any[]): void
 }
