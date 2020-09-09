@@ -4,7 +4,7 @@ import _ = require('lodash')
 
 const debug = createDebug('api:socket:online')
 
-const EMIT_DEBOUNCE = 300
+const EMIT_DEBOUNCE = 10 * 1000
 
 export default function online(chow: TypedChow) {
   const pkg = require('../../package.json')
