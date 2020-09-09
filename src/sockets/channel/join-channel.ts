@@ -2,6 +2,7 @@ import { TypedChow } from '../../server'
 import { ChannelStruct, isStruct } from '../../structs'
 import createDebug = require('debug')
 import { getChannelRoom, getActiveKey } from '../interpret/interpret-utils'
+import { LogEvent } from '../../events/log'
 
 const debug = createDebug('api:socket:join-channel')
 
@@ -16,6 +17,8 @@ export default function joinChannel(chow: TypedChow) {
       auth,
       sendError,
       emitToRoom,
+      emit,
+      users,
       getRoomClients,
       redis,
     } = ctx
@@ -65,5 +68,19 @@ export default function joinChannel(chow: TypedChow) {
     const activeKey = getActiveKey(sessionId, channel)
     const active = await redis.get(activeKey)
     if (active) emitToRoom(socket.id, 'channel-started')
+
+    //
+    // Find the attendee and log an event
+    //
+    const attendee = await users.getRegistration(token.sub, true)
+    emit<LogEvent>('log', {
+      action: 'join-channel',
+      socket: socket.id,
+      attendee: attendee?.id,
+      data: {
+        sessionId,
+        channel,
+      },
+    })
   })
 }

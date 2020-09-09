@@ -9,11 +9,14 @@ import {
 
 let chow: TypedMockChow
 let translator: AuthJwt
+let logSpy: jest.Mock
 
 beforeEach(() => {
   chow = createServer()
   translator = createAuthToken(['translator'])
   socket(chow)
+
+  logSpy = chow.spyEvent('log')
 })
 
 async function setup() {
@@ -47,5 +50,21 @@ describe('@leave-interpret', () => {
         email: expect.any(String),
       }
     )
+  })
+
+  it('should log an event', async () => {
+    const { socket } = await setup()
+
+    await socket.emit('leave-interpret', '001', 'fr')
+
+    expect(logSpy).toBeCalledWith({
+      action: 'leave-interpret',
+      socket: socket.id,
+      data: {
+        sessionId: '001',
+        channel: 'fr',
+        email: translator.sub,
+      },
+    })
   })
 })

@@ -4,7 +4,7 @@ import { PoolClient } from '../services/postgres'
 
 const debug = createDebug('api:event:log')
 
-interface LogEvent {
+export interface LogEvent {
   name: 'log'
   payload: {
     action: string
@@ -28,9 +28,11 @@ export default function log(chow: TypedChow) {
       client = undefined,
     } = event.payload
 
+    debug(`action=${action} socket=${socket}, attendee=${attendee}`)
+
     await pg.run((client) => {
       return client.sql`
-        INSERT INTO logs (action, attendee, socket, data)
+        INSERT INTO logs (event, attendee, socket, data)
         VALUES (${action}, ${attendee}, ${socket}, ${data})
       `
     }, client)

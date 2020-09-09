@@ -7,6 +7,8 @@ import {
   getActiveKey,
 } from './interpret-utils'
 import { AuthJwt } from '../../test-utils'
+import { LogEvent } from '../../events/log'
+import auth from '../auth'
 
 const debug = createDebug('api:socket:join-interpret')
 
@@ -37,7 +39,7 @@ export default function joinInterpret(chow: TypedChow) {
   // @join-interpret(sessionId, channel)
   //
   chow.socket('join-interpret', async (ctx, sessionId, channel) => {
-    const { socket, emitToRoom, getRoomClients, redis } = ctx
+    const { socket, emitToRoom, getRoomClients, redis, emit } = ctx
     debug(`socket="${socket.id}" sessionId="${sessionId}" channel="${channel}"`)
 
     //
@@ -99,6 +101,19 @@ export default function joinInterpret(chow: TypedChow) {
       if (!occupants.includes(socket.id)) return
 
       emitToRoom(interpretRoom, 'interpret-left', self)
+    })
+
+    //
+    // Log an event
+    //
+    emit<LogEvent>('log', {
+      action: 'join-interpret',
+      socket: socket.id,
+      data: {
+        sessionId,
+        channel,
+        email: self.email,
+      },
     })
   })
 }

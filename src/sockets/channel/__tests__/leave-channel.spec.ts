@@ -9,11 +9,14 @@ import {
 
 let chow: TypedMockChow
 let attendee: AuthJwt
+let logSpy: jest.Mock
 
 beforeEach(() => {
   chow = createServer()
   attendee = createAuthToken(['attendee'])
   leaveChannelSocket(chow)
+
+  logSpy = chow.spyEvent('log')
 })
 
 describe('@leave-channel(sessionId', () => {
@@ -39,5 +42,22 @@ describe('@leave-channel(sessionId', () => {
       'channel-occupancy',
       2
     )
+  })
+  it('should log an event', async () => {
+    const socket = chow.io()
+
+    mocked(chow.auth.fromSocket).mockResolvedValue(attendee)
+
+    await socket.emit('leave-channel', '001', 'fr')
+
+    expect(logSpy).toBeCalledWith({
+      action: 'leave-channel',
+      socket: socket.id,
+      attendee: expect.any(Number),
+      data: {
+        sessionId: '001',
+        channel: 'fr',
+      },
+    })
   })
 })

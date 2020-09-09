@@ -1,5 +1,6 @@
 import { TypedChow } from '../server'
 import { AuthJwt } from '../services/jwt'
+import { LogEvent } from '../events/log'
 import createDebug = require('debug')
 
 const debug = createDebug('api:socket:auth')
@@ -10,7 +11,7 @@ export default function auth(chow: TypedChow) {
   // @auth(token)
   //
   chow.socket('auth', async (ctx, token = '') => {
-    const { socket, jwt, redis, sendError } = ctx
+    const { socket, jwt, redis, sendError, emit, users } = ctx
 
     debug(`socket="${socket.id}" token="${token}"`)
 
@@ -27,6 +28,17 @@ export default function auth(chow: TypedChow) {
       // - is it easier to jwt.decode or JSON.parse the info on the other side
       //
       redis.setAndExpire('auth_' + socket.id, JSON.stringify(auth), sixHours)
+
+      //
+      // Log an event
+      //
+      const attendee = await users.getRegistration(auth.sub, true)
+      emit<LogEvent>('log', {
+        action: 'auth',
+        socket: socket.id,
+        attendee: attendee?.id,
+        data: {},
+      })
 
       debug('valid auth')
       return true

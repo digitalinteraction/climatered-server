@@ -44,6 +44,7 @@ interface TestExtras {
   i18n: I18nService
   sql: jest.Mock
   io(): MockSocket
+  spyEvent(eventName: string): jest.Mock
 }
 
 /**
@@ -145,6 +146,18 @@ export function createServer(): TypedMockChow {
 
   const io = fakeIo(chow, { emitToRoom, getRoomClients })
 
+  const logSpy = () => {
+    const spy = jest.fn()
+    chow.event('log', (ctx) => spy(ctx.event.payload))
+    return spy
+  }
+
+  const spyEvent = (eventName: string) => {
+    const spy = jest.fn()
+    chow.event(eventName, (ctx) => spy(ctx.event.payload))
+    return spy
+  }
+
   const extras: TestExtras = {
     redis,
     jwt,
@@ -157,6 +170,7 @@ export function createServer(): TypedMockChow {
     pg,
     sql,
     i18n,
+    spyEvent,
   }
 
   return Object.assign(mockchow(chow, extras), {

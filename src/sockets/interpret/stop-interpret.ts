@@ -7,6 +7,7 @@ import {
   getActiveKey,
   getInterpretRoom,
 } from './interpret-utils'
+import { LogEvent } from '../../events/log'
 
 const debug = createDebug('api:socket:stop-interpret')
 
@@ -15,7 +16,7 @@ export default function stopChannel(chow: TypedChow) {
   // @stop-interpret()
   //
   chow.socket('stop-interpret', async (ctx) => {
-    const { socket, sendError, redis, auth, emitToRoom, schedule } = ctx
+    const { socket, sendError, redis, auth, emitToRoom, schedule, emit } = ctx
     debug(`socket="${socket.id}"`)
 
     //
@@ -69,5 +70,17 @@ export default function stopChannel(chow: TypedChow) {
     //
     const interpretRoom = getInterpretRoom(sessionId, channel)
     emitToRoom(interpretRoom, 'interpret-stopped', translator)
+
+    //
+    // Log an event
+    //
+    emit<LogEvent>('log', {
+      action: 'stop-interpret',
+      socket: socket.id,
+      data: {
+        sessionId,
+        channel,
+      },
+    })
   })
 }

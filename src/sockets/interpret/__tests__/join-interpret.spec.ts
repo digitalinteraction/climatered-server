@@ -9,6 +9,7 @@ import {
 
 let chow: TypedMockChow
 let translator: AuthJwt
+let logSpy: jest.Mock
 
 const translatorIsh = {
   slug: expect.any(String),
@@ -20,6 +21,8 @@ beforeEach(() => {
   chow = createServer()
   translator = createAuthToken(['translator'])
   socket(chow)
+
+  logSpy = chow.spyEvent('log')
 })
 
 async function setup() {
@@ -68,5 +71,21 @@ describe('@join-interpret', () => {
       'interpret-joined',
       translatorIsh
     )
+  })
+
+  it('should log an event', async () => {
+    const { socket } = await setup()
+
+    await socket.emit('join-interpret', '001', 'fr')
+
+    expect(logSpy).toBeCalledWith({
+      action: 'join-interpret',
+      socket: socket.id,
+      data: {
+        sessionId: '001',
+        channel: 'fr',
+        email: translator.sub,
+      },
+    })
   })
 })

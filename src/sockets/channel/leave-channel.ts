@@ -2,6 +2,7 @@ import { TypedChow } from '../../server'
 import { ChannelStruct, isStruct } from '../../structs'
 import createDebug = require('debug')
 import { getChannelRoom } from '../interpret/interpret-utils'
+import { LogEvent } from '../../events/log'
 
 const debug = createDebug('api:socket:leave-channel')
 
@@ -15,6 +16,8 @@ export default function leaveChannel(chow: TypedChow) {
       schedule,
       sendError,
       auth,
+      users,
+      emit,
       getRoomClients,
       emitToRoom,
     } = ctx
@@ -57,5 +60,19 @@ export default function leaveChannel(chow: TypedChow) {
     //
     const clients = await getRoomClients([room])
     emitToRoom(room, 'channel-occupancy', clients.length)
+
+    //
+    // Find the attendee and log an event
+    //
+    const attendee = await users.getRegistration(authToken.sub, true)
+    emit<LogEvent>('log', {
+      action: 'leave-channel',
+      socket: socket.id,
+      attendee: attendee?.id,
+      data: {
+        sessionId,
+        channel,
+      },
+    })
   })
 }

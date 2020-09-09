@@ -30,7 +30,7 @@ async function makeClient(pool: pg.Pool): Promise<PoolClient> {
       for (let i = 0; i < strings.length; i++) {
         query.push(strings[i])
 
-        if (values[i]) {
+        if (i < values.length) {
           query.push(`$${i + 1}`)
         }
       }

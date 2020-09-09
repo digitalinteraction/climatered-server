@@ -2,6 +2,7 @@ import { TypedChow } from '../../server'
 import createDebug = require('debug')
 import { getPacketKey, getChannelRoom, getActiveKey } from './interpret-utils'
 import { S3Event } from '../../events/put-object'
+import { LogEvent } from '../../events/log'
 
 const fiveMinsInSeconds = 5 * 60
 
@@ -43,10 +44,24 @@ export default function sendInterpret(chow: TypedChow) {
     await redis.expire(activeKey, fiveMinsInSeconds)
 
     const cleanId = sessionId.trim().replace(/\s+/, '').toLowerCase()
+    const timestamp = new Date().getTime()
     emit<S3Event>('put-object', {
-      key: `interpret/${cleanId}/${channel}/${new Date().getTime()}.pcm`,
+      key: `interpret/${cleanId}/${channel}/${timestamp}.pcm`,
       body: Buffer.from(rawData.arrayBuffer),
       acl: 'private',
+    })
+
+    //
+    // Log an event
+    //
+    emit<LogEvent>('log', {
+      action: 'send-interpret',
+      socket: socket.id,
+      data: {
+        sessionId,
+        channel,
+        timestamp,
+      },
     })
 
     return true

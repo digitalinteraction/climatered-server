@@ -8,6 +8,8 @@ import {
   getInterpretRoom,
   getChannelRoom,
 } from './interpret-utils'
+import { emit } from 'process'
+import { LogEvent } from '../../events/log'
 
 const debug = createDebug('api:socket:start-interpret')
 
@@ -21,7 +23,7 @@ export default function startInterpret(chow: TypedChow) {
   // @start-interpret(sessionId, channel)
   //
   chow.socket('start-interpret', async (ctx, sessionId, channel) => {
-    const { socket, redis, schedule, emitToRoom } = ctx
+    const { socket, redis, schedule, emitToRoom, emit } = ctx
     debug(`socket="${socket.id}" sessionId="${sessionId}" channel="${channel}"`)
 
     //
@@ -73,5 +75,17 @@ export default function startInterpret(chow: TypedChow) {
     // Let attendees know somethings happening
     //
     emitToRoom(channelRoom, 'channel-started')
+
+    //
+    // Log an event
+    //
+    emit<LogEvent>('log', {
+      action: 'start-interpret',
+      socket: socket.id,
+      data: {
+        sessionId,
+        channel,
+      },
+    })
   })
 }
