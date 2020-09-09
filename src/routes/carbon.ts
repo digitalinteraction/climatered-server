@@ -2,6 +2,8 @@ import { TypedChow } from '../server'
 import dataset = require('../data/countries-latlng.json')
 import distance = require('haversine-distance')
 
+const carbonKey = 'c02'
+
 // For an entire airplane, 0.85kg per kilometer
 const CARBON_FACTOR = 0.85
 
@@ -19,6 +21,11 @@ interface CountryCount {
   count: number
 }
 
+interface Packet {
+  totalDistance: number
+  carbonNotEmitted: number
+}
+
 export default function carbon(chow: TypedChow) {
   const map = new Map<string, Location>()
 
@@ -29,9 +36,12 @@ export default function carbon(chow: TypedChow) {
   //
   // GET /carbon
   //
-  chow.route('get', '/carbon', async ({ auth, request, pg }) => {
+  chow.route('get', '/carbon', async ({ redis, pg }) => {
     // const authToken = await auth.fromRequest(request)
     // if (!authToken) throw new BadAuth()
+
+    const cached = await redis.getJson<Packet | null>(carbonKey, null)
+    if (cached) return cached
 
     const result = await pg.run((client) => {
       return client.sql<CountryCount>`
@@ -59,9 +69,13 @@ export default function carbon(chow: TypedChow) {
     // At 0.85 kg of CO2 per kilometer
     const carbonNotEmitted = (totalDistance * CARBON_FACTOR) / 1000
 
-    return {
+    const response = {
       totalDistance,
       carbonNotEmitted,
     }
+
+    // Cache the response for 5 minutes
+    await redis.setAndExpire(carbonKey, JSON.stringify(response), 5 * 60)
+    return response
   })
 }
