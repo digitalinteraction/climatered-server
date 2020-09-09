@@ -3,6 +3,7 @@ import { Chow, BaseContext, Chowish } from '@robb_j/chowchow'
 import socketIo = require('socket.io')
 import socketIoRedis = require('socket.io-redis')
 import { eventNames } from 'process'
+import redis = require('redis')
 
 export interface EmitToRoomFn {
   (room: string, eventName: string, ...args: any[]): void
@@ -80,7 +81,16 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
   }
 
   useRedis(redisUrl: string) {
-    this.io.adapter(socketIoRedis(redisUrl))
+    const pub = redis.createClient(redisUrl, {
+      tls: { servername: new URL(redisUrl).hostname },
+    })
+
+    const sub = redis.createClient(redisUrl, {
+      tls: { servername: new URL(redisUrl).hostname },
+    })
+
+    // this.io.adapter(socketIoRedis(redisUrl))
+    this.io.adapter(socketIoRedis({ pubClient: pub, subClient: sub }))
   }
 
   socket(message: string, handler: SockHandler<C>) {
