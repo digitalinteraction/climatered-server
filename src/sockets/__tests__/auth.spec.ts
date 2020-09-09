@@ -44,25 +44,4 @@ describe('@auth(token)', () => {
 
     expect(socket.sendError).toBeCalledWith('Bad auth')
   })
-
-  it('should log an event', async () => {
-    const socket = chow.io()
-
-    const auth: AuthJwt = {
-      typ: 'auth',
-      sub: 'user@example.com',
-      user_roles: ['attendee'],
-      user_lang: 'en',
-    }
-    const token = jwt.sign(auth, chow.env.JWT_SECRET)
-
-    await socket.emit('auth', token)
-
-    expect(logSpy).toBeCalledWith({
-      action: 'auth',
-      socket: socket.id,
-      attendee: expect.any(Number),
-      data: {},
-    })
-  })
 })

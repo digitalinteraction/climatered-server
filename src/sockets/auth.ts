@@ -29,17 +29,6 @@ export default function auth(chow: TypedChow) {
       //
       redis.setAndExpire('auth_' + socket.id, JSON.stringify(auth), sixHours)
 
-      //
-      // Log an event
-      //
-      const attendee = await users.getRegistration(auth.sub, true)
-      emit<LogEvent>('log', {
-        action: 'auth',
-        socket: socket.id,
-        attendee: attendee?.id,
-        data: {},
-      })
-
       debug('valid auth')
       return true
     } catch (error) {
