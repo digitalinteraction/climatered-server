@@ -4,8 +4,9 @@ import distance = require('haversine-distance')
 
 const carbonKey = 'c02'
 
-// For an entire airplane, 0.85kg per kilometer
-const CARBON_FACTOR = 0.85
+// The kg of carbon emitted for a 1km of flight
+// https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2019
+const CARBON_FACTOR = 0.195
 
 interface Location {
   code: string
