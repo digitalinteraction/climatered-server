@@ -24,5 +24,8 @@ export default function online(chow: TypedChow) {
     await trigger()
 
     socket.once('disconnect', async () => trigger())
+
+    const count = await getSocketCount()
+    socket.emitBack('site-visitors', count)
   })
 }
