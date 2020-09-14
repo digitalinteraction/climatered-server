@@ -83,6 +83,11 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
   }
 
   useRedis(redisUrl: string) {
+    if (!redisUrl.startsWith('rediss://')) {
+      this.io.adapter(socketIoRedis(redisUrl))
+      return
+    }
+
     const pub = redis.createClient(redisUrl, {
       tls: { servername: new URL(redisUrl).hostname },
     })
@@ -91,7 +96,6 @@ export class SockChow<E, C extends SockContext<E>> extends Chow<E, C>
       tls: { servername: new URL(redisUrl).hostname },
     })
 
-    // this.io.adapter(socketIoRedis(redisUrl))
     this.io.adapter(socketIoRedis({ pubClient: pub, subClient: sub }))
   }
 
