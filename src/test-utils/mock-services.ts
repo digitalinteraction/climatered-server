@@ -97,6 +97,7 @@ export function mockSchedule(): ScheduleService {
     scheduleLive: false,
     enableHelpdesk: false,
     enableCoffeechat: false,
+    conferenceIsOver: false,
   }
 
   const translators = [createTranslator('Rob Anderson')]

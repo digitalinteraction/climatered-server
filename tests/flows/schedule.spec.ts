@@ -73,6 +73,7 @@ test('Schedule flow', async () => {
     scheduleLive: false,
     enableHelpdesk: false,
     enableCoffeechat: false,
+    conferenceIsOver: false,
   })
 
   //

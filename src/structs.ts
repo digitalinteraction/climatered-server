@@ -189,6 +189,7 @@ export const ConfigSettingsStruct = object({
   scheduleLive: boolean(),
   enableHelpdesk: boolean(),
   enableCoffeechat: boolean(),
+  conferenceIsOver: boolean(),
 })
 
 //
