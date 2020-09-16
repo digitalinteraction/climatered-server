@@ -32,11 +32,15 @@ export default function getSessions(chow: TypedChow) {
       // Remove links from the sessions if they aren't logged in
       //
       if (!authToken) {
-        sessions = sessions.map((s) => ({
-          ...s,
-          links: [],
-          hostEmail: null,
-        }))
+        sessions = sessions.map((s) => {
+          if (s.isPublic === true) return s
+
+          return {
+            ...s,
+            links: [],
+            hostEmail: null,
+          }
+        })
       }
 
       //

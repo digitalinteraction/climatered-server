@@ -102,4 +102,12 @@ describe('GET /schedule/sessions', () => {
 
     expect(res.sessions[0].hostEmail).toEqual(expect.any(String))
   })
+
+  it('should allow links for public sessions', async () => {
+    fakeSessions[0].isPublic = true
+
+    const res = await chow.http('get', '/schedule/sessions')
+
+    expect(res.sessions[0].links).toHaveLength(1)
+  })
 })

@@ -90,6 +90,7 @@ export const SessionStruct = object({
   proxyUrl: string(),
   hideFromSchedule: optional(boolean()),
   isCancelled: optional(boolean()),
+  isPublic: optional(boolean()),
 })
 
 //
