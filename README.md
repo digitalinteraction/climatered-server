@@ -3,7 +3,7 @@
 This repo is a [node.js](https://nodejs.org/en/) app
 written in [TypeScript](https://www.typescriptlang.org),
 it provides a Restful json-based stateless API using [ChowChow](https://github.com/robb-j/chowchow/)
-and other infrastructure commands
+and other infrastructure commands.
 
 This is the backend for [climate.red](https://climate.red) and does the following:
 
@@ -37,7 +37,7 @@ This is the backend for [climate.red](https://climate.red) and does the followin
 
 ### Frameworks used
 
-- The app is structured as command-line commands using [https://yargs.js.org]
+- The app is structured as command-line commands using (yargs)[https://yargs.js.org]
 - A customised [ChowChow](https://github.com/robb-j/chowchow/) is used for routes and sockets
   - Router are served [express](https://expressjs.com) underneath
   - Sockets are served [socket.io](https://socket.io) underneath
