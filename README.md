@@ -1,26 +1,47 @@
 # ifrc-vconf-api
 
-A prototype API for the ifrc's virtual conference, designed to:
+This repo is a [node.js](https://nodejs.org/en/) app
+written in [TypeScript](https://www.typescriptlang.org),
+it provides a Restful json-based stateless API using [ChowChow](https://github.com/robb-j/chowchow/)
+and other infrastructure commands
 
-- Protect zoom links to only give them out to registered participants
-- Scope out the data we need to have/store/serve to the webapp
+This is the backend for [climate.red](https://climate.red) and does the following:
+
+- Acts as a gatekeeper for schedule information
+- Provides endpoints for attendee registration
+- Hosts sockets to setup coffeechat sessions
+- Calculate "carbon not emitted"
+- Track session attendance intentions
+- Hosts sockets for real-time interpretation during live events
 
 <!-- toc-head -->
 
 ## Table of contents
 
 - [Development](#development)
+  - [Frameworks used](#frameworks-used)
   - [Setup](#setup)
   - [Regular use](#regular-use)
   - [Testing](#testing)
   - [Irregular use](#irregular-use)
   - [Code formatting](#code-formatting)
+  - [Useful links](#useful-links)
 - [Deployment](#deployment)
   - [env vars](#env-vars)
+- [Future work](#future-work)
 
 <!-- toc-tail -->
 
 ## Development
+
+### Frameworks used
+
+- The app is structured as command-line commands using [https://yargs.js.org]
+- A customised [ChowChow](https://github.com/robb-j/chowchow/) is used for routes and sockets
+  - Router are served [express](https://expressjs.com) underneath
+  - Sockets are served [socket.io](https://socket.io) underneath
+- Tests are written with [Jest](https://jestjs.io)
+- Structures are asserted with [superstruct](https://github.com/ianstormtaylor/superstruct#readme)
 
 ### Setup
 
