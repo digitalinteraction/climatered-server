@@ -7,8 +7,6 @@ const debug = createDebug('api:cmd:geocode')
 
 const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-// https://maps.googleapis.com/maps/api/geocode/json?&address=algeria&key=AIzaSyDN3M2TenuRulsRnfnHdCTh_71GUefAsMw
-
 export async function runGeocode() {
   validateEnv(['GEOCODE_KEY'])
 
