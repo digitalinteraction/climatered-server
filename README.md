@@ -13,6 +13,7 @@ This is the backend for [climate.red](https://climate.red) and does the followin
 - Calculate "carbon not emitted"
 - Track session attendance intentions
 - Hosts sockets for real-time interpretation during live events
+- Scrapes the conference schedule (from a private repo), validate it and store into redis
 
 <!-- toc-head -->
 
