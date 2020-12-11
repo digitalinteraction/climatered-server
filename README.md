@@ -1,6 +1,22 @@
-# ifrc-vconf-api
+# Climate:Red | API
 
-This repo is a [node.js](https://nodejs.org/en/) app
+## About
+
+Climate:Red was a international virtual conference run between the [Open Lab at Newcastle University](http://openlab.ncl.ac.uk) and the [IFRC](https://ifrc.org/).
+It was a 36-hour continuous multi-timezone, multi-lingual conference with official and user-submitted sessions around the subject of Climage Change.
+This code is open source except where explicitly stated in the [LICENCE](/LICENCE).
+
+**The team:**
+
+- Rob Anderson - Lead Engineer
+- Tom Nappey - Lead Design and Coordinator
+- Tom Feltwell - Chatbot Engineer
+- Simon Bowen - Project Coordinator
+- Andy Garbett - Coffeechat Engineer
+- Gerrad Wilkinson - Coffeechat Engineer
+
+This repo is the backend infrastructure that powered Climate:Red.
+It is a [node.js](https://nodejs.org/en/) app
 written in [TypeScript](https://www.typescriptlang.org),
 it provides a Restful json-based stateless API using [ChowChow](https://github.com/robb-j/chowchow/)
 and other infrastructure commands.
