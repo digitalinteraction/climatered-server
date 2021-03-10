@@ -7,9 +7,11 @@ let chow: TypedMockChow
 
 const fakeSettings: ConfigSettings = {
   scheduleLive: true,
-  enableHelpdesk: true,
-  enableCoffeechat: true,
   conferenceIsOver: true,
+  schedule: 'ENABLE',
+  coffeechat: 'ENABLE',
+  explore: 'ENABLE',
+  helpdesk: 'ENABLE',
 }
 
 beforeEach(() => {

@@ -71,9 +71,11 @@ test('Schedule flow', async () => {
   expect(settings.status).toEqual(200)
   expect(settings.body.settings).toEqual({
     scheduleLive: false,
-    enableHelpdesk: false,
-    enableCoffeechat: false,
     conferenceIsOver: false,
+    schedule: 'ENABLE',
+    coffeechat: 'ENABLE',
+    explore: 'ENABLE',
+    helpdesk: 'ENABLE',
   })
 
   //
