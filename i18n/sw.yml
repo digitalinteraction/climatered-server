@@ -1,0 +1,23 @@
+test:
+  simple: 
+  substituted: 
+
+email:
+  general:
+    greeting: 
+    signature: 
+
+  userExists:
+    subject: 
+    body: 
+    action: 
+
+  pleaseVerify:
+    subject: 
+    body: 
+    action: 
+
+  login:
+    subject: 
+    body: 
+    action: 
