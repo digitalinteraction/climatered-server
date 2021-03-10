@@ -21,6 +21,7 @@ const fakeTranslated = (name: string) => ({
   fr: `${name} - fr`,
   es: `${name} - es`,
   ar: `${name} - ar`,
+  sw: `${name} - ar`,
 })
 
 //

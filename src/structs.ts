@@ -47,6 +47,7 @@ export const LocalisedStruct = object({
   fr: string(),
   es: string(),
   ar: string(),
+  sw: string(),
 })
 
 //
@@ -185,11 +186,15 @@ export const RegisterBodyStruct = object({
 //
 // ConfigSettings
 //
+const featureStates = ['ENABLE', 'DISABLE', 'HIDE']
+
 export type ConfigSettings = StructType<typeof ConfigSettingsStruct>
 export const ConfigSettingsStruct = object({
   scheduleLive: boolean(),
-  enableHelpdesk: boolean(),
-  enableCoffeechat: boolean(),
+  schedule: enums(featureStates),
+  coffeechat: enums(featureStates),
+  explore: enums(featureStates),
+  helpdesk: enums(featureStates),
   conferenceIsOver: boolean(),
 })
 
