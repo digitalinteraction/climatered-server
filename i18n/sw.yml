@@ -10,10 +10,10 @@ email:
     body: "Kuna mtu amejaribu kujisajili kwa anwani pepe yako.kama ni wewe binafsi.Jisajili na ujiunge upya."
     action: "Jisajili"
   pleaseVerify:
-    subject:
-    body:
-    action:
+    subject: "Kamilisha usajili na solferino Air"
+    body: "Asante sana kwa kujisajili na Solferino Air! Uko karibu kufika, Tunachohitaji ni kuthibitisha barua pepe yako. Kufanya ivo basi bonyeza kiungo hapo chini."
+    action: "Thibitisha barua pepe yako"
   login:
-    subject:
-    body:
-    action:
+    subject: "Ingia Solferino Air."
+    body: "Hapa kuna nambari yako ya kuingia ya Solferino Air, ili uingie bonyeza kiungo hapo chini au uifungue kwenye kivinjari chako."
+    action: "Ingia"
