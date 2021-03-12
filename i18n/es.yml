@@ -1,23 +1,19 @@
 test:
   simple: ¡Hola Mundo!
   substituted: Hola, {{ name }}!
-
 email:
   general:
-    greeting: Hola,
-    signature: Gracias, el equipo de Climate:Red
-
+    greeting: "Hola,"
+    signature: "Gracias, el equipo Solferino Air"
   userExists:
-    subject: 'Su inscripción Climate:Red'
-    body: Alguien intentó registrarse con su correo electrónico. Si fue usted puede iniciar la sesión haciendo clic en el enlace de abajo.
-    action: Iniciar sesión
-
+    subject: "Tu inscripción Solferino Air"
+    body: "Alguien intentó conectarse con tu 0752696446 electrónico. Si fuiste tu, te puedes conectar con el enlace más abajo."
+    action: "Connexión"
   pleaseVerify:
-    subject: Complete su inscripción a Climate:Red
-    body: '¡Muchas gracias por registrarse en Climate: Red! Ya casi has terminado, solo necesitamos verificar tu dirección de correo electrónico. Para hacer esto, haga clic en el enlace de abajo.'
-    action: Verificar mi correo electrónico
-
+    subject: "Terminar tu inscripción Solferino Air"
+    body: "¡Gracias por registrarte en Solferino Air! Estás a un paso de terminar, necesitamos confirmar tu correo electrónico. Para ese fin, favor de hacer clic en el enlace más abajo. "
+    action: "Confirmer mi correo electrónico"
   login:
-    subject: 'Iniciar sesión: Climate:Red'
-    body: 'Aquí está su código para  iniciar sesión de Climate:Red. Para iniciar sesión, haga clic en el enlace de abajo o ábralo en su navegador.'
-    action: Iniciar sesión
+    subject: "Conexión a Solferino Air"
+    body: "Este es tu código de conexión Solferino Air. Para conectarte, haz clic en el enlace más abajo, o copia y pegalo en tu explorador de internet."
+    action: "Conexión"

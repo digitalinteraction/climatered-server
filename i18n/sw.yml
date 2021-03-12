@@ -1,23 +1,19 @@
 test:
-  simple: 
-  substituted: 
-
+  simple: "-"
+  substituted: "Habari,{{jina}}!"
 email:
   general:
-    greeting: 
-    signature: 
-
+    greeting: "Habari"
+    signature: "Asanteni wakala wa ndege ya Salfarino"
   userExists:
-    subject: 
-    body: 
-    action: 
-
+    subject: "Usajili wako katika wakala wa ndege ya Salfarino"
+    body: "Kuna mtu amejaribu kujisajili kwa anwani pepe yako.kama ni wewe binafsi.Jisajili na ujiunge upya."
+    action: "Jisajili"
   pleaseVerify:
-    subject: 
-    body: 
-    action: 
-
+    subject:
+    body:
+    action:
   login:
-    subject: 
-    body: 
-    action: 
+    subject:
+    body:
+    action:
