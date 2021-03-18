@@ -55,7 +55,7 @@ export const LocalisedStruct = object({
 //
 export type Link = StructType<typeof LinkStruct>
 export const LinkStruct = object({
-  type: enums(['video', 'poll', 'tool']),
+  type: enums(['video', 'poll', 'tool', 'vimeo-chat']),
   url: string(),
   title: optional(string()),
   language: string(),
@@ -151,7 +151,7 @@ export const TranslatorStruct = object({
 //
 // Channels
 //
-export const ChannelStruct = enums(['en', 'fr', 'es', 'ar', 'sw'])
+export const ChannelStruct = enums(['en', 'fr', 'es', 'ar'])
 
 //
 // Registration
