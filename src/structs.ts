@@ -151,7 +151,7 @@ export const TranslatorStruct = object({
 //
 // Channels
 //
-export const ChannelStruct = enums(['en', 'fr', 'es', 'ar'])
+export const ChannelStruct = enums(['en', 'fr', 'es', 'ar', 'sw'])
 
 //
 // Registration
