@@ -18,6 +18,7 @@ import { I18nService, createI18nService } from './services/i18n'
 
 import homeRoute from './routes/home'
 import carbonRoute from './routes/carbon'
+import postcardRoute from './routes/postcard'
 import meRoute from './routes/auth/me'
 import emailRequestRoute from './routes/auth/email-request'
 import emailCallbackRoute from './routes/auth/email-callback'
@@ -119,6 +120,7 @@ export function setupRoutes(chow: TypedChow) {
   chow.apply(
     homeRoute,
     carbonRoute,
+    postcardRoute,
     meRoute,
     emailRequestRoute,
     emailCallbackRoute,
