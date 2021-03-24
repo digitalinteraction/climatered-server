@@ -13,14 +13,15 @@ export default function postcard(chow: TypedChow) {
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solferino Air | Postcard</title>
+    <meta content="Solferino Air | Postcard" property="og:title" />
     <meta content="website" property="og:type" />
     <meta content="https://solferinoair.com/postcard.jpg" property="og:image" />
-    <meta content="https://solferinoair.com/" property="og:url" />
+    <meta content="https://solferinoair.com/api/postcard" property="og:url" />
   </head>
   <body style="background: #111111;">
-    <img src="https://solferinoair.com/postcard.jpg" style="margin: 50px;" />
+    <img src="https://solferinoair.com/postcard.jpg" style="display: block;  height: 500px; width: auto; margin: 50px auto;" />
+    <a href="https://solferinoair.com/" target="_self" style="background-color: #F20262; border-radius: 6px; color: white; display: block; margin: 0 auto; padding: 10px 20px; text-align: center; text-decoration: none; width: 200px;">Join the Tour</a>
   </body>
-  <script>setTimeout(()=>{document.location='https://solferinoair.com/';},1000)</script>
   </html>
 `
 
