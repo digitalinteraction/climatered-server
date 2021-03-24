@@ -17,6 +17,8 @@ export default function postcard(chow: TypedChow) {
     <meta content="website" property="og:type" />
     <meta content="https://solferinoair.com/postcard.jpg" property="og:image" />
     <meta content="https://solferinoair.com/api/postcard" property="og:url" />
+    <meta content="summary" name="twitter:card" />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body style="background: #111111;">
     <img src="https://solferinoair.com/postcard.jpg" style="display: block;  height: 500px; width: auto; margin: 50px auto;" />
