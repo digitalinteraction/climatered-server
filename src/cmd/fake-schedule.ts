@@ -1,4 +1,4 @@
-import createDebug = require('debug')
+import createDebug from 'debug'
 
 const debug = createDebug('api:cmd:fake-schedule')
 
@@ -126,8 +126,7 @@ function randomSession(
     session.links.push({
       type: 'misc',
       language: '*',
-      url:
-        'https://drive.google.com/drive/folders/1Il2sflOFfFm3F18Z9xmso3JP1nBWaCzw',
+      url: 'https://drive.google.com/drive/folders/1Il2sflOFfFm3F18Z9xmso3JP1nBWaCzw',
     })
     session.links.push({
       type: 'misc',

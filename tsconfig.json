@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
     "outDir": "dist",
-    "target": "es2019",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "target": "es2020",
+    "moduleResolution": "Node",
+    "esModuleInterop": true,
+    "module": "CommonJS",
+
     "sourceMap": true,
     "declaration": true,
-    "pretty": true,
     "newLine": "lf",
     "stripInternal": true,
+
     "strict": true,
     "noImplicitReturns": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "noEmitOnError": true,
     "forceConsistentCasingInFileNames": true,

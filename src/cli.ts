@@ -1,143 +1,113 @@
-import yargs = require('yargs')
-import jwt = require('jsonwebtoken')
-import { validateEnv } from 'valid-env'
-import { runServer } from './server'
-import { runScraper } from './cmd/scrape-content'
-import { runMigrator } from './cmd/migrate'
-import { runRebuilder } from './cmd/rebuild-audio'
-import { runGeocode } from './cmd/geocode'
-import { AuthJwt } from './test-utils'
-import { fakeSchedule } from './cmd/fake-schedule'
-import { appendUrl } from './services/url'
+#!/usr/bin/env node
 
-yargs.help().alias('h', 'help').demandCommand().recommendCommands()
+//
+// The cli entrypoint
+//
 
-function fail(error: any) {
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+import { devAuthCommand } from './cmd/dev-auth-command'
+import { migrateCommand } from './cmd/migrate-command'
+import {
+  pretalxDataCommand,
+  pretalxDataCommands,
+} from './cmd/pretalx-data-command'
+import { scrapePretalxCommand } from './cmd/scrape-pretalx-command'
+import { serveCommand } from './cmd/serve-command'
+
+const cli = yargs(hideBin(process.argv))
+
+cli
+  .help()
+  .alias('h', 'help')
+  .demandCommand(1, 'A command is required')
+  .recommendCommands()
+
+function errorHandler(error: any) {
+  console.error('Fatal error')
   console.error(error)
   process.exit(1)
 }
 
-function handleFail<T extends any[]>(block: (...args: T) => Promise<any>) {
-  return async (...args: T) => {
-    try {
-      await block(...args)
-    } catch (error) {
-      console.error(error)
-      process.exit(1)
-    }
-  }
-}
-
 yargs.command(
   'serve',
-  'Run the api server',
+  'Run the server',
   (yargs) =>
-    yargs
-      .option('migrate', {
-        type: 'boolean',
-        describe: 'Run database migrations',
-        default: false,
-      })
-      .option('scrape', {
-        type: 'boolean',
-        describe: 'Scrape content from the repo',
-        default: false,
-      }),
-  handleFail(async (args) => {
-    if (args.migrate) await runMigrator()
-    if (args.scrape) await runScraper()
-
-    await runServer()
-  })
+    yargs.option('port', {
+      type: 'number',
+      describe: 'The port to run the server on',
+      default: 3000,
+    }),
+  (args) => serveCommand(args).catch(errorHandler)
 )
 
 yargs.command(
-  'scrape-content',
-  'Scrape content from GitHub and put into redis',
+  'scrape-pretalx',
+  'Scrape content from pretalx and put into redis',
   (yargs) => yargs,
-  async (args) => {
-    try {
-      await runScraper()
-    } catch (error) {
-      fail(error)
-    }
-  }
+  (args) => scrapePretalxCommand(args).catch(errorHandler)
+)
+
+yargs.command(
+  'pretalx <data>',
+  'Fetch and output data from pretalx',
+  (yargs) =>
+    yargs.positional('data', {
+      type: 'string',
+      choices: Object.keys(pretalxDataCommands),
+      demandOption: true,
+    }),
+  (args) => pretalxDataCommand(args).catch(errorHandler)
+)
+
+yargs.command(
+  'dev-auth',
+  'Generate an authentication for local Development',
+  (yargs) =>
+    yargs
+      .option('email', { type: 'string', demandOption: true })
+      .option('interpreter', { type: 'boolean', default: false })
+      .option('admin', { type: 'boolean', default: false }),
+  (args) => devAuthCommand(args).catch(errorHandler)
 )
 
 yargs.command(
   'migrate',
-  'Run the database migrator',
+  'Run any new database migrations',
   (yargs) => yargs,
-  handleFail(async (args) => {
-    await runMigrator()
-  })
+  (args) => migrateCommand(args).catch(errorHandler)
 )
 
-yargs.command(
-  'fake-auth',
-  'Generate an auth token',
-  (yargs) =>
-    yargs
-      .option('email', {
-        type: 'string',
-        default: 'robanderson@hey.com',
-      })
-      .option('lang', {
-        type: 'string',
-        default: 'en',
-        choices: ['en', 'fr', 'es', 'ar'],
-      })
-      .option('url', {
-        type: 'boolean',
-        default: false,
-      }),
-  handleFail(async (args) => {
-    validateEnv(['JWT_SECRET'])
-    const auth: AuthJwt = {
-      typ: 'auth',
-      sub: args.email,
-      user_roles: ['translator', 'attendee'],
-      user_lang: args.lang,
-    }
-    const token = jwt.sign(auth, process.env.JWT_SECRET!)
-    if (args.url) {
-      validateEnv(['WEB_URL'])
-      const base = new URL(process.env.WEB_URL!)
-      console.log(appendUrl(base, `/_token?token=${token}`).toString())
-    } else {
-      console.log(token)
-    }
-  })
-)
+// yargs.command(
+//   'rebuild-audio <path> <file>',
+//   'Rebuild audio in a given folder',
+//   (yargs) =>
+//     yargs
+//       .positional('path', { type: 'string', demandOption: true })
+//       .positional('file', { type: 'string', demandOption: true }),
+//   handleFail(async (args) => {
+//     await runRebuilder(args.path, args.file)
+//   })
+// )
 
-yargs.command(
-  'rebuild-audio <path> <file>',
-  'Rebuild audio in a given folder',
-  (yargs) =>
-    yargs
-      .positional('path', { type: 'string', demandOption: true })
-      .positional('file', { type: 'string', demandOption: true }),
-  handleFail(async (args) => {
-    await runRebuilder(args.path, args.file)
-  })
-)
+// yargs.command(
+//   'fake-schedule',
+//   'Generate a fake schedule and put it into redis',
+//   (yargs) => yargs,
+//   handleFail(async (args) => {
+//     await fakeSchedule()
+//   })
+// )
 
-yargs.command(
-  'fake-schedule',
-  'Generate a fake schedule and put it into redis',
-  (yargs) => yargs,
-  handleFail(async (args) => {
-    await fakeSchedule()
-  })
-)
+// yargs.command(
+//   'geocode',
+//   'Generate countries geocoded json',
+//   (yargs) => yargs,
+//   handleFail(async (args) => {
+//     await runGeocode()
+//   })
+// )
 
-yargs.command(
-  'geocode',
-  'Generate countries geocoded json',
-  (yargs) => yargs,
-  handleFail(async (args) => {
-    await runGeocode()
-  })
-)
-
-yargs.parse()
+// Execute the CLI
+cli.parse()

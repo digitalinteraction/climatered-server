@@ -1,261 +1,80 @@
-import createDebug = require('debug')
-import dotenv = require('dotenv')
-import morgan = require('morgan')
+import http from 'http'
 
-import { createTerminus } from '@godaddy/terminus'
-import { Chowish } from '@robb_j/chowchow'
+import Koa from 'koa'
+import KoaRouter from '@koa/router'
+import koaCors from '@koa/cors'
+import koaJson from 'koa-json'
+import koaBodyParser from 'koa-bodyparser'
+import koaHelment from 'koa-helmet'
 
-import { createEnv, Env } from './env'
+import ms from 'ms'
+import createDebug from 'debug'
 
-import { RedisService, createRedisService } from './services/redis'
-import { ScheduleService, createScheduleService } from './services/schedule'
-import { JwtService, createJwtService } from './services/jwt'
-import { UrlService, createUrlService } from './services/url'
-import { UsersService, createUsersService } from './services/users'
-import { AuthService, createAuthService } from './services/auth'
-import { PostgresService, createPostgresService } from './services/postgres'
-import { I18nService, createI18nService } from './services/i18n'
+import { ApiError } from '@openlab/deconf-api-toolkit'
+import { AppRouter } from './lib/app-router'
+import { AppContext } from './lib/context'
 
-import homeRoute from './routes/home'
-import carbonRoute from './routes/carbon'
-import postcardRoute from './routes/postcard'
-import meRoute from './routes/auth/me'
-import emailRequestRoute from './routes/auth/email-request'
-import emailCallbackRoute from './routes/auth/email-callback'
-import registerRoute from './routes/auth/register'
-import unregisterRoute from './routes/auth/unregister'
-import verifyRoute from './routes/auth/verify'
+const debug = createDebug('cr:server')
 
-import getSlotsRoute from './routes/schedule/get-slots'
-import getSessionsRoute from './routes/schedule/get-sessions'
-import getSettingsRoute from './routes/schedule/get-settings'
-import getSpeakersRoute from './routes/schedule/get-speakers'
-import getThemesRoute from './routes/schedule/get-themes'
-import getTypesRoute from './routes/schedule/get-types'
-import getTracksRoute from './routes/schedule/get-tracks'
-import getIcsRoute from './routes/schedule/get-ics'
-
-import attendRoute from './routes/attendance/attend'
-import unattendRoute from './routes/attendance/unattend'
-import userAttendanceRoute from './routes/attendance/user-attendance'
-
-import hiSocket from './sockets/hi'
-import onlineSocket from './sockets/online'
-import authSocket from './sockets/auth'
-import deauthSocket from './sockets/deauth'
-
-import joinChannelSocket from './sockets/channel/join-channel'
-import leaveChannelSocket from './sockets/channel/leave-channel'
-
-import acceptInterpretSocket from './sockets/interpret/accept-interpret'
-import joinInterpretSocket from './sockets/interpret/join-interpret'
-import leaveInterpretSocket from './sockets/interpret/leave-interpret'
-import messageInterpretSocket from './sockets/interpret/message-interpret'
-import requestInterpretSocket from './sockets/interpret/request-interpret'
-import sendInterpretSocket from './sockets/interpret/send-interpret'
-import startInterpretSocket from './sockets/interpret/start-interpret'
-import stopInterpretSocket from './sockets/interpret/stop-interpret'
-
-import joinLobby from './sockets/coffee-chat/join-lobby'
-import joinRoom from './sockets/coffee-chat/join-room'
-import leaveRoom from './sockets/coffee-chat/leave-room'
-import userJoinedAck from './sockets/coffee-chat/user-ack'
-import sendOffer from './sockets/coffee-chat/send-offer'
-import sendAnswer from './sockets/coffee-chat/send-answer'
-import sendIce from './sockets/coffee-chat/send-ice'
-
-import emailEvent from './events/email'
-import logEvent from './events/log'
-import putObjectEvent from './events/put-object'
-
-import { SockChowish, SockChow, SockContext } from './sockchow'
-import leaveLobby from './sockets/coffee-chat/leave-lobby'
-import queryLobby from './sockets/coffee-chat/query-lobby'
-
-export * from './errors'
-
-const debug = createDebug('api:server')
-
-export interface Context extends SockContext<Env> {
-  redis: RedisService
-  schedule: ScheduleService
-  jwt: JwtService
-  url: UrlService
-  users: UsersService
-  auth: AuthService
-  pg: PostgresService
-  i18n: I18nService
+/** A middleware to output requests when in debug mode */
+function debugMiddleware(): Koa.Middleware {
+  return async (ctx, next) => {
+    const start = Date.now()
+    await next()
+    const dt = Date.now() - start
+    debug(
+      '%s %i %s %s',
+      ctx.request.method,
+      ctx.response.status,
+      ctx.request.path,
+      ms(dt)
+    )
+  }
 }
 
-export type TypedChow = SockChowish<Env, Context> & Chowish<Env, Context>
-
-export function setupMiddleware(chow: TypedChow) {
-  chow.middleware((app) => {
-    //
-    // Log requests for debugging
-    //
-    app.use((req, res, next) => {
-      if (req.path !== 'req.path') {
-        debug(`${req.method}: ${req.path}`)
+function errorHandler(nodeEnv: string): Koa.Middleware {
+  return async (ctx, next) => {
+    try {
+      await next()
+    } catch (error) {
+      if (error instanceof ApiError) {
+        ctx.status = error.status
+        ctx.body = {
+          error: error.message,
+          codes: error.codes,
+        }
+      } else {
+        ctx.status = 500
+        ctx.body = {
+          error:
+            nodeEnv === 'production' ? 'Something went wrong' : error.message,
+          stack: nodeEnv === 'production' ? null : error.stack,
+        }
       }
-      next()
-    })
-
-    //
-    // Optionally enable access logs
-    //
-    if (chow.env.ENABLE_ACCESS_LOGS) {
-      app.use(morgan('tiny'))
     }
-  })
+  }
 }
 
-export function setupEvents(chow: TypedChow) {
-  debug('#setupEvents')
-  chow.apply(emailEvent, logEvent, putObjectEvent)
-}
+export async function createServer(context: AppContext) {
+  const router = new KoaRouter()
 
-export function setupRoutes(chow: TypedChow) {
-  debug('#setupRoutes')
-  chow.apply(
-    homeRoute,
-    carbonRoute,
-    postcardRoute,
-    meRoute,
-    emailRequestRoute,
-    emailCallbackRoute,
-    registerRoute,
-    unregisterRoute,
-    verifyRoute,
-    getSlotsRoute,
-    getSessionsRoute,
-    getSettingsRoute,
-    getSpeakersRoute,
-    getThemesRoute,
-    getTracksRoute,
-    getTypesRoute,
-    getIcsRoute,
-    attendRoute,
-    unattendRoute,
-    userAttendanceRoute
-  )
-}
+  const routers: AppRouter[] = []
 
-export function setupSockets(chow: TypedChow) {
-  debug('#setupSockets')
-  chow.apply(
-    hiSocket,
-    onlineSocket,
-    authSocket,
-    deauthSocket,
+  for (const appRouter of routers) {
+    appRouter.apply(router)
+  }
 
-    joinChannelSocket,
-    leaveChannelSocket,
+  const app = new Koa()
+    .use(koaHelment())
+    .use(koaCors({ origin: context.env.CLIENT_URL }))
+    .use(koaJson())
+    .use(koaBodyParser())
+    .use(debugMiddleware())
+    .use(errorHandler(context.env.NODE_ENV))
+    .use(router.routes())
+    .use(router.allowedMethods())
 
-    acceptInterpretSocket,
-    joinInterpretSocket,
-    leaveInterpretSocket,
-    messageInterpretSocket,
-    requestInterpretSocket,
-    sendInterpretSocket,
-    startInterpretSocket,
-    stopInterpretSocket,
+  const server = http.createServer(app.callback())
 
-    joinLobby,
-    leaveLobby,
-    queryLobby,
-    joinRoom,
-    leaveRoom,
-    userJoinedAck,
-    sendOffer,
-    sendAnswer,
-    sendIce
-  )
-}
-
-export async function runServer() {
-  debug('#runServer')
-  //
-  // Load variables from environment variables
-  //
-  dotenv.config()
-
-  //
-  // Create our custom environment
-  //
-  debug('#runServer creating env')
-  const env = createEnv(process.env)
-
-  //
-  // Setup services
-  //
-  debug('#runServer setting up services')
-  const redis = createRedisService(env.REDIS_URL)
-  const schedule = createScheduleService(redis)
-  const jwt = createJwtService(env.JWT_SECRET)
-  const url = createUrlService(env.SELF_URL, env.WEB_URL)
-  const auth = createAuthService(redis, jwt)
-  const pg = createPostgresService(env.SQL_URL)
-  const users = createUsersService(pg)
-  const i18n = await createI18nService()
-
-  //
-  // Create our chow instance
-  //
-  debug('#runServer creating server')
-  const ctxFactory: (ctx: SockContext<Env>) => Context = (base) => ({
-    ...base,
-    redis,
-    schedule,
-    jwt,
-    url,
-    users,
-    auth,
-    pg,
-    i18n,
-  })
-  const chow = new SockChow(ctxFactory, env)
-  chow.addHelpers({
-    trustProxy: true,
-    jsonBody: true,
-    urlEncodedBody: true,
-    corsHosts: env.CORS_HOSTS,
-  })
-  chow.useRedis(env.REDIS_URL)
-
-  setupMiddleware(chow)
-  setupEvents(chow)
-  setupRoutes(chow)
-  setupSockets(chow)
-
-  //
-  // Start our server
-  //
-  debug('#runServer starting')
-  await chow.start({
-    port: 3000,
-    handle404s: true,
-    outputUrl: true,
-  })
-
-  //
-  // Make sure the server shuts down consistently
-  //
-  createTerminus(chow.server, {
-    healthChecks: {
-      '/healthz': async () => {
-        await redis.ping()
-      },
-    },
-    signals: ['SIGINT', 'SIGTERM'],
-    onSignal: async () => {
-      debug('onSignal')
-      await redis.quit()
-    },
-    beforeShutdown: () => {
-      debug('beforeShutdown')
-      if (env.NODE_ENV === 'development') return Promise.resolve()
-      return new Promise((resolve) => setTimeout(resolve, 5000))
-    },
-  })
+  return { app, server, router }
 }
