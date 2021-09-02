@@ -1,6 +1,13 @@
 import { MetricsSockets } from '@openlab/deconf-api-toolkit'
 import { Socket } from 'socket.io'
-import { AppBroker, AppContext, SocketErrorHandler } from '../lib/module'
+import {
+  AppBroker,
+  AppContext,
+  createDebug,
+  SocketErrorHandler,
+} from '../lib/module'
+
+const debug = createDebug('cr:deconf:metrics-broker')
 
 type Context = AppContext
 
@@ -16,6 +23,7 @@ export class MetricsBroker implements AppBroker {
     socket.on(
       'trackMetric',
       handleErrors(async (eventName, payload) => {
+        debug('trackMetric socket=%o event=%o', socket.id, eventName)
         await this.#sockets.event(socket.id, eventName, payload)
       })
     )
@@ -23,6 +31,7 @@ export class MetricsBroker implements AppBroker {
     socket.on(
       'trackError',
       handleErrors(async (error) => {
+        debug('trackError socket=%o', socket.id)
         await this.#sockets.error(socket.id, error)
       })
     )

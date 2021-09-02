@@ -20,7 +20,9 @@ import {
   createDebug,
   createEnv,
   EmailService,
+  EnvRecord,
   loadConfig,
+  RedisService,
   S3Service,
   SocketService,
   UrlService,
@@ -28,6 +30,16 @@ import {
 import { createServer } from '../server'
 
 const debug = createDebug('cr:cmd:serve')
+
+export function pickAStore(redisUrl: string | null) {
+  if (redisUrl) {
+    debug('Using redis store %o', redisUrl)
+    return new RedisService(redisUrl)
+  } else {
+    debug('Using in-memory store')
+    return createMemoryStore()
+  }
+}
 
 export interface ServeCommandOptions {
   port: number
@@ -45,7 +57,7 @@ export async function serveCommand(options: ServeCommandOptions) {
   debug('Package name=%o version=%o', pkg.name, pkg.version)
   debug('Loaded resources %o', [...resources.keys()])
 
-  const store = createMemoryStore()
+  const store = pickAStore(env.REDIS_URL)
   const postgres = new PostgresService({ env })
   const url = new UrlService({ env })
   const email = new EmailService({ env, config })

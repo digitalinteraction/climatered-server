@@ -1,8 +1,11 @@
 import { RedisClient } from 'redis'
-import { createMemoryStore, KeyValueService } from '@openlab/deconf-api-toolkit'
-import { EnvRecord } from './env'
+import { KeyValueService } from '@openlab/deconf-api-toolkit'
 import { createRedisClient } from './redis'
 import { promisify } from 'util'
+
+//
+// TODO: move to ./redis.ts ?
+//
 
 function promisifyRedis(client: RedisClient) {
   const get = promisify(client.get).bind(client)
@@ -50,13 +53,5 @@ export class RedisService implements KeyValueService {
 
   async close() {
     await this.#client.close()
-  }
-}
-
-export function pickAStore(env: EnvRecord) {
-  if (env.REDIS_URL) {
-    return new RedisService(env.REDIS_URL)
-  } else {
-    return createMemoryStore()
   }
 }

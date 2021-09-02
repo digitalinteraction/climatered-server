@@ -1,6 +1,13 @@
 import { AuthSockets } from '@openlab/deconf-api-toolkit'
 import { Socket } from 'socket.io'
-import { AppBroker, AppContext, SocketErrorHandler } from '../lib/module'
+import {
+  AppBroker,
+  AppContext,
+  createDebug,
+  SocketErrorHandler,
+} from '../lib/module'
+
+const debug = createDebug('cr:deconf:auth-broker')
 
 type Context = AppContext
 
@@ -14,6 +21,7 @@ export class AuthBroker implements AppBroker {
     socket.on(
       'auth',
       handleErrors(async (authToken) => {
+        debug('@auth socket=%o', socket.id)
         await this.#sockets.auth(socket.id, authToken)
       })
     )
@@ -21,12 +29,13 @@ export class AuthBroker implements AppBroker {
     socket.on(
       'deauth',
       handleErrors(async () => {
+        debug('@deauth socket=%o', socket.id)
         await this.#sockets.deauth(socket.id)
       })
     )
   }
 
   async socketDisconnected(socket: Socket) {
-    await this.#sockets.deauth(socket.id)
+    await this.#sockets.deauth(socket.id).catch(() => {})
   }
 }
