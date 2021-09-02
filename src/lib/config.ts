@@ -3,12 +3,13 @@ import {
   DeconfConfigStruct,
   loadConfig as loadDeconfConfig,
 } from '@openlab/deconf-api-toolkit'
+import { DeconfConfig } from '@openlab/deconf-shared/dist/lib'
 
-import { object, assign, Infer } from 'superstruct'
+import { object, assign, Infer, Describe } from 'superstruct'
 
-export type AppConfig = Infer<typeof AppConfigStruct>
+export type AppConfig = DeconfConfig
 
-export const AppConfigStruct = DeconfConfigStruct
+export const AppConfigStruct: Describe<DeconfConfig> = DeconfConfigStruct
 // export const AppConfigStruct = assign(
 //   DeconfConfigStruct,
 //   object({
