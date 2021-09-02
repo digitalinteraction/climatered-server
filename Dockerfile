@@ -2,7 +2,7 @@
 FROM node:14-alpine as base
 RUN apk add --no-cache git \
   && mkdir /app && chown -R node:node /app
-COPY --chown=node ["package*.json", "npm-shrinkwrap.json", "tsconfig.json", "/app/"]
+COPY --chown=node ["package*.json", "tsconfig.json", "/app/"]
 USER node
 WORKDIR /app
 
