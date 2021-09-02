@@ -27,7 +27,7 @@ export class ConferenceRouter implements AppRouter {
   }
 
   apply(router: KoaRouter) {
-    router.get('conference.sessions', '/schedule/sessions', async (ctx) => {
+    router.get('conference.sessions', '/schedule', async (ctx) => {
       ctx.body = await this.#routes.getSchedule()
     })
 

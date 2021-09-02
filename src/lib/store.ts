@@ -1,29 +1,55 @@
+import { RedisClient } from 'redis'
 import { createMemoryStore, KeyValueService } from '@openlab/deconf-api-toolkit'
 import { EnvRecord } from './env'
+import { createRedisClient } from './redis'
+import { promisify } from 'util'
+
+function promisifyRedis(client: RedisClient) {
+  const get = promisify(client.get).bind(client)
+  const set = promisify(client.set).bind(client)
+  const expire = promisify(client.expire).bind(client)
+  const ping = promisify(client.ping).bind(client) as () => Promise<string>
+  const close = promisify(client.quit).bind(client)
+  const del = promisify(client.del).bind(client) as (
+    k: string
+  ) => Promise<number>
+
+  return { get, set, expire, ping, del, close }
+}
+
+type PromisifiedRedis = ReturnType<typeof promisifyRedis>
 
 export class RedisService implements KeyValueService {
-  #redisUrl: string
+  #client: PromisifiedRedis
   constructor(redisUrl: string) {
-    this.#redisUrl = redisUrl
+    this.#client = promisifyRedis(createRedisClient(redisUrl))
   }
 
-  retrieve<T>(key: string): Promise<T | null> {
-    throw new Error('Method not implemented.')
+  async retrieve<T>(key: string) {
+    const result = await this.#client.get(key)
+    if (!result) return null
+    return JSON.parse(result)
   }
-  put<T>(key: string, value: T): Promise<void> {
-    throw new Error('Method not implemented.')
+
+  async put<T>(key: string, value: T) {
+    await this.#client.set(key, JSON.stringify(value))
   }
-  checkHealth(): Promise<void> {
-    throw new Error('Method not implemented.')
+
+  async checkHealth() {
+    const pong = await this.#client.ping()
+    if (pong !== 'PONG') throw new Error('Redis disconnected')
   }
-  setExpiry(key: string, duractionInSeconds: number): Promise<void> {
-    throw new Error('Method not implemented.')
+
+  async setExpiry(key: string, duractionInSeconds: number) {
+    await this.#client.expire(key, duractionInSeconds)
   }
-  delete(key: string): Promise<void> {
-    throw new Error('Method not implemented.')
+
+  async delete(key: string) {
+    await this.#client.del(key)
   }
-  close(): Promise<void> {
-    throw new Error('Method not implemented.')
+
+  async close() {
+    await this.#client.close()
   }
 }
 

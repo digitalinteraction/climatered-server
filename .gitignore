@@ -9,3 +9,5 @@ coverage
 dist
 schedule-clone*
 raw-audio
+
+app-config.json

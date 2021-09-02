@@ -8,11 +8,14 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
 import { devAuthCommand } from './cmd/dev-auth-command'
+import { geocodeCommand } from './cmd/geocode-command'
+import { hackCommand, allHackCommands } from './cmd/hack-command'
 import { migrateCommand } from './cmd/migrate-command'
 import {
   pretalxDataCommand,
   pretalxDataCommands,
 } from './cmd/pretalx-data-command'
+import { rebuildAudioCommand } from './cmd/rebuild-audio-command'
 import { scrapePretalxCommand } from './cmd/scrape-pretalx-command'
 import { serveCommand } from './cmd/serve-command'
 
@@ -73,41 +76,40 @@ yargs.command(
 )
 
 yargs.command(
+  'hack <hack>',
+  'Run one of the hack commands',
+  (yargs) =>
+    yargs.positional('hack', {
+      type: 'string',
+      choices: Object.keys(allHackCommands),
+      demandOption: true,
+    }),
+  (args) => hackCommand(args).catch(errorHandler)
+)
+
+yargs.command(
   'migrate',
   'Run any new database migrations',
   (yargs) => yargs,
   (args) => migrateCommand(args).catch(errorHandler)
 )
 
-// yargs.command(
-//   'rebuild-audio <path> <file>',
-//   'Rebuild audio in a given folder',
-//   (yargs) =>
-//     yargs
-//       .positional('path', { type: 'string', demandOption: true })
-//       .positional('file', { type: 'string', demandOption: true }),
-//   handleFail(async (args) => {
-//     await runRebuilder(args.path, args.file)
-//   })
-// )
+yargs.command(
+  'rebuild-audio <directory> <outfile>',
+  'Rebuild pre-downloaded audio chunks in a given folder into a single wav file',
+  (yargs) =>
+    yargs
+      .positional('directory', { type: 'string', demandOption: true })
+      .positional('outfile', { type: 'string', demandOption: true }),
+  async (args) => rebuildAudioCommand(args).catch(errorHandler)
+)
 
-// yargs.command(
-//   'fake-schedule',
-//   'Generate a fake schedule and put it into redis',
-//   (yargs) => yargs,
-//   handleFail(async (args) => {
-//     await fakeSchedule()
-//   })
-// )
-
-// yargs.command(
-//   'geocode',
-//   'Generate countries geocoded json',
-//   (yargs) => yargs,
-//   handleFail(async (args) => {
-//     await runGeocode()
-//   })
-// )
+yargs.command(
+  'geocode',
+  'Generate and output geocoded locations',
+  (yargs) => yargs,
+  (args) => geocodeCommand(args).catch(errorHandler)
+)
 
 // Execute the CLI
 cli.parse()

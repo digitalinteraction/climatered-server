@@ -4,7 +4,9 @@ import {
   MigrateService,
   PostgresService,
 } from '@openlab/deconf-api-toolkit'
-import { createEnv } from '../lib/module'
+import { createEnv, createDebug } from '../lib/module'
+
+const debug = createDebug('cr:cmd:migrate')
 
 export interface MigrateCommandOptions {
   // ...
@@ -13,7 +15,15 @@ export interface MigrateCommandOptions {
 const CLIMATERED_MIGRATIONS = [...DECONF_MIGRATIONS]
 
 export async function migrateCommand(options: MigrateCommandOptions) {
+  debug('start')
+
   const env = createEnv()
+
+  debug('url %o', env.DATABASE_URL)
+  debug(
+    'migrations %o',
+    CLIMATERED_MIGRATIONS.map((m) => m.id)
+  )
 
   const postgres = new PostgresService({ env })
 

@@ -7,12 +7,27 @@ import koaJson from 'koa-json'
 import koaBodyParser from 'koa-bodyparser'
 import koaHelment from 'koa-helmet'
 
+import { Server as SocketIoServer, Socket } from 'socket.io'
+import { createAdapter as socketIoRedisAdapter } from '@socket.io/redis-adapter'
+
 import ms from 'ms'
 import createDebug from 'debug'
 
 import { ApiError } from '@openlab/deconf-api-toolkit'
-import { AppRouter } from './lib/app-router'
-import { AppContext } from './lib/context'
+import {
+  AppContext,
+  AppRouter,
+  AppBroker,
+  createRedisClient,
+} from './lib/module'
+import { AttendanceRouter } from './deconf/attendance-router'
+import { CarbonRouter } from './deconf/carbon-router'
+import { ConferenceRouter } from './deconf/conference-router'
+import { RegistrationRouter } from './deconf/registration-router'
+import { AuthBroker } from './deconf/auth-broker'
+import { ChannelBroker } from './deconf/channel-broker'
+import { InterpreterBroker } from './deconf/interpreter-broker'
+import { MetricsBroker } from './deconf/metrics-broker'
 
 const debug = createDebug('cr:server')
 
@@ -32,7 +47,7 @@ function debugMiddleware(): Koa.Middleware {
   }
 }
 
-function errorHandler(nodeEnv: string): Koa.Middleware {
+function httpErrorHandler(isProduction: boolean): Koa.Middleware {
   return async (ctx, next) => {
     try {
       await next()
@@ -43,12 +58,37 @@ function errorHandler(nodeEnv: string): Koa.Middleware {
           error: error.message,
           codes: error.codes,
         }
-      } else {
+      } else if (error instanceof Error) {
         ctx.status = 500
         ctx.body = {
-          error:
-            nodeEnv === 'production' ? 'Something went wrong' : error.message,
-          stack: nodeEnv === 'production' ? null : error.stack,
+          error: isProduction ? 'Something went wrong' : error.message,
+          stack: isProduction ? null : error.stack,
+        }
+      } else {
+        console.error('A non-Error was thrown')
+        console.error(error)
+        process.exit(1)
+      }
+    }
+  }
+}
+
+export function ioErrorHandler<T extends unknown[]>(socket: Socket) {
+  return (endpoint: (...args: T) => Promise<void>) => {
+    return async (...args: T) => {
+      try {
+        await endpoint(...args)
+      } catch (error) {
+        if (error instanceof ApiError) {
+          socket.emit('api_error', {
+            status: error.status,
+            codes: error.codes,
+            stack: error.stack,
+          })
+        } else {
+          console.error('An unknown error occured')
+          console.error(error)
+          process.exit(1)
         }
       }
     }
@@ -58,7 +98,19 @@ function errorHandler(nodeEnv: string): Koa.Middleware {
 export async function createServer(context: AppContext) {
   const router = new KoaRouter()
 
-  const routers: AppRouter[] = []
+  const routers: AppRouter[] = [
+    new AttendanceRouter(context),
+    new CarbonRouter(context),
+    new ConferenceRouter(context),
+    new RegistrationRouter(context),
+  ]
+
+  const appBrokers: AppBroker[] = [
+    new AuthBroker(context),
+    new ChannelBroker(context),
+    new InterpreterBroker(context),
+    new MetricsBroker(context),
+  ]
 
   for (const appRouter of routers) {
     appRouter.apply(router)
@@ -70,11 +122,29 @@ export async function createServer(context: AppContext) {
     .use(koaJson())
     .use(koaBodyParser())
     .use(debugMiddleware())
-    .use(errorHandler(context.env.NODE_ENV))
+    .use(httpErrorHandler(context.env.NODE_ENV === 'production'))
     .use(router.routes())
     .use(router.allowedMethods())
 
   const server = http.createServer(app.callback())
+  const io = new SocketIoServer(server, {})
+  context.sockets.setIo(io)
 
-  return { app, server, router }
+  io.on('connection', (socket) => {
+    const m = ioErrorHandler(socket)
+    appBrokers.forEach((b) => b.socketConnected(socket, m))
+
+    socket.on('disconnect', () => {
+      // TODO: potential uncaught promises here
+      appBrokers.forEach((b) => b.socketDisconnected(socket))
+    })
+  })
+
+  if (context.env.REDIS_URL) {
+    const pub = createRedisClient(context.env.REDIS_URL)
+    const sub = createRedisClient(context.env.REDIS_URL)
+    io.adapter(socketIoRedisAdapter(pub, sub))
+  }
+
+  return { app, server, router, io }
 }

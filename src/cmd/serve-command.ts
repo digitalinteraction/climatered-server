@@ -1,5 +1,4 @@
 import fs from 'fs/promises'
-import dotenv from 'dotenv'
 
 import { createTerminus } from '@godaddy/terminus'
 import {
@@ -7,7 +6,6 @@ import {
   CarbonRepository,
   ConferenceRepository,
   createMemoryStore,
-  EmailService,
   I18nService,
   InterpreterRepository,
   JwtService,
@@ -15,17 +13,18 @@ import {
   MetricsRepository,
   PostgresService,
   RegistrationRepository,
-  S3Service,
   SemaphoreService,
 } from '@openlab/deconf-api-toolkit'
 import {
   AppContext,
   createDebug,
   createEnv,
+  EmailService,
   loadConfig,
+  S3Service,
+  SocketService,
   UrlService,
 } from '../lib/module'
-import { SocketService } from '../lib/sockets-service'
 import { createServer } from '../server'
 
 const debug = createDebug('cr:cmd:serve')
@@ -35,7 +34,7 @@ export interface ServeCommandOptions {
 }
 
 export async function serveCommand(options: ServeCommandOptions) {
-  dotenv.config()
+  debug('start')
 
   const env = createEnv()
   const config = await loadConfig()
@@ -98,7 +97,7 @@ export async function serveCommand(options: ServeCommandOptions) {
     healthChecks: {
       '/healthz': async () => {
         await store.checkHealth()
-        await postgres
+        await postgres.run((c) => c.sql`SELECT 'OK';`)
       },
     },
     beforeShutdown: () => {
