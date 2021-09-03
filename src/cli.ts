@@ -8,6 +8,7 @@ import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
 import { devAuthCommand } from './cmd/dev-auth-command'
+import { fakeScheduleCommand } from './cmd/fake-schedule-command'
 import { geocodeCommand } from './cmd/geocode-command'
 import { hackCommand, allHackCommands } from './cmd/hack-command'
 import { migrateCommand } from './cmd/migrate-command'
@@ -33,7 +34,7 @@ function errorHandler(error: any) {
   process.exit(1)
 }
 
-yargs.command(
+cli.command(
   'serve',
   'Run the server',
   (yargs) =>
@@ -45,14 +46,14 @@ yargs.command(
   (args) => serveCommand(args).catch(errorHandler)
 )
 
-yargs.command(
+cli.command(
   'scrape-pretalx',
   'Scrape content from pretalx and put into redis',
   (yargs) => yargs,
   (args) => scrapePretalxCommand(args).catch(errorHandler)
 )
 
-yargs.command(
+cli.command(
   'pretalx <data>',
   'Fetch and output data from pretalx',
   (yargs) =>
@@ -64,7 +65,7 @@ yargs.command(
   (args) => pretalxDataCommand(args).catch(errorHandler)
 )
 
-yargs.command(
+cli.command(
   'dev-auth',
   'Generate an authentication for local Development',
   (yargs) =>
@@ -75,7 +76,7 @@ yargs.command(
   (args) => devAuthCommand(args).catch(errorHandler)
 )
 
-yargs.command(
+cli.command(
   'hack <hack>',
   'Run one of the hack commands',
   (yargs) =>
@@ -87,14 +88,14 @@ yargs.command(
   (args) => hackCommand(args).catch(errorHandler)
 )
 
-yargs.command(
+cli.command(
   'migrate',
   'Run any new database migrations',
   (yargs) => yargs,
   (args) => migrateCommand(args).catch(errorHandler)
 )
 
-yargs.command(
+cli.command(
   'rebuild-audio <directory> <outfile>',
   'Rebuild pre-downloaded audio chunks in a given folder into a single wav file',
   (yargs) =>
@@ -104,7 +105,15 @@ yargs.command(
   async (args) => rebuildAudioCommand(args).catch(errorHandler)
 )
 
-yargs.command(
+cli.command(
+  'fake-schedule',
+  'Generate a fake schedule and put it into redis',
+  (yargs) =>
+    yargs.option('interpreter', { type: 'string', array: true, default: [] }),
+  (args) => fakeScheduleCommand(args).catch(errorHandler)
+)
+
+cli.command(
   'geocode',
   'Generate and output geocoded locations',
   (yargs) => yargs,
