@@ -18,6 +18,9 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
   get #jwt() {
     return this.#context.jwt
   }
+  get #email() {
+    return this.#context.email
+  }
 
   #context: Context
   #routes: RegistrationRoutes
@@ -38,7 +41,7 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
     })
 
     router.post('registration.startLogin', '/auth/login', async (ctx) => {
-      await this.#routes.startEmailLogin(ctx.body)
+      await this.#routes.startEmailLogin(ctx.request.body)
       ctx.body = 'ok'
     })
 
@@ -47,14 +50,13 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
       '/auth/login/:token',
       async (ctx) => {
         const { token } = validateStruct(ctx.params, TokenStruct)
-        ctx.body = {
-          token: await this.#routes.finishEmailLogin(token),
-        }
+        const url = await this.#routes.finishEmailLogin(token)
+        ctx.redirect(url.toString())
       }
     )
 
     router.post('registration.startRegister', '/auth/register', async (ctx) => {
-      await this.#routes.startRegister(ctx.body)
+      await this.#routes.startRegister(ctx.request.body)
       ctx.body = 'ok'
     })
 
@@ -79,10 +81,26 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
   //
   // RegistrationMailer
   //
-  sendLoginEmail(registration: Registration, token: string): Promise<void> {
-    throw new Error('Method not implemented.')
+  async sendLoginEmail(
+    registration: Registration,
+    token: string
+  ): Promise<void> {
+    console.log(
+      'TODO: sendLoginEmail email=%o token=%o',
+      registration.email,
+      token
+    )
+    // throw new Error('Method not implemented.')
   }
-  sendVerifyEmail(registration: Registration, token: string): Promise<void> {
-    throw new Error('Method not implemented.')
+  async sendVerifyEmail(
+    registration: Registration,
+    token: string
+  ): Promise<void> {
+    // throw new Error('Method not implemented.')
+    console.log(
+      'TODO: sendVerifyEmail email=%o token=%o',
+      registration.email,
+      token
+    )
   }
 }
