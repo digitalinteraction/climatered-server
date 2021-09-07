@@ -28,6 +28,7 @@ import { AuthBroker } from './deconf/auth-broker'
 import { ChannelBroker } from './deconf/channel-broker'
 import { InterpreterBroker } from './deconf/interpreter-broker'
 import { MetricsBroker } from './deconf/metrics-broker'
+import { ContentRouter } from './content/content-router'
 
 const debug = createDebug('cr:server')
 
@@ -103,6 +104,7 @@ export async function createServer(context: AppContext) {
     new CarbonRouter(context),
     new ConferenceRouter(context),
     new RegistrationRouter(context),
+    new ContentRouter(context),
   ]
 
   const appBrokers: AppBroker[] = [

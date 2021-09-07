@@ -4,11 +4,12 @@
 // The cli entrypoint
 //
 
-import yargs from 'yargs'
+import yargs, { string } from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
 import { devAuthCommand } from './cmd/dev-auth-command'
 import { fakeScheduleCommand } from './cmd/fake-schedule-command'
+import { fetchContentCommand } from './cmd/fetch-content-command'
 import { geocodeCommand } from './cmd/geocode-command'
 import { hackCommand, allHackCommands } from './cmd/hack-command'
 import { migrateCommand } from './cmd/migrate-command'
@@ -118,6 +119,24 @@ cli.command(
   'Generate and output geocoded locations',
   (yargs) => yargs,
   (args) => geocodeCommand(args).catch(errorHandler)
+)
+
+cli.command(
+  'fetch-content',
+  'Fetch content from climatered-schedule and put into redis',
+  (yargs) =>
+    yargs
+      .positional('remote', {
+        type: 'string',
+        describe: 'The remote of the git repository',
+        default: 'git@github.com:digitalinteraction/climatered-content.git',
+      })
+      .positional('branch', {
+        type: 'string',
+        describe: 'The branch to use',
+        default: 'main',
+      }),
+  (args) => fetchContentCommand(args).catch(errorHandler)
 )
 
 // Execute the CLI
