@@ -56,7 +56,11 @@ export class SocketService implements Readonly<DeconfSocketService> {
     return sockets.map((r) => r.id)
   }
 
-  sendError(error: ApiError): void {
-    // ... TBR
+  sendError(socketId: string, error: ApiError): void {
+    this.#io.to(socketId).emit('api_error', {
+      status: error.status,
+      codes: error.codes,
+      stack: error.stack,
+    })
   }
 }

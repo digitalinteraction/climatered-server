@@ -1,5 +1,6 @@
 import { MetricsSockets } from '@openlab/deconf-api-toolkit'
 import { Socket } from 'socket.io'
+import { object, string, Struct } from 'superstruct'
 import {
   AppBroker,
   AppContext,
@@ -11,10 +12,23 @@ const debug = createDebug('cr:deconf:metrics-broker')
 
 type Context = AppContext
 
+const eventStructs = new Map<string, Struct<any>>()
+eventStructs.set(
+  'page-view',
+  object({
+    path: string(),
+  })
+)
+
+// TODO: add more metrics
+
 export class MetricsBroker implements AppBroker {
   #sockets: MetricsSockets
   constructor(context: Context) {
-    this.#sockets = new MetricsSockets(context)
+    this.#sockets = new MetricsSockets({
+      ...context,
+      eventStructs,
+    })
   }
 
   async socketConnected(socket: Socket, handleErrors: SocketErrorHandler) {
