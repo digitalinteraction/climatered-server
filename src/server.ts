@@ -19,16 +19,16 @@ import {
   AppRouter,
   AppBroker,
   createRedisClient,
-} from './lib/module'
-import { AttendanceRouter } from './deconf/attendance-router'
-import { CarbonRouter } from './deconf/carbon-router'
-import { ConferenceRouter } from './deconf/conference-router'
-import { RegistrationRouter } from './deconf/registration-router'
-import { AuthBroker } from './deconf/auth-broker'
-import { ChannelBroker } from './deconf/channel-broker'
-import { InterpreterBroker } from './deconf/interpreter-broker'
-import { MetricsBroker } from './deconf/metrics-broker'
-import { ContentRouter } from './content/content-router'
+} from './lib/module.js'
+import { AttendanceRouter } from './deconf/attendance-router.js'
+import { CarbonRouter } from './deconf/carbon-router.js'
+import { ConferenceRouter } from './deconf/conference-router.js'
+import { RegistrationRouter } from './deconf/registration-router.js'
+import { AuthBroker } from './deconf/auth-broker.js'
+import { ChannelBroker } from './deconf/channel-broker.js'
+import { InterpreterBroker } from './deconf/interpreter-broker.js'
+import { MetricsBroker } from './deconf/metrics-broker.js'
+import { ContentRouter } from './content/content-router.js'
 
 const debug = createDebug('cr:server')
 

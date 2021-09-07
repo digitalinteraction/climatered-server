@@ -1,7 +1,9 @@
+import { promisify } from 'util'
+
 import { RedisClient } from 'redis'
 import { KeyValueService } from '@openlab/deconf-api-toolkit'
-import { createRedisClient } from './redis'
-import { promisify } from 'util'
+
+import { createRedisClient } from './redis.js'
 
 //
 // TODO: move to ./redis.ts ?

@@ -4,7 +4,7 @@ import {
   MigrateService,
   PostgresService,
 } from '@openlab/deconf-api-toolkit'
-import { createEnv, createDebug } from '../lib/module'
+import { createEnv, createDebug } from '../lib/module.js'
 
 const debug = createDebug('cr:cmd:migrate')
 

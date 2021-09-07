@@ -1,6 +1,6 @@
 import { ChannelSockets } from '@openlab/deconf-api-toolkit'
 import { Socket } from 'socket.io'
-import { AppBroker, AppContext, SocketErrorHandler } from '../lib/module'
+import { AppBroker, AppContext, SocketErrorHandler } from '../lib/module.js'
 
 type Context = AppContext
 

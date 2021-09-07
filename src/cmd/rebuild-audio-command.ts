@@ -2,7 +2,7 @@ import fs from 'fs/promises'
 import path from 'path'
 import waveheader from 'waveheader'
 
-import { createDebug } from '../lib/module'
+import { createDebug } from '../lib/module.js'
 
 const debug = createDebug('cr:cmd:rebuild-audio')
 

@@ -1,7 +1,6 @@
 import {
   ConferenceConfig,
   Interpreter,
-  Registration,
   Session,
   SessionSlot,
   SessionState,
@@ -11,7 +10,8 @@ import {
   Theme,
   Track,
 } from '@openlab/deconf-shared'
-import { createDebug, createEnv, RedisService } from '../lib/module'
+
+import { createDebug, createEnv, RedisService } from '../lib/module.js'
 
 const debug = createDebug('cr:cmd:fake-schedule')
 

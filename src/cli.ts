@@ -4,22 +4,22 @@
 // The cli entrypoint
 //
 
-import yargs, { string } from 'yargs'
+import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
 
-import { devAuthCommand } from './cmd/dev-auth-command'
-import { fakeScheduleCommand } from './cmd/fake-schedule-command'
-import { fetchContentCommand } from './cmd/fetch-content-command'
-import { geocodeCommand } from './cmd/geocode-command'
-import { hackCommand, allHackCommands } from './cmd/hack-command'
-import { migrateCommand } from './cmd/migrate-command'
+import { devAuthCommand } from './cmd/dev-auth-command.js'
+import { fakeScheduleCommand } from './cmd/fake-schedule-command.js'
+import { fetchContentCommand } from './cmd/fetch-content-command.js'
+import { geocodeCommand } from './cmd/geocode-command.js'
+import { hackCommand, allHackCommands } from './cmd/hack-command.js'
+import { migrateCommand } from './cmd/migrate-command.js'
 import {
   pretalxDataCommand,
   pretalxDataCommands,
-} from './cmd/pretalx-data-command'
-import { rebuildAudioCommand } from './cmd/rebuild-audio-command'
-import { scrapePretalxCommand } from './cmd/scrape-pretalx-command'
-import { serveCommand } from './cmd/serve-command'
+} from './cmd/pretalx-data-command.js'
+import { rebuildAudioCommand } from './cmd/rebuild-audio-command.js'
+import { scrapePretalxCommand } from './cmd/scrape-pretalx-command.js'
+import { serveCommand } from './cmd/serve-command.js'
 
 const cli = yargs(hideBin(process.argv))
 

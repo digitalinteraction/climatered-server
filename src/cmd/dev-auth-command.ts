@@ -5,8 +5,9 @@ import {
   RegistrationRepository,
 } from '@openlab/deconf-api-toolkit'
 import { AuthToken } from '@openlab/deconf-shared'
-import { createEnv, UrlService, createDebug } from '../lib/module'
 import jsonwebtoken from 'jsonwebtoken'
+
+import { createEnv, UrlService, createDebug } from '../lib/module.js'
 
 const debug = createDebug('cr:cmd:dev-auth')
 

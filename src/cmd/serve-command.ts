@@ -20,14 +20,13 @@ import {
   createDebug,
   createEnv,
   EmailService,
-  EnvRecord,
   loadConfig,
   RedisService,
   S3Service,
   SocketService,
   UrlService,
-} from '../lib/module'
-import { createServer } from '../server'
+} from '../lib/module.js'
+import { createServer } from '../server.js'
 
 const debug = createDebug('cr:cmd:serve')
 

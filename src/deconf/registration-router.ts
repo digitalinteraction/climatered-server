@@ -2,9 +2,9 @@ import KoaRouter from '@koa/router'
 import {
   RegistrationMailer,
   RegistrationRoutes,
-} from '@openlab/deconf-api-toolkit/dist/module'
-import { Registration } from '@openlab/deconf-shared/dist/registration'
-import { AppContext, AppRouter, validateStruct } from '../lib/module'
+} from '@openlab/deconf-api-toolkit'
+import { Registration } from '@openlab/deconf-shared'
+import { AppContext, AppRouter, validateStruct } from '../lib/module.js'
 
 import { object, string } from 'superstruct'
 

@@ -1,4 +1,4 @@
-import { createDebug } from '../lib/module'
+import { createDebug } from '../lib/module.js'
 
 const debug = createDebug('cr:cmd:pretalx-data')
 

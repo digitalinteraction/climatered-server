@@ -1,10 +1,7 @@
 import dedent from 'dedent'
 import KoaRouter from '@koa/router'
-import {
-  ApiError,
-  ConferenceRoutes,
-} from '@openlab/deconf-api-toolkit/dist/module'
-import { AppContext, AppRouter, validateStruct } from '../lib/module'
+import { ApiError, ConferenceRoutes } from '@openlab/deconf-api-toolkit'
+import { AppContext, AppRouter, validateStruct } from '../lib/module.js'
 
 import { object, string } from 'superstruct'
 

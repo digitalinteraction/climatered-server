@@ -2,9 +2,16 @@ import path from 'path'
 import fs from 'fs/promises'
 import cp from 'child_process'
 import { promisify } from 'util'
-import { createDebug, createEnv, RedisService } from '../lib/module'
+
 import { assert as assertStruct } from 'superstruct'
-import { ConferenceConfigStruct } from '@openlab/deconf-api-toolkit/dist/module'
+import { ConferenceConfigStruct } from '@openlab/deconf-api-toolkit'
+
+import { remark } from 'remark'
+import remarkHtml from 'remark-html'
+import { findAndReplace } from 'mdast-util-find-and-replace'
+import { u } from 'unist-builder'
+
+import { createDebug, createEnv, RedisService } from '../lib/module.js'
 
 const debug = createDebug('cr:cmd:fetch-content')
 const asyncExec = promisify(cp.exec)
@@ -14,53 +21,9 @@ function exec(cmd: string) {
   return asyncExec(cmd)
 }
 
-async function validateSettings(tmpdir: string) {
-  const file = path.join(tmpdir, 'content/settings.json')
-  try {
-    debug('checking settings %o', file)
-    return JSON.parse(await fs.readFile(file, 'utf8'))
-  } catch (error) {
-    console.error('Error with settings.json')
-    console.error(error)
-    throw error
-  }
-}
-async function validateContent(tmpdir: string, dir: string) {
-  debug('validateContent %o', dir)
-  try {
-    return {
-      en: await fs.readFile(path.join(tmpdir, dir, 'en.md'), 'utf8'),
-      fr: await fs.readFile(path.join(tmpdir, dir, 'fr.md'), 'utf8'),
-      es: await fs.readFile(path.join(tmpdir, dir, 'es.md'), 'utf8'),
-      ar: await fs.readFile(path.join(tmpdir, dir, 'ar.md'), 'utf8'),
-    }
-  } catch (error) {
-    console.error('Error reading content ')
-    throw error
-  }
-}
-
-async function* contentInterator(tmpdir: string, keys: string[]) {
-  const content: Array<{ key: string; files: Record<string, string> }> = []
-
-  debug('contentInterator validating %o', keys)
-  for (const key of keys) {
-    content.push({
-      key,
-      files: await validateContent(tmpdir, path.join('content', key)),
-    })
-  }
-
-  const redis: RedisService = yield
-
-  debug('contentInterator storing %o', keys)
-  for (const { key, files } of content) {
-    await redis.put(`content.${key}`, files)
-  }
-}
-
 export const CONTENT_KEYS = [
   'about',
+  'atrium-public',
   'atrium-active',
   'guidelines',
   'privacy',
@@ -70,6 +33,7 @@ export const CONTENT_KEYS = [
 export interface FetchContentCommandOptions {
   remote: string
   branch: string
+  existingRepo?: string
 }
 
 export async function fetchContentCommand(options: FetchContentCommandOptions) {
@@ -77,9 +41,9 @@ export async function fetchContentCommand(options: FetchContentCommandOptions) {
   if (!env.REDIS_URL) throw new Error('REDIS_URL not set')
 
   const redis = new RedisService(env.REDIS_URL)
-  const tmpdir = await fs.mkdtemp('content_')
+  const repoDir = options.existingRepo ?? (await fs.mkdtemp('content_'))
 
-  debug('start tmpdir=%o', tmpdir)
+  debug('start tmpdir=%o', repoDir)
 
   // Ensure we were passed a valid url
   const { stderr } = await exec(`git ls-remote ${options.remote}`)
@@ -88,14 +52,14 @@ export async function fetchContentCommand(options: FetchContentCommandOptions) {
   try {
     // Clone the content repo into a temporary directory
     await exec(
-      `git clone --branch ${options.branch} ${options.remote} "${tmpdir}"`
+      `git clone --branch ${options.branch} ${options.remote} "${repoDir}"`
     )
 
     // Get and validate settings
-    const settings = await validateSettings(tmpdir)
+    const settings = await validateSettings(repoDir)
 
     // Get and validate page content
-    const content = contentInterator(tmpdir, CONTENT_KEYS)
+    const content = contentInterator(repoDir, CONTENT_KEYS)
     await content.next()
 
     // Put settings into redis
@@ -105,9 +69,85 @@ export async function fetchContentCommand(options: FetchContentCommandOptions) {
     await content.next(redis)
   } catch (error) {
     console.error(error)
-    process.exit(1)
+    process.exitCode = 1
   } finally {
-    await exec(`rm -rf "${tmpdir}"`)
+    if (!options.existingRepo) {
+      await exec(`rm -rf "${repoDir}"`)
+    }
+
     await redis.close()
+  }
+}
+
+//
+// Helpers
+//
+
+async function validateSettings(tmpdir: string) {
+  const file = path.join(tmpdir, 'content/settings.json')
+  try {
+    debug('checking settings %o', file)
+    const settings = JSON.parse(await fs.readFile(file, 'utf8'))
+
+    if (settings.startDate) settings.startDate = new Date(settings.startDate)
+    if (settings.endDate) settings.endDate = new Date(settings.endDate)
+
+    assertStruct(settings, ConferenceConfigStruct)
+    return settings
+  } catch (error) {
+    console.error('Error with settings.json')
+    console.error(error)
+    throw error
+  }
+}
+
+async function processMarkdown(file: string) {
+  const markdown = await fs.readFile(file, 'utf8')
+
+  return remark()
+    .use(remarkHtml, {
+      sanitize: false,
+    })
+    .use(() => {
+      return (rootNode) => {
+        findAndReplace(rootNode, /^%+(.+)%+$/, (match, id) =>
+          u('html', `<div id="${id}"></div>`)
+        )
+      }
+    })
+    .processSync(markdown)
+    .toString()
+}
+
+async function validateContent(repoDir: string, dir: string) {
+  debug('validateContent %o', dir)
+  try {
+    return {
+      en: await processMarkdown(path.join(repoDir, dir, 'en.md')),
+      fr: await processMarkdown(path.join(repoDir, dir, 'fr.md')),
+      es: await processMarkdown(path.join(repoDir, dir, 'es.md')),
+      ar: await processMarkdown(path.join(repoDir, dir, 'ar.md')),
+    }
+  } catch (error) {
+    console.error('Error reading content')
+    throw error
+  }
+}
+
+async function* contentInterator(repoDir: string, keys: string[]) {
+  const content: Array<{ key: string; files: Record<string, string> }> = []
+
+  debug('contentInterator validating %o', keys)
+  for (const key of keys) {
+    const files = await validateContent(repoDir, path.join('content', key))
+    console.log(files)
+    content.push({ key, files })
+  }
+
+  const redis: RedisService = yield
+
+  debug('contentInterator storing %o', keys)
+  for (const { key, files } of content) {
+    await redis.put(`content.${key}`, files)
   }
 }

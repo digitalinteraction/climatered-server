@@ -1,8 +1,7 @@
 import got from 'got'
-import { validateEnv } from 'valid-env'
 import countries from 'i18n-iso-countries'
 
-import { createDebug } from '../lib/module'
+import { createDebug } from '../lib/module.js'
 
 const debug = createDebug('cr:cmd:geocode')
 

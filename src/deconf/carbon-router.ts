@@ -1,6 +1,6 @@
 import KoaRouter from '@koa/router'
-import { CarbonRoutes } from '@openlab/deconf-api-toolkit/dist/module'
-import { AppContext, AppRouter, validateStruct } from '../lib/module'
+import { CarbonRoutes } from '@openlab/deconf-api-toolkit'
+import { AppContext, AppRouter, validateStruct } from '../lib/module.js'
 
 type Context = AppContext
 

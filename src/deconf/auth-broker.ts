@@ -5,7 +5,7 @@ import {
   AppContext,
   createDebug,
   SocketErrorHandler,
-} from '../lib/module'
+} from '../lib/module.js'
 
 const debug = createDebug('cr:deconf:auth-broker')
 

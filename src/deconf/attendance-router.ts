@@ -2,7 +2,7 @@ import KoaRouter from '@koa/router'
 import { object, string } from 'superstruct'
 
 import { AttendanceRoutes } from '@openlab/deconf-api-toolkit'
-import { AppContext, AppRouter, validateStruct } from '../lib/module'
+import { AppContext, AppRouter, validateStruct } from '../lib/module.js'
 
 const SessionIdStruct = object({
   sessionId: string(),

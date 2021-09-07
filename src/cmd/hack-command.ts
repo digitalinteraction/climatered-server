@@ -4,7 +4,7 @@ import {
   RESOURCE_CARBON_LOCATIONS,
 } from '@openlab/deconf-api-toolkit'
 import { array, assert as assertStruct } from 'superstruct'
-import { createDebug } from '../lib/module'
+import { createDebug } from '../lib/module.js'
 
 const debug = createDebug('cr:cmd:hack')
 
