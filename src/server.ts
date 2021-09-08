@@ -13,7 +13,7 @@ import { createAdapter as socketIoRedisAdapter } from '@socket.io/redis-adapter'
 import ms from 'ms'
 import createDebug from 'debug'
 
-import { ApiError } from '@openlab/deconf-api-toolkit'
+import { ApiError, StructApiError } from '@openlab/deconf-api-toolkit'
 import {
   AppContext,
   AppRouter,
@@ -58,6 +58,10 @@ function httpErrorHandler(isProduction: boolean): Koa.Middleware {
         ctx.body = {
           error: error.message,
           codes: error.codes,
+          stack: error.stack,
+        }
+        if (error instanceof StructApiError) {
+          ctx.body.failures = error.failures
         }
       } else if (error instanceof Error) {
         ctx.status = 500

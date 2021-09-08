@@ -2,19 +2,24 @@ import KoaRouter from '@koa/router'
 import {
   RegistrationMailer,
   RegistrationRoutes,
+  validateStruct,
 } from '@openlab/deconf-api-toolkit'
 import { Registration } from '@openlab/deconf-shared'
-import { AppContext, AppRouter, validateStruct } from '../lib/module.js'
+import { AppContext, AppRouter } from '../lib/module.js'
 
-import { any, Infer, object, string } from 'superstruct'
+import { Describe, boolean, object, string } from 'superstruct'
 
 const TokenStruct = object({
   token: string(),
 })
 
 // TODO: move somewhere better
-type UserData = Infer<typeof UserDataStruct>
-const UserDataStruct = object({})
+export interface UserData {
+  marketing: boolean
+}
+const UserDataStruct: Describe<UserData> = object({
+  marketing: boolean(),
+})
 
 type Context = AppContext
 
@@ -27,13 +32,15 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
   }
 
   #context: Context
-  #routes: RegistrationRoutes<UserData>
+  #routes: RegistrationRoutes<any>
   constructor(context: Context) {
     this.#context = context
     this.#routes = new RegistrationRoutes({
       ...context,
       mailer: this,
-      userDataStruct: UserDataStruct,
+
+      // TODO: work out how to properly type this
+      userDataStruct: UserDataStruct as any,
     })
   }
 
@@ -44,7 +51,7 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
     router.get('registration.me', '/auth/me', async (ctx) => {
       const token = this.#jwt.getRequestAuth(ctx.request.header)
       ctx.body = {
-        profile: await this.#routes.getRegistration(token),
+        registration: await this.#routes.getRegistration(token),
       }
     })
 

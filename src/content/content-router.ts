@@ -1,7 +1,8 @@
 import KoaRouter from '@koa/router'
+import { validateStruct } from '@openlab/deconf-api-toolkit'
 import { enums, object } from 'superstruct'
 import { CONTENT_KEYS } from '../cmd/fetch-content-command.js'
-import { AppContext, AppRouter, validateStruct } from '../lib/module.js'
+import { AppContext, AppRouter } from '../lib/module.js'
 
 const SlugStruct = object({
   slug: enums(CONTENT_KEYS),

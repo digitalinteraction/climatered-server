@@ -9,6 +9,5 @@ export * from './s3-service.js'
 export * from './sockets-service.js'
 export * from './store.js'
 export * from './url-service.js'
-export * from './validate-struct.js'
 
 export { default as createDebug } from 'debug'
