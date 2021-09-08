@@ -3,7 +3,7 @@ import {
   DeconfConfigStruct,
   loadConfig as loadDeconfConfig,
 } from '@openlab/deconf-api-toolkit'
-import { DeconfConfig } from '@openlab/deconf-shared/dist/lib'
+import { DeconfConfig } from '@openlab/deconf-shared'
 
 import { object, assign, Infer, Describe } from 'superstruct'
 

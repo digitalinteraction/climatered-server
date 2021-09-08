@@ -6,11 +6,15 @@ import {
 import { Registration } from '@openlab/deconf-shared'
 import { AppContext, AppRouter, validateStruct } from '../lib/module.js'
 
-import { object, string } from 'superstruct'
+import { any, Infer, object, string } from 'superstruct'
 
 const TokenStruct = object({
   token: string(),
 })
+
+// TODO: move somewhere better
+type UserData = Infer<typeof UserDataStruct>
+const UserDataStruct = object({})
 
 type Context = AppContext
 
@@ -23,10 +27,14 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
   }
 
   #context: Context
-  #routes: RegistrationRoutes
+  #routes: RegistrationRoutes<UserData>
   constructor(context: Context) {
     this.#context = context
-    this.#routes = new RegistrationRoutes({ ...context, mailer: this })
+    this.#routes = new RegistrationRoutes({
+      ...context,
+      mailer: this,
+      userDataStruct: UserDataStruct,
+    })
   }
 
   //
