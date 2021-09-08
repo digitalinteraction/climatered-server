@@ -36,7 +36,7 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
     router.get('registration.me', '/auth/me', async (ctx) => {
       const token = this.#jwt.getRequestAuth(ctx.request.header)
       ctx.body = {
-        registration: await this.#routes.getRegistration(token),
+        profile: await this.#routes.getRegistration(token),
       }
     })
 
@@ -65,9 +65,8 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
       '/auth/register/:token',
       async (ctx) => {
         const { token } = validateStruct(ctx.params, TokenStruct)
-        ctx.body = {
-          token: await this.#routes.finishRegister(token),
-        }
+        const url = await this.#routes.finishRegister(token)
+        ctx.redirect(url.toString())
       }
     )
 
