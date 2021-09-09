@@ -79,7 +79,11 @@ function getFakeSchedule() {
 
   const types: SessionType[] = [
     mockSessionType({ id: 'plenary', title: mockLocalised('Plenary') }),
-    mockSessionType({ id: 'workshop', title: mockLocalised('Workshop') }),
+    mockSessionType({
+      id: 'workshop',
+      title: mockLocalised('Workshop'),
+      layout: 'workshop',
+    }),
   ]
 
   const themes: Theme[] = [
