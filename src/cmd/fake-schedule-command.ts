@@ -113,10 +113,14 @@ function getFakeSchedule() {
     }),
   ]
 
+  const random = (min: number, max: number) => {
+    return min + Math.floor(Math.random() * (max - min))
+  }
+
   const sessionBase = () => ({
     track: pickOne(tracks).id,
-    themes: pickMany(themes, 2).map((t) => t.id),
-    speakers: pickMany(speakers, 3).map((s) => s.id),
+    themes: pickMany(themes, random(2, 4)).map((t) => t.id),
+    speakers: pickMany(speakers, random(1, 3)).map((s) => s.id),
   })
 
   const sessions: Session[] = [
@@ -185,7 +189,7 @@ export const mockSession = makeFixture<Session>({
   themes: ['theme-a', 'theme-b'],
   coverImage: undefined,
   title: mockLocalised('Session Title'),
-  content: mockLocalised('Session Info'),
+  content: mockLocalised('Lorem ipsum sil dor amet ...'),
   links: [{ type: 'video', url: 'https://youtu.be', language: 'en' }],
   hostLanguages: ['en'],
   enableInterpretation: false,
