@@ -135,6 +135,10 @@ cli.command(
         type: 'string',
         describe: 'The branch to use',
         default: 'main',
+      })
+      .positional('reuse', {
+        type: 'string',
+        describe: 'A previously checked out repo to re-use',
       }),
   (args) => fetchContentCommand(args).catch(errorHandler)
 )

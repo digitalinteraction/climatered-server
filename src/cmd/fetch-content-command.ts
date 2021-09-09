@@ -28,12 +28,13 @@ export const CONTENT_KEYS = [
   'guidelines',
   'privacy',
   'terms',
+  'faqs',
 ]
 
 export interface FetchContentCommandOptions {
   remote: string
   branch: string
-  existingRepo?: string
+  reuse?: string
 }
 
 export async function fetchContentCommand(options: FetchContentCommandOptions) {
@@ -41,19 +42,23 @@ export async function fetchContentCommand(options: FetchContentCommandOptions) {
   if (!env.REDIS_URL) throw new Error('REDIS_URL not set')
 
   const redis = new RedisService(env.REDIS_URL)
-  const repoDir = options.existingRepo ?? (await fs.mkdtemp('content_'))
+  const repoDir = options.reuse ?? (await fs.mkdtemp('content_'))
 
   debug('start tmpdir=%o', repoDir)
 
   // Ensure we were passed a valid url
-  const { stderr } = await exec(`git ls-remote ${options.remote}`)
-  if (stderr) throw new Error(stderr)
+  if (!options.reuse) {
+    const { stderr } = await exec(`git ls-remote ${options.remote}`)
+    if (stderr) throw new Error(stderr)
+  }
 
   try {
     // Clone the content repo into a temporary directory
-    await exec(
-      `git clone --branch ${options.branch} ${options.remote} "${repoDir}"`
-    )
+    if (!options.reuse) {
+      await exec(
+        `git clone --branch ${options.branch} ${options.remote} "${repoDir}"`
+      )
+    }
 
     // Get and validate settings
     const settings = await validateSettings(repoDir)
@@ -71,7 +76,7 @@ export async function fetchContentCommand(options: FetchContentCommandOptions) {
     console.error(error)
     process.exitCode = 1
   } finally {
-    if (!options.existingRepo) {
+    if (!options.reuse) {
       await exec(`rm -rf "${repoDir}"`)
     }
 
@@ -140,7 +145,6 @@ async function* contentInterator(repoDir: string, keys: string[]) {
   debug('contentInterator validating %o', keys)
   for (const key of keys) {
     const files = await validateContent(repoDir, path.join('content', key))
-    console.log(files)
     content.push({ key, files })
   }
 
