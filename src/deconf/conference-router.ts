@@ -39,7 +39,7 @@ export class ConferenceRouter implements AppRouter {
 
       ctx.set('content-type', 'text/calendar')
       ctx.set('content-disposition', `attachment; filename="${sessionId}.ics`)
-      ctx.body = this.#routes.generateIcs(locale, sessionId)
+      ctx.body = await this.#routes.generateIcs(locale, sessionId)
     })
 
     router.get(
