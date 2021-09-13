@@ -50,14 +50,11 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
   apply(router: KoaRouter) {
     router.get('registration.me', '/auth/me', async (ctx) => {
       const token = this.#jwt.getRequestAuth(ctx.request.header)
-      ctx.body = {
-        registration: await this.#routes.getRegistration(token),
-      }
+      ctx.body = await this.#routes.getRegistration(token)
     })
 
     router.post('registration.startLogin', '/auth/login', async (ctx) => {
-      await this.#routes.startEmailLogin(ctx.request.body)
-      ctx.body = 'ok'
+      ctx.body = await this.#routes.startEmailLogin(ctx.request.body)
     })
 
     router.get(
@@ -71,8 +68,7 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
     )
 
     router.post('registration.startRegister', '/auth/register', async (ctx) => {
-      await this.#routes.startRegister(ctx.request.body)
-      ctx.body = 'ok'
+      ctx.body = await this.#routes.startRegister(ctx.request.body)
     })
 
     router.get(
@@ -87,8 +83,7 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
 
     router.delete('registration.unregister', '/auth/me', async (ctx) => {
       const token = this.#jwt.getRequestAuth(ctx.request.headers)
-      await this.#routes.unregister(token)
-      ctx.body = 'ok'
+      ctx.body = await this.#routes.unregister(token)
     })
   }
 

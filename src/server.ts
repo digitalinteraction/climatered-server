@@ -37,6 +37,19 @@ function debugMiddleware(): Koa.Middleware {
   return async (ctx, next) => {
     const start = Date.now()
     await next()
+
+    // Check for invalid ctx.body use
+    if (ctx.body instanceof Promise) {
+      console.error('A promise was set on ctx.body')
+      console.error(
+        'Request: %s %i %s',
+        ctx.request.method,
+        ctx.response.status,
+        ctx.request.path
+      )
+      process.exit(1)
+    }
+
     const dt = Date.now() - start
     debug(
       '%s %i %s %s',

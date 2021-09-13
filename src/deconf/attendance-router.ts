@@ -29,8 +29,7 @@ export class AttendanceRouter implements AppRouter {
       async (ctx) => {
         const { sessionId } = validateStruct(ctx.params, SessionIdStruct)
         const token = this.#jwt.getRequestAuth(ctx.request.headers)
-        await this.#routes.attend(token, sessionId)
-        ctx.body = 'ok'
+        ctx.body = await this.#routes.attend(token, sessionId)
       }
     )
 
@@ -40,8 +39,7 @@ export class AttendanceRouter implements AppRouter {
       async (ctx) => {
         const { sessionId } = validateStruct(ctx.params, SessionIdStruct)
         const token = this.#jwt.getRequestAuth(ctx.request.headers)
-        await this.#routes.unattend(token, sessionId)
-        ctx.body = 'ok'
+        ctx.body = await this.#routes.unattend(token, sessionId)
       }
     )
 
@@ -53,9 +51,7 @@ export class AttendanceRouter implements AppRouter {
 
     router.get('attendance.user', '/attendance/me', async (ctx) => {
       const token = this.#jwt.getRequestAuth(ctx.request.headers)
-      ctx.body = {
-        attendance: this.#routes.getUserAttendance(token),
-      }
+      ctx.body = await this.#routes.getUserAttendance(token)
     })
   }
 }
