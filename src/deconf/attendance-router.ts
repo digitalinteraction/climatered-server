@@ -43,15 +43,15 @@ export class AttendanceRouter implements AppRouter {
       }
     )
 
+    router.get('attendance.user', '/attendance/me', async (ctx) => {
+      const token = this.#jwt.getRequestAuth(ctx.request.headers)
+      ctx.body = await this.#routes.getUserAttendance(token)
+    })
+
     router.get('attendance.session', '/attendance/:sessionId', async (ctx) => {
       const { sessionId } = validateStruct(ctx.params, SessionIdStruct)
       const token = this.#jwt.getRequestAuth(ctx.request.headers)
       ctx.body = await this.#routes.getSessionAttendance(token, sessionId)
-    })
-
-    router.get('attendance.user', '/attendance/me', async (ctx) => {
-      const token = this.#jwt.getRequestAuth(ctx.request.headers)
-      ctx.body = await this.#routes.getUserAttendance(token)
     })
   }
 }
