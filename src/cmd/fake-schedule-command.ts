@@ -58,7 +58,7 @@ function pickOne<T>(array: T[]) {
 }
 
 function pickMany<T>(array: T[], count: number) {
-  return Array.from({ length: count }, () => pickOne(array))
+  return array.slice(0, count).sort(() => (Math.random() > 0.5 ? -1 : 1))
 }
 
 function getFakeSchedule() {
