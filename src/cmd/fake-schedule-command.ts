@@ -111,7 +111,7 @@ function getFakeSchedule() {
       role: mockLocalised('Role B'),
     }),
     mockSpeaker({
-      id: 'speaker-a',
+      id: 'speaker-c',
       name: 'Speaker C',
       role: mockLocalised('Role C'),
     }),
@@ -194,7 +194,11 @@ export const mockSession = makeFixture<Session>({
   coverImage: undefined,
   title: mockLocalised('Session Title'),
   content: mockLocalised('Lorem ipsum sil dor amet ...'),
-  links: [{ type: 'video', url: 'https://youtu.be', language: 'en' }],
+  links: [
+    { type: 'video', url: 'https://youtu.be/dQw4w9WgXcQ', language: 'en' },
+    { type: 'extra', url: 'https://miro.com', language: 'en' },
+    { type: 'extra', url: 'https://docs.google.com/abcdef', language: 'en' },
+  ],
   hostLanguages: ['en'],
   enableInterpretation: false,
   speakers: ['speaker-a', 'speaker-b', 'speaker-c'],
