@@ -49,7 +49,7 @@ export class ConferenceRouter implements AppRouter {
         const { sessionId } = validateStruct(ctx.params, SessionIdStruct)
         const token = this.#jwt.getRequestAuth(ctx.request.headers)
 
-        ctx.body = this.#routes.getLinks(token, sessionId)
+        ctx.body = await this.#routes.getLinks(token, sessionId)
       }
     )
 
