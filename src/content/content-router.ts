@@ -24,9 +24,7 @@ export class ContentRouter implements AppRouter {
     router.get('content.get', '/content/:slug', async (ctx) => {
       const { slug } = validateStruct(ctx.params, SlugStruct)
 
-      ctx.body = {
-        content: await this.#store.retrieve(`content.${slug}`),
-      }
+      ctx.body = await this.#store.retrieve(`content.${slug}`)
     })
   }
 }
