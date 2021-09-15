@@ -50,7 +50,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
       - name: PR comment
-        uses: ./actions/pr-comment
+        uses: ./.github/actions/pr-comment
         with:
           message: |
             Generated tags:
