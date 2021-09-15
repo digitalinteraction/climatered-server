@@ -71,7 +71,6 @@ export async function serveCommand(options: ServeCommandOptions) {
   const pkg = JSON.parse(await fs.readFile('package.json', 'utf8'))
   const resources = await loadResources('res')
   const locales = loadLocales(resources)
-  console.log(locales)
 
   debug('Package name=%o version=%o', pkg.name, pkg.version)
   debug('Loaded resources %o', [...resources.keys()])
