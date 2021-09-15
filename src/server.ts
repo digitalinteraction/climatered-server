@@ -29,6 +29,7 @@ import { ChannelBroker } from './deconf/channel-broker.js'
 import { InterpreterBroker } from './deconf/interpreter-broker.js'
 import { MetricsBroker } from './deconf/metrics-broker.js'
 import { ContentRouter } from './content/content-router.js'
+import { GeneralRouter } from './general/general-router.js'
 
 const debug = createDebug('cr:server')
 
@@ -117,6 +118,7 @@ export async function createServer(context: AppContext) {
   const router = new KoaRouter()
 
   const routers: AppRouter[] = [
+    new GeneralRouter(context),
     new AttendanceRouter(context),
     new CarbonRouter(context),
     new ConferenceRouter(context),
