@@ -5,7 +5,7 @@
 # - https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token
 #
 
-name: Publish docker image
+name: Build PR Container
 
 on: [pull_request]
 
@@ -58,4 +58,4 @@ jobs:
             ```
             ${{ steps.meta.outputs.tags }}
             ```
-          password: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -11,7 +11,7 @@ async function main() {
     return
   }
 
-  const client = github.getOctokit(core.getInput('token'))
+  const client = github.getOctokit(core.getInput('github-token'))
   core.debug(`message: ${message}`)
 
   const result = await client.rest.issues.createComment({
