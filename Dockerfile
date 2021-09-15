@@ -18,6 +18,7 @@ FROM base as dist
 EXPOSE 3000
 ENV NODE_ENV production
 RUN npm ci && npm cache clean --force
+COPY --chown=node ["res", "/app/res"]
 COPY --from=builder --chown=node ["/app/dist", "/app/dist"]
 ENTRYPOINT [ "node", "dist/cli.js" ]
 CMD ["serve"]
