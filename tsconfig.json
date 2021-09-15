@@ -10,6 +10,7 @@
     "declaration": true,
     "newLine": "lf",
     "stripInternal": true,
+    "pretty": true,
 
     "strict": true,
     "noImplicitReturns": true,

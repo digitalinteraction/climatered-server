@@ -52,6 +52,7 @@
     "unist-builder": "^3.0.0",
     "valid-env": "^1.1.1",
     "waveheader": "0.0.2",
+    "yaml": "^1.10.2",
     "yargs": "^17.1.1"
   },
   "devDependencies": {
@@ -71,6 +72,7 @@
     "@types/minio": "^7.0.10",
     "@types/node": "^16.7.10",
     "@types/redis": "^2.8.31",
+    "@types/yaml": "^1.9.7",
     "@types/yargs": "^17.0.2",
     "jest": "^27.1.0",
     "lint-staged": "^11.1.2",

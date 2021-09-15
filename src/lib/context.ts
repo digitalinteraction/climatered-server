@@ -5,6 +5,7 @@ import { EnvRecord } from './env'
 import { EmailService } from './email-service'
 import { SocketService } from './sockets-service'
 import { S3Service } from './s3-service'
+import { UrlService } from './url-service'
 
 // prettier-ignore
 type Contexify<T> = T extends object 
@@ -17,7 +18,7 @@ type Contexify<T> = T extends object
 //
 export type AppContext = Omit<
   DeconfBaseContext,
-  'config' | 'env' | 'email' | 'sockets' | 's3'
+  'config' | 'env' | 'email' | 'sockets' | 's3' | 'url'
 > & {
   config: AppConfig
   env: EnvRecord
@@ -28,4 +29,5 @@ export type AppContext = Omit<
   email: Readonly<EmailService>
   sockets: Readonly<SocketService>
   s3: Readonly<S3Service>
+  url: Readonly<UrlService>
 }

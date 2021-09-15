@@ -13,8 +13,11 @@ import {
   MetricsRepository,
   PostgresService,
   RegistrationRepository,
+  ResourcesMap,
   SemaphoreService,
 } from '@openlab/deconf-api-toolkit'
+import Yaml from 'yaml'
+
 import {
   AppContext,
   createDebug,
@@ -40,6 +43,22 @@ export function pickAStore(redisUrl: string | null) {
   }
 }
 
+export function loadLocales(resources: ResourcesMap): Record<string, unknown> {
+  const locales: Record<string, unknown> = {}
+
+  for (const locale of ['en', 'fr', 'es', 'ar']) {
+    const key = `i18n/${locale}.yml`
+
+    debug('Loading res/%s', key)
+    const raw = resources.get(key)
+    if (!raw) throw new Error(`I18n: "${key}" not found`)
+
+    locales[locale] = Yaml.parse(raw.toString('utf8'))
+  }
+
+  return locales
+}
+
 export interface ServeCommandOptions {
   port: number
 }
@@ -51,7 +70,8 @@ export async function serveCommand(options: ServeCommandOptions) {
   const config = await loadConfig()
   const pkg = JSON.parse(await fs.readFile('package.json', 'utf8'))
   const resources = await loadResources('res')
-  const locales = await I18nService.loadLocales('i18n')
+  const locales = loadLocales(resources)
+  console.log(locales)
 
   debug('Package name=%o version=%o', pkg.name, pkg.version)
   debug('Loaded resources %o', [...resources.keys()])

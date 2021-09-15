@@ -30,6 +30,12 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
   get #email() {
     return this.#context.email
   }
+  get #i18n() {
+    return this.#context.i18n
+  }
+  get #url() {
+    return this.#context.url
+  }
 
   #context: Context
   #routes: RegistrationRoutes<any>
@@ -99,17 +105,34 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
       registration.email,
       token
     )
-    // throw new Error('Method not implemented.')
+    this.#email.sendTransactional(
+      registration.email,
+      this.#i18n.translate(registration.language, 'email.login.subject'),
+      {
+        body: this.#i18n.translate(registration.language, 'email.login.body'),
+        action: this.#i18n.translate(
+          registration.language,
+          'email.login.action'
+        ),
+        url: this.#url.getServerLoginLink(token).toString(),
+      }
+    )
   }
   async sendVerifyEmail(
     registration: Registration,
     token: string
   ): Promise<void> {
-    // throw new Error('Method not implemented.')
-    console.log(
-      'TODO: sendVerifyEmail email=%o token=%o',
+    this.#email.sendTransactional(
       registration.email,
-      token
+      this.#i18n.translate(registration.language, 'email.verify.subject'),
+      {
+        body: this.#i18n.translate(registration.language, 'email.verify.body'),
+        action: this.#i18n.translate(
+          registration.language,
+          'email.verify.action'
+        ),
+        url: this.#url.getServerVerifyLink(token).toString(),
+      }
     )
   }
 }

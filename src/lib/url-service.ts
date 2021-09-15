@@ -28,4 +28,12 @@ export class UrlService implements Readonly<DeconfUrlService> {
 
     return url
   }
+
+  getServerLoginLink(token: string): URL {
+    return new URL(`auth/login/${token}`, this.#env.SELF_URL)
+  }
+
+  getServerVerifyLink(token: string): URL {
+    return new URL(`auth/register/${token}`, this.#env.SELF_URL)
+  }
 }

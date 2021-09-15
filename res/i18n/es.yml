@@ -1,0 +1,31 @@
+test:
+  simple: ¡Hola Mundo!
+  substituted: Hola, {{ name }}!
+email:
+  userExists:
+    subject: Tu inscripción Planet:Red
+    body: >
+      Hola,
+
+      Alguien intentó conectarse con tu 0752696446 electrónico. Si fuiste tu, te puedes conectar con el enlace más abajo.
+
+      Gracias, el equipo Planet:Red
+    action: Connexión
+  pleaseVerify:
+    subject: Terminar tu inscripción Planet:Red
+    body: >
+      Hola,
+
+      ¡Gracias por registrarte en Planet:Red! Estás a un paso de terminar, necesitamos confirmar tu correo electrónico. Para ese fin, favor de hacer clic en el enlace más abajo. 
+
+      Gracias, el equipo Planet:Red
+    action: Confirmer mi correo electrónico
+  login:
+    subject: Conexión a Planet:Red
+    body: >
+      Hola,
+
+      Este es tu código de conexión Planet:Red. Para conectarte, haz clic en el enlace más abajo, o copia y pegalo en tu explorador de internet.
+
+      Gracias, el equipo Planet:Red
+    action: Conexión
