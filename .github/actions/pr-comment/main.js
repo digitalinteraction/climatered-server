@@ -4,7 +4,7 @@ const github = require('@actions/github')
 async function main() {
   const message = core.getInput('message')
 
-  const pr = github.context.pr
+  const pr = github.context.payload.pull_request
 
   if (!pr) {
     core.setFailed('PR not found')
