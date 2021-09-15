@@ -4,7 +4,7 @@ test:
 email:
   userExists:
     subject: Tu inscripción Planet:Red
-    body: >
+    body: |
       Hola,
 
       Alguien intentó conectarse con tu 0752696446 electrónico. Si fuiste tu, te puedes conectar con el enlace más abajo.
@@ -13,7 +13,7 @@ email:
     action: Connexión
   pleaseVerify:
     subject: Terminar tu inscripción Planet:Red
-    body: >
+    body: |
       Hola,
 
       ¡Gracias por registrarte en Planet:Red! Estás a un paso de terminar, necesitamos confirmar tu correo electrónico. Para ese fin, favor de hacer clic en el enlace más abajo. 
@@ -22,7 +22,7 @@ email:
     action: Confirmer mi correo electrónico
   login:
     subject: Conexión a Planet:Red
-    body: >
+    body: |
       Hola,
 
       Este es tu código de conexión Planet:Red. Para conectarte, haz clic en el enlace más abajo, o copia y pegalo en tu explorador de internet.

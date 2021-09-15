@@ -4,7 +4,7 @@ test:
 email:
   userExists:
     subject: Usajili wako katika wakala wa ndege ya Salfarino
-    body: >
+    body: |
       Habari
       
       Kuna mtu amejaribu kujisajili kwa anwani pepe yako.kama ni wewe binafsi.Jisajili na ujiunge upya.
@@ -13,7 +13,7 @@ email:
     action: Jisajili
   pleaseVerify:
     subject: Kamilisha usajili na solferino Air
-    body: >
+    body: |
       Habari
       
       Asante sana kwa kujisajili na Solferino Air! Uko karibu kufika, Tunachohitaji ni kuthibitisha barua pepe yako. Kufanya ivo basi bonyeza kiungo hapo chini.
@@ -22,7 +22,7 @@ email:
     action: Thibitisha barua pepe yako
   login:
     subject: Ingia Solferino Air.
-    body: >
+    body: |
       Habari
       
       Hapa kuna nambari yako ya kuingia ya Solferino Air, ili uingie bonyeza kiungo hapo chini au uifungue kwenye kivinjari chako.
