@@ -48,3 +48,14 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: PR comment
+        uses: ./actions/pr-comment
+        with:
+          message: |
+            Generated tags:
+
+            ```
+            ${{ steps.meta.outputs.tags }}
+            ```
+          password: ${{ secrets.GITHUB_TOKEN }}
