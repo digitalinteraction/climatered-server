@@ -12,3 +12,4 @@ raw-audio
 app-config.json
 
 content_*
+data/*.json

@@ -13,12 +13,11 @@ import { fetchContentCommand } from './cmd/fetch-content-command.js'
 import { geocodeCommand } from './cmd/geocode-command.js'
 import { hackCommand, allHackCommands } from './cmd/hack-command.js'
 import { migrateCommand } from './cmd/migrate-command.js'
-import {
-  pretalxDataCommand,
-  pretalxDataCommands,
-} from './cmd/pretalx-data-command.js'
 import { rebuildAudioCommand } from './cmd/rebuild-audio-command.js'
-import { scrapePretalxCommand } from './cmd/scrape-pretalx-command.js'
+import {
+  scrapePretalxCommand,
+  pretalxDataCommands,
+} from './cmd/scrape-pretalx-command.js'
 import { serveCommand } from './cmd/serve-command.js'
 
 const cli = yargs(hideBin(process.argv))
@@ -63,7 +62,7 @@ cli.command(
       choices: Object.keys(pretalxDataCommands),
       demandOption: true,
     }),
-  (args) => pretalxDataCommand(args).catch(errorHandler)
+  (args) => pretalxDataCommands[args.data]?.().catch(errorHandler)
 )
 
 cli.command(
