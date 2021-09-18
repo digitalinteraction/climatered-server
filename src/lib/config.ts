@@ -12,6 +12,8 @@ import {
   Describe,
   number,
   array,
+  record,
+  optional,
 } from 'superstruct'
 
 const localisedQuestion = () =>
@@ -51,6 +53,7 @@ export const PretalxConfigStruct = object({
     recorded: number(),
     speakerAffiliation: number(),
   }),
+  languages: record(string(), optional(string())),
   types: array(
     object({
       id: string(),

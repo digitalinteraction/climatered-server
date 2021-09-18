@@ -33,7 +33,7 @@ export class RedisService implements KeyValueService {
   async retrieve<T>(key: string) {
     const result = await this.#client.get(key)
     if (!result) return null
-    return JSON.parse(result)
+    return JSON.parse(result) as T
   }
 
   async put<T>(key: string, value: T) {

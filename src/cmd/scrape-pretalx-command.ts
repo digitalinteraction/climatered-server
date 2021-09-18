@@ -1,3 +1,4 @@
+import ms from 'ms'
 import {
   AppConfigStruct,
   createDebug,
@@ -10,15 +11,22 @@ import {
   PretalxQuestion,
   PretalxService,
   PretalxTalk,
+  SemaphoreService,
 } from '@openlab/deconf-api-toolkit'
 import {
   ScheduleRecord,
-  Session,
   SessionType,
+  Session,
   Theme,
+  SessionVisibility,
+  SessionState,
+  LocalisedLink,
+  ConferenceConfig,
 } from '@openlab/deconf-shared'
 
 const debug = createDebug('cr:cmd:scrape-pretalx')
+const SCRAPE_LOCK_KEY = 'pretalx_lock'
+const SCRAPE_MAX_LOCK = ms('10m')
 
 export interface ScrapePretalxCommandOptions {}
 export interface PretalxDataCommand {
@@ -32,15 +40,12 @@ async function setup() {
   const appConfig = await loadConfig('app-config.json', AppConfigStruct)
   const config = appConfig.pretalx
   const store = new RedisService(env.REDIS_URL)
-  const locales = [
-    { id: 1, name: 'English', locale: 'en' },
-    { id: 2, name: 'French', locale: 'fr' },
-    { id: 3, name: 'Spanish', locale: 'es' },
-    { id: 4, name: 'Arabic', locale: 'ar' },
-  ]
+  const locales: any[] = [] // TODO: tbr
   const pretalx = new PretalxService({ env, store, config, locales })
 
-  return { env, config, store, locales, pretalx }
+  const semaphore = new SemaphoreService({ store })
+
+  return { env, config, store, locales, pretalx, semaphore }
 }
 
 //
@@ -52,28 +57,39 @@ export async function scrapePretalxCommand(
 ) {
   debug('start')
 
-  const { pretalx, store, config } = await setup()
+  const { pretalx, store, config, semaphore } = await setup()
+  const { getSessions, getThemes, getTypes } = getHelpers(pretalx, config)
 
-  const submissions = await pretalx.getSubmissions()
-  const talks = await pretalx.getTalks()
-  const event = await pretalx.getEvent()
-  const speakers = await pretalx.getSpeakers()
-  const questions = await pretalx.getQuestions()
+  await semaphore.aquire(SCRAPE_LOCK_KEY, SCRAPE_MAX_LOCK)
 
-  const schedule: Omit<ScheduleRecord, 'settings'> = {
-    // sessions: getSessions(pretalx, submissions, config),
-    sessions: [],
-    slots: pretalx.getDeconfSlots(talks),
-    speakers: pretalx.getDeconfSpeakers(
-      speakers,
-      config.questions.speakerAffiliation
-    ),
-    themes: getThemes(pretalx, questions, config),
-    tracks: [],
-    types: getTypes(pretalx, config),
+  try {
+    const submissions = await pretalx.getSubmissions()
+    const talks = await pretalx.getTalks()
+    const event = await pretalx.getEvent()
+    const speakers = await pretalx.getSpeakers()
+    const questions = await pretalx.getQuestions()
+
+    const schedule: Omit<ScheduleRecord, 'settings'> = {
+      sessions: getSessions(submissions),
+      slots: pretalx.getDeconfSlots(talks),
+      speakers: pretalx.getDeconfSpeakers(
+        speakers,
+        config.questions.speakerAffiliation
+      ),
+      themes: getThemes(questions),
+      tracks: [],
+      types: getTypes(),
+    }
+
+    for (const [key, value] of Object.entries(schedule)) {
+      await store.put(`schedule.${key}`, value)
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+  } finally {
+    await semaphore.release(SCRAPE_LOCK_KEY)
+    await store.close()
   }
-
-  await store.close()
 }
 
 function dataCommand(block: (pretalx: PretalxService) => Promise<unknown>) {
@@ -100,34 +116,142 @@ export const pretalxDataCommands: Record<
 //
 // Helpers
 //
-function getTypes(pretalx: PretalxService, config: PretalxConfig) {
-  return config.types as SessionType[]
-}
-
-function getThemes(
-  pretalx: PretalxService,
-  questions: PretalxQuestion[],
-  config: PretalxConfig
-): Theme[] {
-  const themeQuestion = questions.find((q) => q.id === config.questions.theme)
-  if (!themeQuestion) {
-    throw new Error('Theme question not found')
+function getHelpers(pretalx: PretalxService, config: PretalxConfig) {
+  function getTypes() {
+    return config.types as SessionType[]
   }
 
-  return themeQuestion.options.map((option) => ({
-    id: pretalx.getIdFromTitle(option.answer, 'unknown'),
-    title: option.answer,
-  }))
+  function getSessions(submissions: PretalxTalk[]): Session[] {
+    return submissions.map((submission) => {
+      const type = pretalx.getIdFromTitle(submission.submission_type, 'unknown')
+
+      const slot = submission.slot
+        ? pretalx.getSlotId(submission.slot)
+        : undefined
+
+      const track = pretalx.getIdFromTitle(submission.track, 'unknown')
+
+      const themesAnswer = submission.answers.find(
+        (a) => a.question.id === config.questions.theme
+      )
+      const themes = themesAnswer?.options.map((o) => o.id.toString()) ?? []
+
+      return {
+        id: pretalx.makeUnique(submission.code),
+        type,
+        title: getSessionText(
+          submission,
+          config.questions.title,
+          submission.title
+        ),
+        slot,
+        track,
+        themes,
+        coverImage: '',
+        content: getSessionText(
+          submission,
+          config.questions.description,
+          submission.description
+        ),
+        links: getSessionLinks(submission),
+        hostLanguages: getSessionLanguages(submission),
+        enableInterpretation: getBoolean(
+          submission,
+          config.questions.interpretation
+        ),
+        speakers: submission.speakers.map((s) => s.code),
+        hostOrganisation: {},
+        isRecorded: getBoolean(submission, config.questions.recorded),
+        isOfficial: false,
+        isFeatured: submission.is_featured,
+        visibility: SessionVisibility.private,
+        state: submission.state as SessionState,
+        participantCap: pretalx.getSessionCap(
+          submission,
+          config.questions.capacity
+        ),
+
+        proxyUrl: undefined,
+        hideFromSchedule: false,
+      }
+    })
+  }
+
+  function getThemes(questions: PretalxQuestion[]) {
+    const question = questions.find((q) => q.id === config.questions.theme)
+    if (!question) {
+      throw new Error(`Themes question not found "${config.questions.theme}"`)
+    }
+    const themes: Theme[] = question.options.map((option) => ({
+      id: option.id.toString(),
+      title: option.answer,
+    }))
+
+    return themes
+  }
+
+  function getSessionLanguages(submission: PretalxTalk) {
+    const result = [submission.content_locale]
+
+    const answer = submission.answers.find(
+      (a) => a.question.id === config.questions.languages
+    )
+
+    for (const option of answer?.options ?? []) {
+      const locale = config.languages[option.id.toString()]
+      if (!locale || result.includes(locale)) continue
+      result.push(locale)
+    }
+
+    return result
+  }
+
+  function getSessionText(
+    submission: PretalxTalk,
+    questions: { en: number; fr: number; es: number; ar: number },
+    englishFallback: string
+  ): Record<string, string | undefined> {
+    const en =
+      pretalx.findAnswer(questions.en, submission.answers) ?? englishFallback
+    const fr = pretalx.findAnswer(questions.fr, submission.answers)
+    const es = pretalx.findAnswer(questions.es, submission.answers)
+    const ar = pretalx.findAnswer(questions.ar, submission.answers)
+
+    const result: Record<string, string | undefined> = { en }
+
+    if (fr) result.fr = fr
+    if (es) result.es = es
+    if (ar) result.ar = ar
+
+    return result
+  }
+
+  function getSessionLinks(submission: PretalxTalk): LocalisedLink[] {
+    return [
+      ...pretalx.getSessionLinks(submission, config.questions.links.en),
+      ...pretalx
+        .getSessionLinks(submission, config.questions.links.fr)
+        .map((l) => ({ ...l, language: 'fr' })),
+      ...pretalx
+        .getSessionLinks(submission, config.questions.links.es)
+        .map((l) => ({ ...l, language: 'es' })),
+      ...pretalx
+        .getSessionLinks(submission, config.questions.links.ar)
+        .map((l) => ({ ...l, language: 'ar' })),
+    ]
+  }
+
+  function getBoolean(submission: PretalxTalk, question: number) {
+    return (
+      pretalx.findAnswer(question, submission.answers)?.toLowerCase() === 'true'
+    )
+  }
+
+  return {
+    getTypes,
+    getThemes,
+    getSessions,
+    getSessionLanguages,
+    getSessionText,
+  }
 }
-
-// TODO:
-//
-// function getSessions(
-//   pretalx: PretalxService,
-//   submissions: PretalxTalk[],
-//   config: PretalxConfig
-//   ): Session[] {
-//   return submissions.map(submission => {
-
-//   })
-// }
