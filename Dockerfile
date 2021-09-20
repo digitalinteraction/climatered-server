@@ -1,6 +1,6 @@
 # [0] A common base for both stages
 FROM node:14-alpine as base
-RUN apk add --no-cache git \
+RUN apk add --no-cache git openssh-client \
   && mkdir /app && chown -R node:node /app
 COPY --chown=node ["package*.json", "tsconfig.json", "/app/"]
 USER node

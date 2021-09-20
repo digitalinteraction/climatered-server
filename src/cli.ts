@@ -125,17 +125,19 @@ cli.command(
   'Fetch content from climatered-schedule and put into redis',
   (yargs) =>
     yargs
-      .positional('remote', {
+      .option('remote', {
         type: 'string',
         describe: 'The remote of the git repository',
-        default: 'git@github.com:digitalinteraction/climatered-content.git',
+        default:
+          process.env.CONTENT_GIT_REMOTE ??
+          'git@github.com:digitalinteraction/climatered-content.git',
       })
-      .positional('branch', {
+      .option('branch', {
         type: 'string',
         describe: 'The branch to use',
-        default: 'main',
+        default: process.env.CONTENT_GIT_BRANCH ?? 'main',
       })
-      .positional('reuse', {
+      .option('reuse', {
         type: 'string',
         describe: 'A previously checked out repo to re-use',
       }),
