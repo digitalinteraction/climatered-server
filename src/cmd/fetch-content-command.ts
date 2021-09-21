@@ -30,6 +30,7 @@ export const CONTENT_KEYS = [
   'terms',
   'faqs',
   'registered',
+  'login',
 ]
 
 export interface FetchContentCommandOptions {
