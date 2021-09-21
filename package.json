@@ -15,11 +15,12 @@
     "lint": "tsc --noEmit",
     "format": "prettier --write '**/*.{js,json,css,md,ts,tsx}'",
     "preversion": "npm run test -s && npm run build",
-    "postversion": "git push --follow-tags",
     "dev": "node --loader ts-node/esm -r dotenv/config src/cli.ts",
     "debug": "node --inspect-brk --loader ts-node/esm -r dotenv/config src/cli.ts",
     "readme-toc": "md-toc -i",
-    "start": "npm run -s dev -- serve --migrate"
+    "start": "npm run -s dev -- serve --migrate",
+    "release": "npm run preversion && standard-version",
+    "release:beta": "npm run preversion && standard-version --prerelease=beta"
   },
   "dependencies": {
     "@godaddy/terminus": "^4.9.0",
