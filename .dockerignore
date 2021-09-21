@@ -2,10 +2,10 @@
 # Files to ignore from the docker daemon
 #
 
-*.env
-.DS_Store
 node_modules
 coverage
+*.env
+.DS_Store
 dist
-*.spec.ts
-__tests__
+**/*.spec.ts
+.git

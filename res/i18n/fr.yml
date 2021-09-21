@@ -1,0 +1,34 @@
+test:
+  simple: Bonjour le monde!
+  substituted: Bonjour {{ name }}!
+email:
+  general:
+    greeting:
+    signature:
+  userExists:
+    subject: Ton inscription Planet:Red
+    body: |
+      Salut,
+
+      Quelqu’un a essayé de se connecter avec ton adresse email. Si c’était toi, tu peux te connecter grâce le lien ci-dessous
+
+      Merci, l’équipe Planet:Red
+    action: Connection
+  pleaseVerify:
+    subject: Terminer ton inscription Planet:Red
+    body: |
+      Salut,
+
+      Merci pour ton inscription à Planet:Red! Tu y es presque! Nous devons juste vérifier ton adresse email. Pour ce faire, merci de cliquer sur le lien ci-dessous.
+
+      Merci, l’équipe Planet:Red
+    action: Confirmer mon email
+  login:
+    subject: Connection à Planet:Red
+    body: |
+      Salut,
+
+      Voici ton code de connexion Planet:Red. Pour te connecter, clique sur le lien ci-dessous, ou copie et colle le dans ton explorateur internet.
+
+      Merci, l’équipe Planet:Red
+    action: Connexion

@@ -1,0 +1,12 @@
+name: PR Comment
+description: Comment on a PR
+inputs:
+  message:
+    description: What to comment
+    required: true
+  github-token:
+    description: Your GITHUB_TOKEN
+    required: true
+runs:
+  using: 'node12'
+  main: 'dist/index.js'

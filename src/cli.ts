@@ -1,143 +1,148 @@
-import yargs = require('yargs')
-import jwt = require('jsonwebtoken')
-import { validateEnv } from 'valid-env'
-import { runServer } from './server'
-import { runScraper } from './cmd/scrape-content'
-import { runMigrator } from './cmd/migrate'
-import { runRebuilder } from './cmd/rebuild-audio'
-import { runGeocode } from './cmd/geocode'
-import { AuthJwt } from './test-utils'
-import { fakeSchedule } from './cmd/fake-schedule'
-import { appendUrl } from './services/url'
+#!/usr/bin/env node
 
-yargs.help().alias('h', 'help').demandCommand().recommendCommands()
+//
+// The cli entrypoint
+//
 
-function fail(error: any) {
+import yargs from 'yargs'
+import { hideBin } from 'yargs/helpers'
+
+import { devAuthCommand } from './cmd/dev-auth-command.js'
+import { fakeScheduleCommand } from './cmd/fake-schedule-command.js'
+import { fetchContentCommand } from './cmd/fetch-content-command.js'
+import { geocodeCommand } from './cmd/geocode-command.js'
+import { hackCommand, allHackCommands } from './cmd/hack-command.js'
+import { migrateCommand } from './cmd/migrate-command.js'
+import { rebuildAudioCommand } from './cmd/rebuild-audio-command.js'
+import {
+  scrapePretalxCommand,
+  pretalxDataCommands,
+} from './cmd/scrape-pretalx-command.js'
+import { serveCommand } from './cmd/serve-command.js'
+
+const cli = yargs(hideBin(process.argv))
+
+cli
+  .help()
+  .alias('h', 'help')
+  .demandCommand(1, 'A command is required')
+  .recommendCommands()
+
+function errorHandler(error: any) {
+  console.error('Fatal error')
   console.error(error)
   process.exit(1)
 }
 
-function handleFail<T extends any[]>(block: (...args: T) => Promise<any>) {
-  return async (...args: T) => {
-    try {
-      await block(...args)
-    } catch (error) {
-      console.error(error)
-      process.exit(1)
-    }
-  }
-}
-
-yargs.command(
+cli.command(
   'serve',
-  'Run the api server',
+  'Run the server',
+  (yargs) =>
+    yargs.option('port', {
+      type: 'number',
+      describe: 'The port to run the server on',
+      default: 3000,
+    }),
+  (args) => serveCommand(args).catch(errorHandler)
+)
+
+cli.command(
+  'scrape-pretalx',
+  'Scrape content from pretalx and put into redis',
+  (yargs) => yargs,
+  (args) => scrapePretalxCommand(args).catch(errorHandler)
+)
+
+cli.command(
+  'pretalx <data>',
+  'Fetch and output data from pretalx',
+  (yargs) =>
+    yargs.positional('data', {
+      type: 'string',
+      choices: Object.keys(pretalxDataCommands),
+      demandOption: true,
+    }),
+  (args) => pretalxDataCommands[args.data]?.().catch(errorHandler)
+)
+
+cli.command(
+  'dev-auth',
+  'Generate an authentication for local Development',
   (yargs) =>
     yargs
-      .option('migrate', {
-        type: 'boolean',
-        describe: 'Run database migrations',
-        default: false,
-      })
-      .option('scrape', {
-        type: 'boolean',
-        describe: 'Scrape content from the repo',
-        default: false,
-      }),
-  handleFail(async (args) => {
-    if (args.migrate) await runMigrator()
-    if (args.scrape) await runScraper()
-
-    await runServer()
-  })
+      .option('email', { type: 'string', demandOption: true })
+      .option('interpreter', { type: 'boolean', default: false })
+      .option('admin', { type: 'boolean', default: false }),
+  (args) => devAuthCommand(args).catch(errorHandler)
 )
 
-yargs.command(
-  'scrape-content',
-  'Scrape content from GitHub and put into redis',
-  (yargs) => yargs,
-  async (args) => {
-    try {
-      await runScraper()
-    } catch (error) {
-      fail(error)
-    }
-  }
+cli.command(
+  'hack <hack>',
+  'Run one of the hack commands',
+  (yargs) =>
+    yargs.positional('hack', {
+      type: 'string',
+      choices: Object.keys(allHackCommands),
+      demandOption: true,
+    }),
+  (args) => hackCommand(args).catch(errorHandler)
 )
 
-yargs.command(
+cli.command(
   'migrate',
-  'Run the database migrator',
+  'Run any new database migrations',
   (yargs) => yargs,
-  handleFail(async (args) => {
-    await runMigrator()
-  })
+  (args) => migrateCommand(args).catch(errorHandler)
 )
 
-yargs.command(
-  'fake-auth',
-  'Generate an auth token',
+cli.command(
+  'rebuild-audio <directory> <outfile>',
+  'Rebuild pre-downloaded audio chunks in a given folder into a single wav file',
   (yargs) =>
     yargs
-      .option('email', {
-        type: 'string',
-        default: 'robanderson@hey.com',
-      })
-      .option('lang', {
-        type: 'string',
-        default: 'en',
-        choices: ['en', 'fr', 'es', 'ar'],
-      })
-      .option('url', {
-        type: 'boolean',
-        default: false,
-      }),
-  handleFail(async (args) => {
-    validateEnv(['JWT_SECRET'])
-    const auth: AuthJwt = {
-      typ: 'auth',
-      sub: args.email,
-      user_roles: ['translator', 'attendee'],
-      user_lang: args.lang,
-    }
-    const token = jwt.sign(auth, process.env.JWT_SECRET!)
-    if (args.url) {
-      validateEnv(['WEB_URL'])
-      const base = new URL(process.env.WEB_URL!)
-      console.log(appendUrl(base, `/_token?token=${token}`).toString())
-    } else {
-      console.log(token)
-    }
-  })
+      .positional('directory', { type: 'string', demandOption: true })
+      .positional('outfile', { type: 'string', demandOption: true }),
+  async (args) => rebuildAudioCommand(args).catch(errorHandler)
 )
 
-yargs.command(
-  'rebuild-audio <path> <file>',
-  'Rebuild audio in a given folder',
-  (yargs) =>
-    yargs
-      .positional('path', { type: 'string', demandOption: true })
-      .positional('file', { type: 'string', demandOption: true }),
-  handleFail(async (args) => {
-    await runRebuilder(args.path, args.file)
-  })
-)
-
-yargs.command(
+cli.command(
   'fake-schedule',
   'Generate a fake schedule and put it into redis',
-  (yargs) => yargs,
-  handleFail(async (args) => {
-    await fakeSchedule()
-  })
+  (yargs) =>
+    yargs.option('interpreter', { type: 'string', array: true, default: [] }),
+  (args) => fakeScheduleCommand(args).catch(errorHandler)
 )
 
-yargs.command(
+cli.command(
   'geocode',
-  'Generate countries geocoded json',
+  'Generate and output geocoded locations',
   (yargs) => yargs,
-  handleFail(async (args) => {
-    await runGeocode()
-  })
+  (args) => geocodeCommand(args).catch(errorHandler)
 )
 
-yargs.parse()
+cli.command(
+  'fetch-content',
+  'Fetch content from climatered-schedule and put into redis',
+  (yargs) =>
+    yargs
+      .option('remote', {
+        type: 'string',
+        describe: 'The remote of the git repository',
+        default:
+          process.env.CONTENT_GIT_REMOTE ??
+          'git@github.com:digitalinteraction/climatered-content.git',
+      })
+      .option('branch', {
+        type: 'string',
+        describe: 'The branch to use',
+        default: process.env.CONTENT_GIT_BRANCH ?? 'main',
+      })
+      .option('reuse', {
+        type: 'string',
+        describe: 'A previously checked out repo to re-use',
+      }),
+  (args) => fetchContentCommand(args).catch(errorHandler)
+)
+
+// Execute the CLI
+cli.parse()

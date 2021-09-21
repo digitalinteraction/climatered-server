@@ -1,11 +1,10 @@
 #
-# Run node.js tests with GitHub actions
-# refs:
+# A GitHub workflow to run NPM based builds and tests for every push
+#
+# help:
+# - original gist: https://gist.github.com/robb-j/049217ca8cecf4e214b8b82123f7371b
 # - https://docs.github.com/en/actions/language-and-framework-guides/using-nodejs-with-github-actions
 # - https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows
-#
-# notes:
-# - Only caches ~/.npm not node_modules
 #
 
 name: Node.js automated tests
@@ -19,22 +18,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use Node.js v12
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: '12.x'
+          node-version: '14'
 
-      - name: Cache node modules
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-node-modules
+      - uses: actions/cache@v2
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+            ${{ runner.os }}-node-
 
       - name: install dependencies
         run: npm ci
