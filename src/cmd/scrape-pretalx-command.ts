@@ -21,7 +21,7 @@ import {
   SessionVisibility,
   SessionState,
   LocalisedLink,
-  ConferenceConfig,
+  Localised,
 } from '@openlab/deconf-shared'
 
 const debug = createDebug('cr:cmd:scrape-pretalx')
@@ -121,15 +121,24 @@ function getHelpers(pretalx: PretalxService, config: PretalxConfig) {
     return config.types as SessionType[]
   }
 
+  // TODO: migrate fix back to deconf
+  function getIdFromTitle(localised: Localised | null, fallback: string) {
+    if (!localised) return fallback
+    for (const key of config.englishKeys) {
+      if (localised[key]) return pretalx.getSlug(localised[key] as string)
+    }
+    return fallback
+  }
+
   function getSessions(submissions: PretalxTalk[]): Session[] {
     return submissions.map((submission) => {
-      const type = pretalx.getIdFromTitle(submission.submission_type, 'unknown')
+      const type = getIdFromTitle(submission.submission_type, 'unknown')
 
       const slot = submission.slot
         ? pretalx.getSlotId(submission.slot)
         : undefined
 
-      const track = pretalx.getIdFromTitle(submission.track, 'unknown')
+      const track = getIdFromTitle(submission.track, 'unknown')
 
       const themesAnswer = submission.answers.find(
         (a) => a.question.id === config.questions.theme
