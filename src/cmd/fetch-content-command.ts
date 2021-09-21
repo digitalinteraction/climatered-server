@@ -60,7 +60,11 @@ export async function fetchContentCommand(options: FetchContentCommandOptions) {
         `git clone --branch ${options.branch} ${options.remote} "${repoDir}"`
       )
     } else {
-      // TODO: git pull -C <dir> <branch> <remote?
+      // Ensure the correct branch
+      await exec(`git -C "${repoDir}" checkout ${options.branch}`)
+
+      // Pull into the branch
+      await exec(`git -C "${repoDir}" pull ${options.remote} ${options.branch}`)
     }
 
     // Get and validate settings
