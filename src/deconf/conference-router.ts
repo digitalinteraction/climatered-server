@@ -8,6 +8,7 @@ import {
 import { AppContext, AppRouter } from '../lib/module.js'
 
 import { object, string } from 'superstruct'
+import { Session, SessionState } from '@openlab/deconf-shared'
 
 const SessionIdStruct = object({
   sessionId: string(),
@@ -30,6 +31,29 @@ export class ConferenceRouter implements AppRouter {
   apply(router: KoaRouter) {
     router.get('conference.sessions', '/schedule', async (ctx) => {
       ctx.body = await this.#routes.getSchedule()
+    })
+
+    router.get('conference.whatsOn', '/schedule/whats-on', async (ctx) => {
+      const allSessions = await this.#context.conferenceRepo.getSessions()
+      const states = new Set([SessionState.accepted, SessionState.confirmed])
+
+      const featured: Session[] = []
+      const notFeatured: Session[] = []
+
+      allSessions
+        .filter((s) => states.has(s.state))
+        .map((session) => ({
+          ...session,
+          links: [],
+          slot: undefined,
+        }))
+        .forEach((session) =>
+          (session.isFeatured ? featured : notFeatured).push(session)
+        )
+
+      ctx.body = {
+        sessions: [...featured, ...notFeatured],
+      }
     })
 
     router.get('conference.ics', '/schedule/:sessionId/ics', async (ctx) => {
