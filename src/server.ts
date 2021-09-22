@@ -13,7 +13,11 @@ import { createAdapter as socketIoRedisAdapter } from '@socket.io/redis-adapter'
 import ms from 'ms'
 import createDebug from 'debug'
 
-import { ApiError, StructApiError } from '@openlab/deconf-api-toolkit'
+import {
+  ApiError,
+  SocketService,
+  StructApiError,
+} from '@openlab/deconf-api-toolkit'
 import {
   AppContext,
   AppRouter,
@@ -92,14 +96,18 @@ function httpErrorHandler(isProduction: boolean): Koa.Middleware {
   }
 }
 
-export function ioErrorHandler<T extends unknown[]>(socket: Socket) {
+export function ioErrorHandler<T extends unknown[]>(
+  socket: Socket,
+  service: SocketService
+) {
   return (endpoint: (...args: T) => Promise<void>) => {
     return async (...args: T) => {
       try {
         await endpoint(...args)
       } catch (error) {
         if (error instanceof ApiError) {
-          socket.emit('api_error', {
+          // service.sendError(socket.id, error)
+          socket.emit('apiError', {
             status: error.status,
             codes: error.codes,
             stack: error.stack,
@@ -152,7 +160,7 @@ export async function createServer(context: AppContext) {
   context.sockets.setIo(io)
 
   io.on('connection', (socket) => {
-    const m = ioErrorHandler(socket)
+    const m = ioErrorHandler(socket, context.sockets)
     appBrokers.forEach((b) => b.socketConnected(socket, m))
 
     socket.on('disconnect', () => {

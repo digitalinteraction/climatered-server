@@ -1,6 +1,6 @@
 import { MetricsSockets } from '@openlab/deconf-api-toolkit'
 import { Socket } from 'socket.io'
-import { object, string, Struct } from 'superstruct'
+import { any, boolean, object, string, Struct } from 'superstruct'
 import {
   AppBroker,
   AppContext,
@@ -14,13 +14,64 @@ type Context = AppContext
 
 const eventStructs = new Map<string, Struct<any>>()
 eventStructs.set(
-  'page-view',
+  'session/ical',
   object({
-    path: string(),
+    sessionId: string(),
   })
 )
-
-// TODO: add more metrics
+eventStructs.set(
+  'attendance/attend',
+  object({
+    sessionId: string(),
+  })
+)
+eventStructs.set(
+  'attendance/unattend',
+  object({
+    sessionId: string(),
+  })
+)
+eventStructs.set(
+  'login/start',
+  object({
+    emailHash: string(),
+  })
+)
+eventStructs.set('login/finish', object({}))
+eventStructs.set('login/logout', object({}))
+eventStructs.set(
+  'register/start',
+  object({
+    country: string(),
+  })
+)
+eventStructs.set(
+  'login/unregister',
+  object({
+    confirmed: boolean(),
+  })
+)
+eventStructs.set(
+  'general/pageView',
+  object({
+    routeName: string(),
+    params: any(),
+  })
+)
+eventStructs.set(
+  'session/link',
+  object({
+    sessionId: string(),
+    action: string(),
+    link: string(),
+  })
+)
+eventStructs.set(
+  'atrium/widget',
+  object({
+    widget: string(),
+  })
+)
 
 export class MetricsBroker implements AppBroker {
   #sockets: MetricsSockets
@@ -28,6 +79,7 @@ export class MetricsBroker implements AppBroker {
     this.#sockets = new MetricsSockets({
       ...context,
       eventStructs,
+      pause: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
     })
   }
 

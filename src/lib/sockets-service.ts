@@ -57,7 +57,9 @@ export class SocketService implements Readonly<DeconfSocketService> {
   }
 
   sendError(socketId: string, error: ApiError): void {
-    this.#io.to(socketId).emit('api_error', {
+    debug('#sendError to=%o error=%O', socketId, error)
+    this.#io.in(socketId).emit('apiError', {
+      ...error,
       status: error.status,
       codes: error.codes,
       stack: error.stack,
