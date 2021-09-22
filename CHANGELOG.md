@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0-beta.1](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.0...v3.0.0-beta.1) (2021-09-22)
+
+### Features
+
+- add metrics ([bc90bc2](https://github.com/digitalinteraction/climatered-server/commit/bc90bc29f4cffeaac80b68b15bebf4a8b73de6c6))
+
+### Bug Fixes
+
+- **metric:** fix initial metrics not captured ([7bb6900](https://github.com/digitalinteraction/climatered-server/commit/7bb6900d50768fa8cca6baae5272603e015b8a71))
+
 ## [3.0.0-beta.0](https://github.com/digitalinteraction/climatered-server/compare/v2.1.6...v3.0.0-beta.0) (2021-09-21)
 
 ### Features
