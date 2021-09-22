@@ -106,12 +106,7 @@ export function ioErrorHandler<T extends unknown[]>(
         await endpoint(...args)
       } catch (error) {
         if (error instanceof ApiError) {
-          // service.sendError(socket.id, error)
-          socket.emit('apiError', {
-            status: error.status,
-            codes: error.codes,
-            stack: error.stack,
-          })
+          service.sendError(socket.id, error)
         } else {
           console.error('An unknown error occured')
           console.error(error)

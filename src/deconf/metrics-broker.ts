@@ -84,7 +84,10 @@ export class MetricsBroker implements AppBroker {
   }
 
   async socketConnected(socket: Socket, handleErrors: SocketErrorHandler) {
-    await this.#sockets.cameOnline(socket.id)
+    this.#sockets.cameOnline(socket.id).catch((error) => {
+      console.error('MetricsBroker#cameOnline', error)
+      process.exit(1)
+    })
 
     socket.on(
       'trackMetric',
