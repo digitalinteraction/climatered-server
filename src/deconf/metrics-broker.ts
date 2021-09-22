@@ -1,4 +1,4 @@
-import { MetricsSockets } from '@openlab/deconf-api-toolkit'
+import { ApiError, MetricsSockets } from '@openlab/deconf-api-toolkit'
 import { Socket } from 'socket.io'
 import { any, boolean, object, string, Struct } from 'superstruct'
 import {
@@ -9,8 +9,7 @@ import {
 } from '../lib/module.js'
 
 const debug = createDebug('cr:deconf:metrics-broker')
-
-type Context = AppContext
+const METRICS_ROOM = 'metrics_analisis'
 
 const eventStructs = new Map<string, Struct<any>>()
 eventStructs.set(
@@ -73,9 +72,13 @@ eventStructs.set(
   })
 )
 
+type Context = AppContext
+
 export class MetricsBroker implements AppBroker {
   #sockets: MetricsSockets
+  #context: Context
   constructor(context: Context) {
+    this.#context = context
     this.#sockets = new MetricsSockets({
       ...context,
       eventStructs,
@@ -94,6 +97,12 @@ export class MetricsBroker implements AppBroker {
       handleErrors(async (eventName, payload) => {
         debug('trackMetric socket=%o event=%o', socket.id, eventName)
         await this.#sockets.event(socket.id, eventName, payload)
+
+        this.#context.sockets.emitTo(METRICS_ROOM, 'liveEvent', {
+          created: new Date(),
+          eventName,
+          payload,
+        })
       })
     )
 
@@ -102,6 +111,34 @@ export class MetricsBroker implements AppBroker {
       handleErrors(async (error) => {
         debug('trackError socket=%o', socket.id)
         await this.#sockets.error(socket.id, error)
+
+        this.#context.sockets.emitTo(METRICS_ROOM, 'liveError', error)
+      })
+    )
+
+    socket.on(
+      'startAnalyse',
+      handleErrors(async () => {
+        debug('startAnalyse socket=%o', socket.id)
+        const { authToken } = await this.#context.jwt.getSocketAuth(socket.id)
+        if (!authToken.user_roles.includes('admin')) {
+          throw ApiError.unauthorized()
+        }
+
+        this.#context.sockets.joinRoom(socket.id, METRICS_ROOM)
+      })
+    )
+
+    socket.on(
+      'stopAnalyse',
+      handleErrors(async () => {
+        debug('stopAnalyse socket=%o', socket.id)
+        const { authToken } = await this.#context.jwt.getSocketAuth(socket.id)
+        if (!authToken.user_roles.includes('admin')) {
+          throw ApiError.unauthorized()
+        }
+
+        this.#context.sockets.leaveRoom(socket.id, METRICS_ROOM)
       })
     )
   }

@@ -10,7 +10,6 @@ import {
   InterpreterRepository,
   JwtService,
   loadResources,
-  MetricsRepository,
   PostgresService,
   RegistrationRepository,
   ResourcesMap,
@@ -30,6 +29,7 @@ import {
   UrlService,
 } from '../lib/module.js'
 import { createServer } from '../server.js'
+import { MetricsRepository } from '../metrics/metrics-repository.js'
 
 const debug = createDebug('cr:cmd:serve')
 

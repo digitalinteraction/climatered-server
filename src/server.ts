@@ -34,6 +34,7 @@ import { InterpreterBroker } from './deconf/interpreter-broker.js'
 import { MetricsBroker } from './deconf/metrics-broker.js'
 import { ContentRouter } from './content/content-router.js'
 import { GeneralRouter } from './general/general-router.js'
+import { MetricsRouter } from './metrics/metrics-router.js'
 
 const debug = createDebug('cr:server')
 
@@ -127,6 +128,7 @@ export async function createServer(context: AppContext) {
     new ConferenceRouter(context),
     new RegistrationRouter(context),
     new ContentRouter(context),
+    new MetricsRouter(context),
   ]
 
   const appBrokers: AppBroker[] = [
