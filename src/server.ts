@@ -5,7 +5,7 @@ import KoaRouter from '@koa/router'
 import koaCors from '@koa/cors'
 import koaJson from 'koa-json'
 import koaBodyParser from 'koa-bodyparser'
-import koaHelment from 'koa-helmet'
+import koaHelmet from 'koa-helmet'
 
 import { Server as SocketIoServer, Socket } from 'socket.io'
 import { createAdapter as socketIoRedisAdapter } from '@socket.io/redis-adapter'
@@ -143,7 +143,7 @@ export async function createServer(context: AppContext) {
   }
 
   const app = new Koa()
-    .use(koaHelment())
+    .use(koaHelmet())
     .use(koaCors({ origin: context.env.CLIENT_URL }))
     .use(koaJson())
     .use(koaBodyParser())
