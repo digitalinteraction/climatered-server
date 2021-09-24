@@ -29,6 +29,11 @@ export class UrlService implements Readonly<DeconfUrlService> {
     return url
   }
 
+  getClientErrorLink(errorCode?: string) {
+    const path = errorCode ? `/error/${errorCode}` : '/error'
+    return new URL(path, this.#env.CLIENT_URL)
+  }
+
   getServerLoginLink(token: string): URL {
     return new URL(`auth/login/${token}`, this.#env.SELF_URL)
   }

@@ -1,5 +1,6 @@
 import KoaRouter from '@koa/router'
 import {
+  ApiError,
   RegistrationMailer,
   RegistrationRoutes,
   validateStruct,
@@ -81,9 +82,23 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
       'registration.finishRegister',
       '/auth/register/:token',
       async (ctx) => {
-        const { token } = validateStruct(ctx.params, TokenStruct)
-        const url = await this.#routes.finishRegister(token)
-        ctx.redirect(url.toString())
+        try {
+          const { token } = validateStruct(ctx.params, TokenStruct)
+          const url = await this.#routes.finishRegister(token)
+          ctx.redirect(url.toString())
+        } catch (error) {
+          let code: string | undefined = undefined
+          console.log(error)
+
+          if (
+            error instanceof ApiError &&
+            error.codes.includes('registration.alreadyVerified')
+          ) {
+            code = 'already_verified'
+          }
+
+          ctx.redirect(this.#url.getClientErrorLink(code).toString())
+        }
       }
     )
 
@@ -132,6 +147,26 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
           'email.verify.action'
         ),
         url: this.#url.getServerVerifyLink(token).toString(),
+      }
+    )
+  }
+  async sendAlreadyRegisteredEmail(
+    registration: Registration,
+    authToken: string
+  ): Promise<void> {
+    this.#email.sendTransactional(
+      registration.email,
+      this.#i18n.translate(registration.language, 'email.userExists.subject'),
+      {
+        body: this.#i18n.translate(
+          registration.language,
+          'email.userExists.body'
+        ),
+        action: this.#i18n.translate(
+          registration.language,
+          'email.userExists.action'
+        ),
+        url: this.#url.getClientLoginLink(authToken),
       }
     )
   }
