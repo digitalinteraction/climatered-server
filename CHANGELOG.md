@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0-beta.2](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.1...v3.0.0-beta.2) (2021-09-24)
+
+### Features
+
+- **metrics:** add metrics admin-only route ([c3f725a](https://github.com/digitalinteraction/climatered-server/commit/c3f725a91abe1fbb74ed1528debf7a4ada9f7502))
+- redirect verification errors to the client and send "already verified" emails ([24ecd45](https://github.com/digitalinteraction/climatered-server/commit/24ecd4516cc1a3ff7b7910f76680c34d2ba8a5a9))
+
 ## [3.0.0-beta.1](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.0...v3.0.0-beta.1) (2021-09-22)
 
 ### Features
