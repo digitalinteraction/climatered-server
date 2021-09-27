@@ -3,8 +3,11 @@ import fs from 'fs/promises'
 import cp from 'child_process'
 import { promisify } from 'util'
 
-import { assert as assertStruct } from 'superstruct'
-import { ConferenceConfigStruct } from '@openlab/deconf-api-toolkit'
+import { array, assert as assertStruct } from 'superstruct'
+import {
+  ConferenceConfigStruct,
+  InterpreterStruct,
+} from '@openlab/deconf-api-toolkit'
 
 import { remark } from 'remark'
 import remarkHtml from 'remark-html'
@@ -71,12 +74,18 @@ export async function fetchContentCommand(options: FetchContentCommandOptions) {
     // Get and validate settings
     const settings = await validateSettings(repoDir)
 
+    // Get and validate interpreters
+    const interpreters = await validateInterpreters(repoDir)
+
     // Get and validate page content
     const content = contentInterator(repoDir, CONTENT_KEYS)
     await content.next()
 
     // Put settings into redis
     await redis.put('schedule.settings', settings)
+
+    // Put interpreters into redis
+    await redis.put('schedule.interpreters', interpreters)
 
     // Put content into redis
     await content.next(redis)
@@ -96,8 +105,8 @@ export async function fetchContentCommand(options: FetchContentCommandOptions) {
 // Helpers
 //
 
-async function validateSettings(tmpdir: string) {
-  const file = path.join(tmpdir, 'content/settings.json')
+async function validateSettings(repoDir: string) {
+  const file = path.join(repoDir, 'content/settings.json')
   try {
     debug('checking settings %o', file)
     const settings = JSON.parse(await fs.readFile(file, 'utf8'))
@@ -109,6 +118,22 @@ async function validateSettings(tmpdir: string) {
     return settings
   } catch (error) {
     console.error('Error with settings.json')
+    console.error(error)
+    throw error
+  }
+}
+
+async function validateInterpreters(repoDir: string) {
+  const file = path.join(repoDir, 'content/interpreters.json')
+  try {
+    debug('checking interpreters %o', file)
+    const interpreters = JSON.parse(await fs.readFile(file, 'utf8'))
+
+    assertStruct(interpreters, array(InterpreterStruct))
+
+    return interpreters
+  } catch (error) {
+    console.error('Error with interpreters.json')
     console.error(error)
     throw error
   }
