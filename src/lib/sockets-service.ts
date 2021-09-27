@@ -31,7 +31,7 @@ export class SocketService implements Readonly<DeconfSocketService> {
 
   emitTo(roomNameOrId: string, eventName: string, ...args: unknown[]): void {
     debug('emitTo to=%o event=%o', roomNameOrId, eventName)
-    this.#io.to(roomNameOrId).emit(eventName, ...args)
+    this.#io.in(roomNameOrId).emit(eventName, ...args)
   }
 
   joinRoom(socketId: string, roomName: string): void {
