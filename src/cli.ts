@@ -101,7 +101,8 @@ cli.command(
   (yargs) =>
     yargs
       .positional('directory', { type: 'string', demandOption: true })
-      .positional('outfile', { type: 'string', demandOption: true }),
+      .positional('outfile', { type: 'string', demandOption: true })
+      .option('sampleRate', { type: 'number', default: 16000 }),
   async (args) => rebuildAudioCommand(args).catch(errorHandler)
 )
 

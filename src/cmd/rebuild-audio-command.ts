@@ -9,11 +9,13 @@ const debug = createDebug('cr:cmd:rebuild-audio')
 export interface RebuildAudioCommandOptions {
   directory: string
   outfile: string
+  sampleRate: number
 }
 
 export async function rebuildAudioCommand({
   directory,
   outfile,
+  sampleRate,
 }: RebuildAudioCommandOptions) {
   debug('start')
   const resolve = (file: string) => path.join(process.cwd(), directory, file)
@@ -36,7 +38,7 @@ export async function rebuildAudioCommand({
 
   buffers.unshift(
     waveheader(totalLength * 8, {
-      sampleRate: 16000,
+      sampleRate,
       bitDepth: 16,
     })
   )
