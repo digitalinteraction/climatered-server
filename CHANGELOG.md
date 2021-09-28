@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0-beta.3](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.2...v3.0.0-beta.3) (2021-09-28)
+
+### Features
+
+- add sampleRate option to rebuild-audio command ([e004858](https://github.com/digitalinteraction/climatered-server/commit/e0048586572530ef9eec3676957797073cb28e0b))
+- pull interpreters from content repo ([65a7f92](https://github.com/digitalinteraction/climatered-server/commit/65a7f92572787fc5e3846ec92a3a3746adf5d66f))
+
+### Bug Fixes
+
+- add debug to InterpreterBroker ([c1460f5](https://github.com/digitalinteraction/climatered-server/commit/c1460f530e1282932a93941cc37a0f75c83e6fb2))
+- increase sockets reliability ([36c29fe](https://github.com/digitalinteraction/climatered-server/commit/36c29fea1b3cf8aba5848ec97544d89c5e074ee9))
+
 ## [3.0.0-beta.2](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.1...v3.0.0-beta.2) (2021-09-24)
 
 ### Features
