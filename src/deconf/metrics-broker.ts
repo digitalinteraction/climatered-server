@@ -125,7 +125,7 @@ export class MetricsBroker implements AppBroker {
           throw ApiError.unauthorized()
         }
 
-        this.#context.sockets.joinRoom(socket.id, METRICS_ROOM)
+        await this.#context.sockets.joinRoom(socket.id, METRICS_ROOM)
       })
     )
 
@@ -138,7 +138,7 @@ export class MetricsBroker implements AppBroker {
           throw ApiError.unauthorized()
         }
 
-        this.#context.sockets.leaveRoom(socket.id, METRICS_ROOM)
+        await this.#context.sockets.leaveRoom(socket.id, METRICS_ROOM)
       })
     )
   }

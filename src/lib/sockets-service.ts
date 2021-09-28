@@ -34,14 +34,26 @@ export class SocketService implements Readonly<DeconfSocketService> {
     this.#io.in(roomNameOrId).emit(eventName, ...args)
   }
 
-  joinRoom(socketId: string, roomName: string): void {
+  async joinRoom(socketId: string, roomName: string): Promise<void> {
     debug('joinRoom socket=%o room=%o', socketId, roomName)
-    this.#io.in(socketId).socketsJoin(roomName)
+
+    const socket = this.#io.of('/').sockets.get(socketId)
+    if (socket) {
+      socket.join(roomName)
+    } else {
+      this.#io.in(socketId).socketsJoin(roomName)
+    }
   }
 
-  leaveRoom(socketId: string, roomName: string): void {
+  async leaveRoom(socketId: string, roomName: string): Promise<void> {
     debug('leaveRoom socket=%o room=%o', socketId, roomName)
-    this.#io.in(socketId).socketsLeave(roomName)
+
+    const socket = this.#io.of('/').sockets.get(socketId)
+    if (socket) {
+      socket.leave(roomName)
+    } else {
+      this.#io.in(socketId).socketsLeave(roomName)
+    }
   }
 
   async getRoomsOfSocket(socketId: string): Promise<Set<string>> {
