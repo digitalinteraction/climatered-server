@@ -12,6 +12,7 @@ import { fakeScheduleCommand } from './cmd/fake-schedule-command.js'
 import { fetchContentCommand } from './cmd/fetch-content-command.js'
 import { geocodeCommand } from './cmd/geocode-command.js'
 import { hackCommand, allHackCommands } from './cmd/hack-command.js'
+import { logVisitorsCommand } from './cmd/log-visitors-command.js'
 import { migrateCommand } from './cmd/migrate-command.js'
 import { rebuildAudioCommand } from './cmd/rebuild-audio-command.js'
 import {
@@ -143,6 +144,13 @@ cli.command(
         describe: 'A previously checked out repo to re-use',
       }),
   (args) => fetchContentCommand(args).catch(errorHandler)
+)
+
+cli.command(
+  'log-visitors',
+  'Get the current number of site visitors and log it as a metric',
+  (yargs) => yargs,
+  (args) => logVisitorsCommand(args).catch(errorHandler)
 )
 
 // Execute the CLI
