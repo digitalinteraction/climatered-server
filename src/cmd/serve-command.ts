@@ -19,6 +19,7 @@ import Yaml from 'yaml'
 
 import {
   AppContext,
+  closeRedisAdapter,
   createDebug,
   createEnv,
   EmailService,
@@ -117,7 +118,7 @@ export async function serveCommand(options: ServeCommandOptions) {
   }
 
   debug('Creating server')
-  const { server } = await createServer(context)
+  const { server, io } = await createServer(context)
   server.listen(options.port, () => {
     debug('Listening on 0.0.0.0:%d', options.port)
   })
@@ -139,6 +140,7 @@ export async function serveCommand(options: ServeCommandOptions) {
       debug('onSignal')
       await store.close()
       await postgres.close()
+      closeRedisAdapter(io.of('/').adapter)
     },
   })
 }
