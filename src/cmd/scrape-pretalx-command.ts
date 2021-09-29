@@ -60,7 +60,10 @@ export async function scrapePretalxCommand(
   const { pretalx, store, config, semaphore } = await setup()
   const { getSessions, getThemes, getTypes } = getHelpers(pretalx, config)
 
-  await semaphore.aquire(SCRAPE_LOCK_KEY, SCRAPE_MAX_LOCK)
+  const hasLock = await semaphore.aquire(SCRAPE_LOCK_KEY, SCRAPE_MAX_LOCK)
+  if (!hasLock) {
+    throw new Error(`Failed to aquire lock "${SCRAPE_LOCK_KEY}"`)
+  }
 
   try {
     const submissions = await pretalx.getSubmissions()
