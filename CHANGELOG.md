@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0-beta.4](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.3...v3.0.0-beta.4) (2021-09-29)
+
+### Features
+
+- add command to read the live site visitors from socket.io and log it as a metric ([d251f3b](https://github.com/digitalinteraction/climatered-server/commit/d251f3bd0ff3bc67395ff3f993693250dcec412b))
+- fetch interpret-help content ([08b39ff](https://github.com/digitalinteraction/climatered-server/commit/08b39ffc2d3fa98e719770c636539a0fafe934e0))
+
+### Bug Fixes
+
+- **pretalx:** command now fails if it fails to aquire a semaphore lock ([2f5554a](https://github.com/digitalinteraction/climatered-server/commit/2f5554a4ac9a56a8aa77738bdb64292e80b75430))
+- server closes more smoothly by disconnecting from socket.io's redis clients ([658ebab](https://github.com/digitalinteraction/climatered-server/commit/658ebab33b2624029f49434961f729ad31efe859))
+
 ## [3.0.0-beta.3](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.2...v3.0.0-beta.3) (2021-09-28)
 
 ### Features
