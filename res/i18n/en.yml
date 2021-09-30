@@ -23,5 +23,4 @@ email:
     subject: Planet:Red login
     body: |
       Please click on the button below or open it in your browser to log in.
-
     action: Log in

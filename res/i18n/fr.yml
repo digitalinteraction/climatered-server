@@ -11,11 +11,13 @@ email:
     body: |
       Quelqu’un a essayé de se connecter avec ton adresse email. Si c’était toi, tu peux te connecter grâce le lien ci-dessous
     action: Connection
-  pleaseVerify:
+
+  verify:
     subject: Terminer ton inscription Planet:Red
     body: |
       Merci pour ton inscription à Planet:Red! Tu y es presque! Nous devons juste vérifier ton adresse email. Pour ce faire, merci de cliquer sur le lien ci-dessous.
     action: Confirmer mon email
+
   login:
     subject: Connection à Planet:Red
     body: |

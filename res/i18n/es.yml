@@ -11,11 +11,13 @@ email:
     body: |
       Alguien intentó conectarse con tu electrónico. Si fuiste tu, te puedes conectar con el enlace más abajo.
     action: Connexión
-  pleaseVerify:
+
+  verify:
     subject: Terminar tu inscripción Planet:Red
     body: |
       ¡Gracias por registrarte en Planet:Red! Estás a un paso de terminar, necesitamos confirmar tu correo electrónico. Para ese fin, favor de hacer clic en el enlace más abajo.
     action: Confirmer mi correo electrónico
+
   login:
     subject: Conexión a Planet:Red
     body: |
