@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0-beta.5](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.4...v3.0.0-beta.5) (2021-09-30)
+
+### Features
+
+- add new "contact" content ([a1ba42f](https://github.com/digitalinteraction/climatered-server/commit/a1ba42f5ffde5591ddc6a53f265c548aa7f1c392))
+
+### Bug Fixes
+
+- **login:** no longer emits errors ([1e2a44e](https://github.com/digitalinteraction/climatered-server/commit/1e2a44e065245c79c6a8ba72ff3e009fe01b3dee))
+- update email copy and split out ([db42ca6](https://github.com/digitalinteraction/climatered-server/commit/db42ca67b89ce8cdbcd441ea6b37e54a87b779d9))
+
 ## [3.0.0-beta.4](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.3...v3.0.0-beta.4) (2021-09-29)
 
 ### Features
