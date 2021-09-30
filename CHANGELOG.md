@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.0.1](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0...v3.0.1) (2021-09-30)
+
+### Bug Fixes
+
+- fix verification email i18n ([4bb85b2](https://github.com/digitalinteraction/climatered-server/commit/4bb85b2c17eed400ef504775edadf39bced22fbb))
+
 ## [3.0.0](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.5...v3.0.0) (2021-09-30)
 
 ## [3.0.0-beta.5](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0-beta.4...v3.0.0-beta.5) (2021-09-30)
