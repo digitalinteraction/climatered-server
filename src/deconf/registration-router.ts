@@ -4,6 +4,7 @@ import {
   RegistrationMailer,
   RegistrationRoutes,
   validateStruct,
+  VOID_RESPONSE,
 } from '@openlab/deconf-api-toolkit'
 import { Registration } from '@openlab/deconf-shared'
 import { AppContext, AppRouter } from '../lib/module.js'
@@ -61,7 +62,9 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
     })
 
     router.post('registration.startLogin', '/auth/login', async (ctx) => {
-      ctx.body = await this.#routes.startEmailLogin(ctx.request.body)
+      ctx.body = await this.#routes
+        .startEmailLogin(ctx.request.body)
+        .catch((error) => VOID_RESPONSE)
     })
 
     router.get(
