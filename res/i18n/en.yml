@@ -3,35 +3,25 @@ test:
   substituted: Hello, {{ name }}!
 
 email:
+  general:
+    greeting: Hi,
+    signature: Thanks, the Planet:Red team
+
   userExists:
     subject: Your Planet:Red registration
     body: |
-      Hi,
-
       Someone tried to register with your email address. If this was you, you can login at the link below.
-
-      Thanks, the Planet:Red team
-
     action: Log in
 
   verify:
     subject: Complete your Planet:Red registration
     body: |
-      Hi,
-
       Thanks for signing up for Planet:Red! You're almost there, we just need to verify your email address. To do this please click the link below.
-
-      Thanks, the Planet:Red team
-
     action: Verify my email
 
   login:
     subject: Planet:Red login
     body: |
-      Hi,
-
-      Here is your Planet:Red login code, to log in click the link below or open it in your browser.
-
-      Thanks, the Planet:Red team
+      Please click on the button below or open it in your browser to log in.
 
     action: Log in

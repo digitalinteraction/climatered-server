@@ -118,21 +118,17 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
     registration: Registration,
     token: string
   ): Promise<void> {
-    console.log(
-      'TODO: sendLoginEmail email=%o token=%o',
-      registration.email,
-      token
-    )
+    const t = (k: string) => this.#i18n.translate(registration.language, k)
+
     this.#email.sendTransactional(
       registration.email,
-      this.#i18n.translate(registration.language, 'email.login.subject'),
+      t('email.login.subject'),
       {
-        body: this.#i18n.translate(registration.language, 'email.login.body'),
-        action: this.#i18n.translate(
-          registration.language,
-          'email.login.action'
-        ),
+        body: t('email.login.body'),
+        action: t('email.login.action'),
         url: this.#url.getServerLoginLink(token).toString(),
+        greeting: t('email.general.greeting'),
+        signature: t('email.general.signature'),
       }
     )
   }
@@ -140,16 +136,17 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
     registration: Registration,
     token: string
   ): Promise<void> {
+    const t = (k: string) => this.#i18n.translate(registration.language, k)
+
     this.#email.sendTransactional(
       registration.email,
-      this.#i18n.translate(registration.language, 'email.verify.subject'),
+      t('email.verify.subject'),
       {
-        body: this.#i18n.translate(registration.language, 'email.verify.body'),
-        action: this.#i18n.translate(
-          registration.language,
-          'email.verify.action'
-        ),
+        body: t('email.verify.body'),
+        action: t('email.verify.action'),
         url: this.#url.getServerVerifyLink(token).toString(),
+        greeting: t('email.general.greeting'),
+        signature: t('email.general.signature'),
       }
     )
   }
@@ -157,19 +154,17 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
     registration: Registration,
     authToken: string
   ): Promise<void> {
+    const t = (k: string) => this.#i18n.translate(registration.language, k)
+
     this.#email.sendTransactional(
       registration.email,
-      this.#i18n.translate(registration.language, 'email.userExists.subject'),
+      t('email.userExists.subject'),
       {
-        body: this.#i18n.translate(
-          registration.language,
-          'email.userExists.body'
-        ),
-        action: this.#i18n.translate(
-          registration.language,
-          'email.userExists.action'
-        ),
+        body: t('email.userExists.body'),
+        action: t('email.userExists.action'),
         url: this.#url.getClientLoginLink(authToken),
+        greeting: t('email.general.greeting'),
+        signature: t('email.general.signature'),
       }
     )
   }
