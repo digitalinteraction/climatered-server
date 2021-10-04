@@ -27,5 +27,17 @@ export class MetricsRouter implements AppRouter {
         })),
       }
     })
+
+    router.get('metrics.attendees', '/metrics/attendees', async (ctx) => {
+      const authToken = this.#context.jwt.getRequestAuth(ctx.request.headers)
+
+      if (!authToken || !authToken.user_roles.includes('admin')) {
+        throw ApiError.unauthorized()
+      }
+
+      ctx.body = {
+        attendees: await this.#context.metricsRepo.getAttendeeCounts(),
+      }
+    })
   }
 }

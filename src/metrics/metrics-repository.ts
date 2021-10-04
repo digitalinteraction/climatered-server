@@ -12,6 +12,11 @@ export interface MetricsRecord {
   data: unknown
 }
 
+export interface AttendeeCount {
+  verified: boolean
+  count: number
+}
+
 type Context = Pick<DeconfBaseContext, 'postgres'>
 
 export class MetricsRepository extends DeconfMetricsRepository {
@@ -32,5 +37,16 @@ export class MetricsRepository extends DeconfMetricsRepository {
         FROM logs;
       `
     })
+  }
+
+  getAttendeeCounts(): Promise<AttendeeCount[]> {
+    return this.#postgres.run(
+      (client) =>
+        client.sql`
+        SELECT verified, count(DISTINCT email) as count
+        FROM attendees
+        GROUP BY verified;
+      `
+    )
   }
 }
