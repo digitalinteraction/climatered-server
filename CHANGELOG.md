@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/digitalinteraction/climatered-server/compare/v3.0.1...v3.1.0) (2021-10-05)
+
+### Features
+
+- add endpoint to query verified attendes ([58e2a4d](https://github.com/digitalinteraction/climatered-server/commit/58e2a4dfa7feed0cdb925f128a0bc31f04dc2a95))
+
 ### [3.0.1](https://github.com/digitalinteraction/climatered-server/compare/v3.0.0...v3.0.1) (2021-09-30)
 
 ### Bug Fixes
