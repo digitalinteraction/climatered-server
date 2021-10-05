@@ -49,4 +49,13 @@ export class MetricsRepository extends DeconfMetricsRepository {
       `
     )
   }
+
+  getAttendance(): Promise<unknown> {
+    return this.#postgres.run(
+      (client) => client.sql`
+        SELECT session, COUNT(*) FROM attendance
+        GROUP BY session;
+      `
+    )
+  }
 }

@@ -39,5 +39,17 @@ export class MetricsRouter implements AppRouter {
         attendees: await this.#context.metricsRepo.getAttendeeCounts(),
       }
     })
+
+    router.get('metrics.attendance', '/metrics/attendance', async (ctx) => {
+      const authToken = this.#context.jwt.getRequestAuth(ctx.request.headers)
+
+      if (!authToken || !authToken.user_roles.includes('admin')) {
+        throw ApiError.unauthorized()
+      }
+
+      ctx.body = {
+        attendance: await this.#context.metricsRepo.getAttendance(),
+      }
+    })
   }
 }
