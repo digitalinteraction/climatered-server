@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.0](https://github.com/digitalinteraction/climatered-server/compare/v3.2.0...v3.3.0) (2021-10-07)
+
+### Features
+
+- pull through session organisation. Requires new config json fields ([cf4b6ee](https://github.com/digitalinteraction/climatered-server/commit/cf4b6ee63f59435be109e7908dedbfe3e88dae01))
+
 ## [3.2.0](https://github.com/digitalinteraction/climatered-server/compare/v3.1.0...v3.2.0) (2021-10-05)
 
 ### Features
