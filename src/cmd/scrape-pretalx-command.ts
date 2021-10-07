@@ -10,6 +10,7 @@ import {
   loadConfig,
   PretalxQuestion,
   PretalxService,
+  PretalxSpeaker,
   PretalxTalk,
   SemaphoreService,
 } from '@openlab/deconf-api-toolkit'
@@ -72,8 +73,10 @@ export async function scrapePretalxCommand(
     const speakers = await pretalx.getSpeakers()
     const questions = await pretalx.getQuestions()
 
+    const speakerMap = new Map(speakers.map((s) => [s.code, s]))
+
     const schedule: Omit<ScheduleRecord, 'settings'> = {
-      sessions: getSessions(submissions),
+      sessions: getSessions(submissions, speakerMap),
       slots: pretalx.getDeconfSlots(talks),
       speakers: pretalx.getDeconfSpeakers(
         speakers,
@@ -133,7 +136,39 @@ function getHelpers(pretalx: PretalxService, config: PretalxConfig) {
     return fallback
   }
 
-  function getSessions(submissions: PretalxTalk[]): Session[] {
+  function getSessionHost(
+    talk: PretalxTalk,
+    speakers: Map<string, PretalxSpeaker>
+  ): Localised {
+    // If there is an answer to the session host question, use that
+    const hostOrg = pretalx.findAnswer(
+      config.questions.sessionOrganisation,
+      talk.answers
+    )
+    if (hostOrg) return { en: hostOrg }
+
+    // Try to combine speaker's organisations
+    const speakerHosts = new Map<string, string>()
+    for (const inlineSpeaker of talk.speakers) {
+      const speaker = speakers.get(inlineSpeaker.code)
+      if (!speaker) continue
+      const answer = speaker.answers.find(
+        (a) => a.question.id === config.questions.speakerOrganisation
+      )
+      if (!answer) continue
+
+      speakerHosts.set(pretalx.getSlug(answer.answer), answer.answer)
+    }
+
+    return {
+      en: Array.from(speakerHosts.values()).join('/'),
+    }
+  }
+
+  function getSessions(
+    submissions: PretalxTalk[],
+    speakers: Map<string, PretalxSpeaker>
+  ): Session[] {
     return submissions.map((submission) => {
       const type = getIdFromTitle(submission.submission_type, 'unknown')
 
@@ -172,7 +207,7 @@ function getHelpers(pretalx: PretalxService, config: PretalxConfig) {
           config.questions.interpretation
         ),
         speakers: submission.speakers.map((s) => s.code),
-        hostOrganisation: {},
+        hostOrganisation: getSessionHost(submission, speakers),
         isRecorded: getBoolean(submission, config.questions.recorded),
         isOfficial: false,
         isFeatured: submission.is_featured,

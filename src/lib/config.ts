@@ -52,6 +52,8 @@ export const PretalxConfigStruct = object({
     languages: number(),
     recorded: number(),
     speakerAffiliation: number(),
+    sessionOrganisation: number(),
+    speakerOrganisation: number(),
   }),
   languages: record(string(), optional(string())),
   types: array(
