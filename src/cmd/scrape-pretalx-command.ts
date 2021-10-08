@@ -41,12 +41,11 @@ async function setup() {
   const appConfig = await loadConfig('app-config.json', AppConfigStruct)
   const config = appConfig.pretalx
   const store = new RedisService(env.REDIS_URL)
-  const locales: any[] = [] // TODO: tbr
-  const pretalx = new PretalxService({ env, store, config, locales })
+  const pretalx = new PretalxService({ env, store, config })
 
   const semaphore = new SemaphoreService({ store })
 
-  return { env, config, store, locales, pretalx, semaphore }
+  return { env, config, store, pretalx, semaphore }
 }
 
 //
@@ -59,7 +58,7 @@ export async function scrapePretalxCommand(
   debug('start')
 
   const { pretalx, store, config, semaphore } = await setup()
-  const { getSessions, getThemes, getTypes } = getHelpers(pretalx, config)
+  const { getSessions, getThemes } = getHelpers(pretalx, config)
 
   const hasLock = await semaphore.aquire(SCRAPE_LOCK_KEY, SCRAPE_MAX_LOCK)
   if (!hasLock) {
@@ -69,7 +68,6 @@ export async function scrapePretalxCommand(
   try {
     const submissions = await pretalx.getSubmissions()
     const talks = await pretalx.getTalks()
-    const event = await pretalx.getEvent()
     const speakers = await pretalx.getSpeakers()
     const questions = await pretalx.getQuestions()
 
@@ -84,7 +82,7 @@ export async function scrapePretalxCommand(
       ),
       themes: getThemes(questions),
       tracks: [],
-      types: getTypes(),
+      types: config.types as SessionType[],
     }
 
     for (const [key, value] of Object.entries(schedule)) {
@@ -122,20 +120,8 @@ export const pretalxDataCommands: Record<
 //
 // Helpers
 //
+
 function getHelpers(pretalx: PretalxService, config: PretalxConfig) {
-  function getTypes() {
-    return config.types as SessionType[]
-  }
-
-  // TODO: migrate fix back to deconf
-  function getIdFromTitle(localised: Localised | null, fallback: string) {
-    if (!localised) return fallback
-    for (const key of config.englishKeys) {
-      if (localised[key]) return pretalx.getSlug(localised[key] as string)
-    }
-    return fallback
-  }
-
   function getSessionHost(
     talk: PretalxTalk,
     speakers: Map<string, PretalxSpeaker>
@@ -170,13 +156,13 @@ function getHelpers(pretalx: PretalxService, config: PretalxConfig) {
     speakers: Map<string, PretalxSpeaker>
   ): Session[] {
     return submissions.map((submission) => {
-      const type = getIdFromTitle(submission.submission_type, 'unknown')
+      const type = pretalx.getIdFromTitle(submission.submission_type, 'unknown')
 
       const slot = submission.slot
         ? pretalx.getSlotId(submission.slot)
         : undefined
 
-      const track = getIdFromTitle(submission.track, 'unknown')
+      const track = pretalx.getIdFromTitle(submission.track, 'unknown')
 
       const themesAnswer = submission.answers.find(
         (a) => a.question.id === config.questions.theme
@@ -274,6 +260,12 @@ function getHelpers(pretalx: PretalxService, config: PretalxConfig) {
   }
 
   function getSessionLinks(submission: PretalxTalk): LocalisedLink[] {
+    const resourceLinks: LocalisedLink[] = submission.resources.map((r) => ({
+      type: 'any',
+      title: r.description,
+      url: `https://pretalx.com${r.resource}`,
+      language: 'en',
+    }))
     return [
       ...pretalx.getSessionLinks(submission, config.questions.links.en),
       ...pretalx
@@ -285,6 +277,7 @@ function getHelpers(pretalx: PretalxService, config: PretalxConfig) {
       ...pretalx
         .getSessionLinks(submission, config.questions.links.ar)
         .map((l) => ({ ...l, language: 'ar' })),
+      ...resourceLinks,
     ]
   }
 
@@ -295,7 +288,6 @@ function getHelpers(pretalx: PretalxService, config: PretalxConfig) {
   }
 
   return {
-    getTypes,
     getThemes,
     getSessions,
     getSessionLanguages,
