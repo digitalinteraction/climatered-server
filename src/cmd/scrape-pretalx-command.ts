@@ -206,6 +206,12 @@ function getHelpers(pretalx: PretalxService, config: PretalxConfig) {
 
         proxyUrl: undefined,
         hideFromSchedule: false,
+
+        // TODO: move this field to the deconf types
+        contactEmail: pretalx.findAnswer(
+          config.questions.contactEmail,
+          submission.answers
+        ),
       }
     })
   }
