@@ -87,6 +87,7 @@ export class ConferenceRouter implements AppRouter {
       const errors = await this.#routes.lintSessions()
 
       const errorHtml = errors
+        .filter((err) => err.messages.length > 0 && err.title !== 'Bad track')
         .map(
           (error) => dedent`
           <h2> ${error.title} </h2>
