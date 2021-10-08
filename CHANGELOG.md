@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.3.1](https://github.com/digitalinteraction/climatered-server/compare/v3.3.0...v3.3.1) (2021-10-08)
+
+### Bug Fixes
+
+- don't show empty lint messages ([89c9903](https://github.com/digitalinteraction/climatered-server/commit/89c99033e552b4f23113b8727ce6e5c520e1e686))
+- **pretalx:** improved url detection, pull resources into links ([13c38af](https://github.com/digitalinteraction/climatered-server/commit/13c38af81afe220cb570af773a4c62fd87e896c8))
+
 ## [3.3.0](https://github.com/digitalinteraction/climatered-server/compare/v3.2.0...v3.3.0) (2021-10-07)
 
 ### Features
