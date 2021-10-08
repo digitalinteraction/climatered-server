@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.4.0](https://github.com/digitalinteraction/climatered-server/compare/v3.3.1...v3.4.0) (2021-10-08)
+
+### Features
+
+- **pretalx:** add `contactEmail` to sessions. Requires new config field ([66099a4](https://github.com/digitalinteraction/climatered-server/commit/66099a416c1b70c7c0c9d470393412188d4e5c8a))
+
 ### [3.3.1](https://github.com/digitalinteraction/climatered-server/compare/v3.3.0...v3.3.1) (2021-10-08)
 
 ### Bug Fixes
