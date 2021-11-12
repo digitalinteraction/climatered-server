@@ -14,6 +14,7 @@ import {
   RegistrationRepository,
   ResourcesMap,
   SemaphoreService,
+  S3Service,
 } from '@openlab/deconf-api-toolkit'
 import Yaml from 'yaml'
 
@@ -25,7 +26,6 @@ import {
   EmailService,
   loadConfig,
   RedisService,
-  S3Service,
   SocketService,
   UrlService,
 } from '../lib/module.js'
