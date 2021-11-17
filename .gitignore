@@ -14,3 +14,4 @@ app-config.json
 content_*
 data/*.json
 output.wav
+.nova
