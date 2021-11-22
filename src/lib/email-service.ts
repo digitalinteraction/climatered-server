@@ -15,7 +15,6 @@ const TRACKING_SETTINGS = {
 
 type Context = Pick<AppContext, 'env' | 'config'>
 
-// TODO: migrate back to api-toolkit as SendgridEmailService
 export class EmailService implements Readonly<DeconfEmailService> {
   get #config() {
     return this.#context.config

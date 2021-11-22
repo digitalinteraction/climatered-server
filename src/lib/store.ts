@@ -5,10 +5,6 @@ import { KeyValueService } from '@openlab/deconf-api-toolkit'
 
 import { createRedisClient } from './redis.js'
 
-//
-// TODO: move to ./redis.ts ?
-//
-
 function promisifyRedis(client: RedisClient) {
   const get = promisify(client.get).bind(client)
   const set = promisify(client.set).bind(client)

@@ -161,7 +161,6 @@ export async function createServer(context: AppContext) {
     appBrokers.forEach((b) => b.socketConnected(socket, m))
 
     socket.on('disconnect', () => {
-      // TODO: potential uncaught promises here
       appBrokers.forEach((b) => b.socketDisconnected(socket))
     })
   })

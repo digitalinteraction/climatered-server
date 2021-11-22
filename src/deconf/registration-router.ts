@@ -15,7 +15,6 @@ const TokenStruct = object({
   token: string(),
 })
 
-// TODO: move somewhere better
 export interface UserData {
   marketing: boolean
 }
@@ -46,8 +45,6 @@ export class RegistrationRouter implements AppRouter, RegistrationMailer {
     this.#routes = new RegistrationRoutes({
       ...context,
       mailer: this,
-
-      // TODO: work out how to properly type this
       userDataStruct: UserDataStruct as any,
     })
   }
